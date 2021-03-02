@@ -1,0 +1,6 @@
+/phpunit.*
+/bin/.phpunit/
+.phpunit
+.phpunit.result.cache
+phpunit.xml
+/vendor/
