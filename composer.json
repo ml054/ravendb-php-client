@@ -4,6 +4,9 @@
   "type": "project",
   "require": {
     "php": "^8.0",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-http": "*",
     "symfony/http-client": "^5.2.3"
   },
   "autoload": {
