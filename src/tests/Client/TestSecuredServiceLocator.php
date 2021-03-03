@@ -2,6 +2,7 @@
 
 namespace RavenDB\Tests\Client;
 
+use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Http\URL;
 use RavenDB\Tests\Client\Driver\RavenServerLocator;
 use RavenDB\Tests\Client\Util\System;

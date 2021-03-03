@@ -140,6 +140,4 @@ abstract class DocumentStoreBase implements Closable
     public function getDocumentStore(string $database, ?bool $secured, ?int $waitIndexingTimeout)
     {
     }
-
-
 }

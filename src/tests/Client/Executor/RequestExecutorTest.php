@@ -33,5 +33,4 @@ class RequestExecutorTest extends RemoteTestBase
             $store->close();
         }
     }
-
 }

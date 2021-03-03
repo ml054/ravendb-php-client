@@ -110,5 +110,4 @@ class DocumentConventions
         }
         $this->_firstBroadcastAttemptTimeout = $firstBroadcastAttemptTimeout;
     }
-
 }

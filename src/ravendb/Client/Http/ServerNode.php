@@ -59,5 +59,4 @@ class ServerNode
             return false;
         }
     }
-
 }

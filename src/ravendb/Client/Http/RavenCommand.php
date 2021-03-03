@@ -123,6 +123,4 @@ abstract class RavenCommand
             throw new RuntimeException($e);
         }
     }
-
 }
-

@@ -50,5 +50,4 @@ class RavenServerLocator
     {
         throw new Exception(null);
     }
-
 }

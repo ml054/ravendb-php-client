@@ -52,6 +52,5 @@ class DocumentStore extends DocumentStoreBase
             return implode(',', $this->urls) . " (DB: " . $this->database . ")";
         }
         return implode(',', $this->urls);
-
     }
 }
