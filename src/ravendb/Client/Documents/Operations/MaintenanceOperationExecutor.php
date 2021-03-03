@@ -5,7 +5,7 @@ namespace RavenDB\Client\Documents\Operations;
 use RavenDB\Client\Documents\DocumentStore;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Http\RequestExecutor;
-use RavenDB\Tests\Client\Util\StringUtils;
+use RavenDB\Client\Util\StringUtils;
 
 class MaintenanceOperationExecutor
 {
@@ -14,15 +14,15 @@ class MaintenanceOperationExecutor
     private RequestExecutor $requestExecutor;
     private ServerOperationExecutor $serverOperationExecutor;
 
-    public function MaintenanceOperationExecutor(DocumentStore $store)
-    {
-        //TODO: $this(store, null);
-    }
-
     public function __construct(DocumentStore $store, string $databaseName)
     {
         $this->store = $store;
         // TODO: $this->databaseName = ObjectUtils.firstNonNull(databaseName, store.getDatabase());
+    }
+
+    public function MaintenanceOperationExecutor(DocumentStore $store)
+    {
+        //TODO: $this(store, null);
     }
 
     private function getRequestExecutor(): RequestExecutor

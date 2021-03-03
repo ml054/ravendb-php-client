@@ -3,8 +3,8 @@
 namespace RavenDB\Tests\Client\Driver;
 
 use Exception;
-use RavenDB\Tests\Client\Util\StringUtils;
-use RavenDB\Tests\Client\Util\System;
+use RavenDB\Client\Util\StringUtils;
+use RavenDB\Client\Util\System;
 
 class RavenServerLocator
 {

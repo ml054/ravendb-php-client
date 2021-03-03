@@ -3,7 +3,13 @@
 
 namespace RavenDB\Client\Documents\Operations;
 
+use RavenDB\Client\Documents\DocumentStore;
+
 class ServerOperationExecutor
 {
-    // TODO MIGRATION : SUB-CLASS EXTRACTED FROM : MaintenanceOperationExecutor
+    private String $_nodeTag;
+    private DocumentStore $_store;
+    private ClusterRequestExecutor $_requestExecutor;
+    private ClusterRequestExecutor $_initialRequestExecutor;
+
 }

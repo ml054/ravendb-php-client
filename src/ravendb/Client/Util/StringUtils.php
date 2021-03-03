@@ -1,6 +1,6 @@
 <?php
 
-namespace RavenDB\Tests\Client\Util;
+namespace RavenDB\Client\Util;
 
 final class StringUtils
 {

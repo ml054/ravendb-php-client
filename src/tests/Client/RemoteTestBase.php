@@ -16,8 +16,10 @@ class RemoteTestBase extends RavenTestDriver implements Closable
 
     private RavenServerLocator $locator;
     private RavenServerLocator $securedLocator;
+
     private static ?IDocumentStore $globalServer;
     private static ?Process $globalServerProcess; // TODO Class Process to implement
+
     private static ?IDocumentStore $globalSecuredServer;
     private static ?Process $globalSecuredServerProcess;
 

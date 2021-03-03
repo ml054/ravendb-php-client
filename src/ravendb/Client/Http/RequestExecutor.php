@@ -2,9 +2,12 @@
 
 namespace RavenDB\Client\Http;
 
+use http\Env\Request;
 use RavenDB\Client\Auth\AuthOptions;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStore;
+use RavenDB\Client\Documents\Operations\DatabaseHealthCheckOperation;
+use RavenDB\Client\Http\Logger\Log;
 use RavenDB\Client\Primitives\Closable;
 /**
  * TODO: SOME OBJECT RESOURCE TO IMPORT
@@ -14,20 +17,20 @@ class RequestExecutor implements Closable
 {
     private AuthOptions $authOptions;
     private string $_databaseName;
-    private Date $_lastReturnedResponse;
+    private object $_lastReturnedResponse; // TODO expecting a date object
     private DocumentConventions $conventions;
     private int $_defaultTimeout;
     private int $_secondBroadcastAttemptTimeout;
     private int $_firstBroadcastAttemptTimeout;
+    /// how to access
     private static DatabaseHealthCheckOperation $failureCheckOperation;
-    public static ?Consumer $requestPostProcessor = null;
+    public static string $requestPostProcessor; // TODO : Setting Consumer to string
     public static string $CLIENT_VERSION = "5.0.0";
     private Log $logger;
-    private HttpCache $cache;
-    public ThreadLocal $aggressiveCaching;
+   // private HttpCache $cache; TODO : IMPLEMENTATION PENDING ON GO
     protected NodeSelector $_nodeSelector;  // TODO: CHECK FOR IMPORT
     private static int $INITIAL_TOPOLOGY_ETAG = -2;
-    public static ?Consumer $configureHttpClient = null;
+    public static string $configureHttpClient;
     private CloseableHttpClient $_httpClient;
     protected float $clientConfigurationEtag;
 
@@ -42,31 +45,25 @@ class RequestExecutor implements Closable
 
     protected function __construct(string $databaseName, AuthOptions $authOptions, DocumentConventions $conventions, array $initialUrls)
     {
-        $cache = new HttpCache($conventions->getMaxHttpCacheSize());
         $this->_databaseName = $databaseName;
         $this->authOptions = $authOptions;
-        $this->_lastReturnedResponse = new Date();
+       // $this->_lastReturnedResponse = new Date();
         $this->conventions = $conventions->clone();
         $this->_defaultTimeout = $conventions->getRequestTimeout();
         $this->_secondBroadcastAttemptTimeout = $conventions->getSecondBroadcastAttemptTimeout();
         $this->_firstBroadcastAttemptTimeout = $conventions->getFirstBroadcastAttemptTimeout();
     }
 
-
-    public static function getFailureCheckOperation(): DatabaseHealthCheckOperation
+    // TODO: CHECK FOR IMPORT --- to migrate - static install : options : A trait with method
+    public function getFailureCheckOperation(): DatabaseHealthCheckOperation
     {
-        return self::$failureCheckOperation = new DatabaseHealthCheckOperation();  // TODO: CHECK FOR IMPORT --- to migrate - static install
+        return new DatabaseHealthCheckOperation();
     }
 
 
     private static function getLogger(): Log
     {
         //return LogFactory::getLog(RequestExecutor::class);  // TODO : Import a secure package for logging
-    }
-
-    public function getCache(): HttpCache   // TODO MIGRATION : wait on go for http cache
-    {
-        return $this->cache;
     }
 
     public function getTopology(): ?Topology
@@ -159,5 +156,16 @@ class RequestExecutor implements Closable
     public function setFirstBroadcastAttemptTimeout(int $firstBroadcastAttemptTimeout): void
     {
         $this->_firstBroadcastAttemptTimeout = $firstBroadcastAttemptTimeout;
+    }
+
+    // TODO : MAKE THIS PUBLIC
+
+
+    private static function staticInit(){
+        RequestExecutor::$failureCheckOperation = new DatabaseHealthCheckOperation();
+    }
+
+    private static function staticInitPublic(){
+        return "Hello World";
     }
 }
