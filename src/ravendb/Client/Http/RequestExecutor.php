@@ -110,7 +110,7 @@ class RequestExecutor implements Closable
 
     public static function createForSingleNodeWithConfigurationUpdates(string|array $initialUrls, string $databaseName, AuthOptions $authOptions, DocumentConventions $conventions): self
     {
-        $executor = new createForSingleNodeWithoutConfigurationUpdates($databaseName, $authOptions, $conventions, $initialUrls);
+        //$executor = new createForSingleNodeWithoutConfigurationUpdates($databaseName, $authOptions, $conventions, $initialUrls);
         // TODO MIGRATION TO COMPLETE FROM JVM SOURCE
     }
 
@@ -124,7 +124,7 @@ class RequestExecutor implements Closable
         $this->_secondBroadcastAttemptTimeout = $secondBroadcastAttemptTimeout;
     }
 
-    public function execute(DocumentStore|ServerNode $chosenNode, object $command): string
+    public function execute(ServerNode $chosenNode, object $command): string
     {
         $chosenNode->setUrls($chosenNode->getUrls());
         $url = $chosenNode->getUrls();
