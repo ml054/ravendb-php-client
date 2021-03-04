@@ -7,8 +7,10 @@ use RavenDB\Client\Auth\AuthOptions;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStore;
 use RavenDB\Client\Documents\Operations\DatabaseHealthCheckOperation;
+use RavenDB\Client\Documents\Session\SessionInfo;
 use RavenDB\Client\Http\Logger\Log;
 use RavenDB\Client\Primitives\Closable;
+use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 class RequestExecutor implements Closable
 {
@@ -35,6 +37,7 @@ class RequestExecutor implements Closable
     protected bool $_disableTopologyUpdates;
     protected bool $_disableClientConfigurationUpdates;
     protected string $lastServerVersion;
+    protected string $_firstTopologyUpdate; // type to confirm
 
     protected function __construct(string $databaseName, AuthOptions $authOptions, DocumentConventions $conventions, array $initialUrls)
     {
@@ -113,11 +116,22 @@ class RequestExecutor implements Closable
         $this->_secondBroadcastAttemptTimeout = $secondBroadcastAttemptTimeout;
     }
 
-    public function execute(ServerNode $chosenNode, object $command): string
+    public function execute(object $command, ?SessionInfo $sessionInfo = null): string
     {
-        $chosenNode->setUrls($chosenNode->getUrls());
-        $url = $chosenNode->getUrls();
-        return $command->createRequest($chosenNode, $url);
+        // CompletableFuture<Void> topologyUpdate = _firstTopologyUpdate; TODO: CHECK WITH MARCIN FOR JAVA'S LIB.
+        // Java native package to check with Marcin
+        $topologyUpdate = $this->_firstTopologyUpdate;
+        /*
+         *  if (topologyUpdate != null &&
+                (topologyUpdate.isDone() && !topologyUpdate.isCompletedExceptionally() && !topologyUpdate.isCancelled())
+                || _disableTopologyUpdates) {
+            CurrentIndexAndNode currentIndexAndNode = chooseNodeForRequest(command, sessionInfo);
+            execute(currentIndexAndNode.currentNode, currentIndexAndNode.currentIndex, command, true, sessionInfo);
+        } else {
+            unlikelyExecute(command, topologyUpdate, sessionInfo);
+        }*/
+
+        $this->execute($command,null);
     }
 
     public function close()
@@ -153,5 +167,10 @@ class RequestExecutor implements Closable
     private static function staticInit(): void
     {
         RequestExecutor::$failureCheckOperation = new DatabaseHealthCheckOperation();
+    }
+
+    public function getConventions(): DocumentConventions
+    {
+        return $this->conventions;
     }
 }

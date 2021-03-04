@@ -54,11 +54,13 @@ class SessionOptions
         $this->noCaching = $noCaching;
     }
 
-    public function getTransactionMode(): TransactionMode {
+    public function getTransactionMode(): TransactionMode
+    {
         return $this->transactionMode;
     }
-    public function setTransactionMode(TransactionMode $transactionMode): void {
+
+    public function setTransactionMode(TransactionMode $transactionMode): void
+    {
         $this->transactionMode = $transactionMode;
     }
-
 }

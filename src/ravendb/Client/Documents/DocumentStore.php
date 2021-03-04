@@ -9,6 +9,7 @@ use RavenDB\Client\Documents\Session\SessionOptions;
 use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
 use RavenDB\Client\Util\StringUtils;
 use Ramsey\Uuid\Uuid;
+
 /**
  * Class DocumentStore
  * @package RavenDB\Client\Documents
@@ -66,7 +67,7 @@ class DocumentStore extends DocumentStoreBase
             $this->ensureNotClosed();
 
             $sessionId = Uuid::uuid4()->toString();
-          //  $session = new DocumentSe
+            //  $session = new DocumentSe
 
         }
     }
