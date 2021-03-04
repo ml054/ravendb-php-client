@@ -2,19 +2,22 @@
 
 namespace RavenDB\Client\Http;
 
+use InvalidArgumentException;
 use ReflectionClass;
-// TODO : IT IS POSSIBLE TO EXTRACT VIA REFLECTION A PRIVATE METHODS AND MAKE IT PUBLIC (TEST)
-// TODO : HOW TO INSTANTIATE A METHOD RETURN void WITH A NEW OBJECT IN THE BODY
-// All private functions with return content or args injections work
 
 class ClassUtils
 {
-    public static function staticInit()
+    const STATICINIT = "staticInit";
+
+    public static function staticInit(object $provider)
     {
-        $reflector = new ReflectionClass(RequestExecutor::class);
-        $method = $reflector->getMethod('staticInit');
-        $method->setAccessible(true);
+        if(!method_exists($provider,self::STATICINIT)){
+            throw new InvalidArgumentException("Invalid provider or private static method ".self::STATICINIT." is not implemented");
+        }
+        $reflector = new ReflectionClass($provider);
         try {
+            $method = $reflector->getMethod(self::STATICINIT);
+            $method->setAccessible(true);
             $method->invoke($reflector);
         } catch (\ReflectionException $e) {
         }

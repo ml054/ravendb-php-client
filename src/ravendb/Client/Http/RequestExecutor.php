@@ -9,10 +9,7 @@ use RavenDB\Client\Documents\DocumentStore;
 use RavenDB\Client\Documents\Operations\DatabaseHealthCheckOperation;
 use RavenDB\Client\Http\Logger\Log;
 use RavenDB\Client\Primitives\Closable;
-/**
- * TODO: SOME OBJECT RESOURCE TO IMPORT
- * TODO: Date (if not native class to confirm)
- */
+
 class RequestExecutor implements Closable
 {
     private AuthOptions $authOptions;
@@ -27,27 +24,23 @@ class RequestExecutor implements Closable
     public static string $requestPostProcessor; // TODO : Setting Consumer to string
     public static string $CLIENT_VERSION = "5.0.0";
     private Log $logger;
-   // private HttpCache $cache; TODO : IMPLEMENTATION PENDING ON GO
+    // private HttpCache $cache; TODO : IMPLEMENTATION PENDING ON GO
     protected NodeSelector $_nodeSelector;  // TODO: CHECK FOR IMPORT
     private static int $INITIAL_TOPOLOGY_ETAG = -2;
     public static string $configureHttpClient;
     private CloseableHttpClient $_httpClient;
     protected float $clientConfigurationEtag;
-
     private Timer $_updateTopologyTimer;// TODO: TIMER CHECK FOR IMPORT
     protected float $topologyEtag;
-
     protected bool $_disableTopologyUpdates;
-
     protected bool $_disableClientConfigurationUpdates;
-
     protected string $lastServerVersion;
 
     protected function __construct(string $databaseName, AuthOptions $authOptions, DocumentConventions $conventions, array $initialUrls)
     {
         $this->_databaseName = $databaseName;
         $this->authOptions = $authOptions;
-       // $this->_lastReturnedResponse = new Date();
+        // $this->_lastReturnedResponse = new Date();
         $this->conventions = $conventions->clone();
         $this->_defaultTimeout = $conventions->getRequestTimeout();
         $this->_secondBroadcastAttemptTimeout = $conventions->getSecondBroadcastAttemptTimeout();
@@ -59,7 +52,6 @@ class RequestExecutor implements Closable
     {
         return new DatabaseHealthCheckOperation();
     }
-
 
     private static function getLogger(): Log
     {
@@ -158,14 +150,8 @@ class RequestExecutor implements Closable
         $this->_firstBroadcastAttemptTimeout = $firstBroadcastAttemptTimeout;
     }
 
-    // TODO : MAKE THIS PUBLIC
-
-
-    private static function staticInit(){
+    private static function staticInit(): void
+    {
         RequestExecutor::$failureCheckOperation = new DatabaseHealthCheckOperation();
-    }
-
-    private static function staticInitPublic(){
-        return "Hello World";
     }
 }

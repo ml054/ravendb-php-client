@@ -45,7 +45,7 @@ abstract class DocumentStoreBase implements Closable
     /**
      * @throws Exception
      */
-    private function assertInitialized(): void
+    public function assertInitialized(): void
     {
         if (!$this->initialized) {
             throw new Exception("You cannot open a session or access the database commands
@@ -111,10 +111,10 @@ abstract class DocumentStoreBase implements Closable
 
     /**
      * Set the database instance
-     * @param string $database
-     * @return string
+     * @param string|null $database
+     * @return string|null
      */
-    public function setDatabase(string $database): string
+    public function setDatabase(?string $database=null): ?string
     {
         return $this->database = $database;
     }
@@ -131,7 +131,6 @@ abstract class DocumentStoreBase implements Closable
         }
     }
 
-
     /**
      * @param string $database
      * @param bool|null $secured
@@ -139,5 +138,9 @@ abstract class DocumentStoreBase implements Closable
      */
     public function getDocumentStore(string $database, ?bool $secured, ?int $waitIndexingTimeout)
     {
+    }
+
+    public function getEffectiveDatabase(string $database):self {
+        return self::getEffectiveDatabase($database);
     }
 }
