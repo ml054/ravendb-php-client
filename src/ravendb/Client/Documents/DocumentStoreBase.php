@@ -81,11 +81,11 @@ abstract class DocumentStoreBase implements IDocumentStore
             for ($i = 0; $i < count($values); $i++) {
 
                 $values[$i] ?: throw new InvalidArgumentException("value cannot be null");
-
+                // TODO: check URL to migrate to an Utils (UrlUtils::checkUrl()). based on occurrences
                 if (false === filter_var($values[$i], FILTER_VALIDATE_URL)) {
                     throw new InvalidArgumentException("The url " . $values[$i] . " is not valid");
                 }
-
+                // TODO rtrim to StringUtils
                 $collect[$i] = rtrim($values[$i], "/");
             }
         }

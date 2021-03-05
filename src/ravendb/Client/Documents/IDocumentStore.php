@@ -3,14 +3,16 @@
 namespace RavenDB\Client\Documents;
 
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
+use RavenDB\Client\Documents\Indexes\IAbstractIndexCreationTask;
 use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
 use RavenDB\Client\Documents\Operations\OperationExecutor;
 use RavenDB\Client\Documents\Session\SessionOptions;
 use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
+use RavenDB\Client\Documents\TimeSeries\TimeSeriesOperations;
 use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Util\IDisposalNotification;
-// TODO: IMPORT FROM JVM CLIENT MISSING CLASSES
+
 interface IDocumentStore extends IDisposalNotification
 {
     /**
@@ -28,19 +30,19 @@ interface IDocumentStore extends IDisposalNotification
 
     function executeIndex(IAbstractIndexCreationTask $task, string $database): void;
 
-    function executeIndexes(IAbstractIndexCreationTask $tasks): void; // TODO Interface IAbstractIndexCreationTask MIGRATION
+    function executeIndexes(IAbstractIndexCreationTask $tasks): void;
 
     public function getConventions(): DocumentConventions;
 
     public function getUrls(): array|string;
 
-    public function bulkInsert(string $database): BulkInsertOperation; // TODO BulkInsertOperation MIGRATION
+    public function bulkInsert(string $database): BulkInsertOperation;
 
     public function getDatabase(): string;
 
     public function getRequestExecutor(?string $databaseName): RequestExecutor;
 
-    public function timeSeries(): TimeSeriesOperations; // TODO TimeSeriesOperations MIGRATION
+    public function timeSeries(): TimeSeriesOperations;
 
     public function maintenance(): MaintenanceOperationExecutor;
 
