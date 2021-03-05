@@ -20,7 +20,7 @@ class RequestExecutorTest extends RemoteTestBase
             try {
                 $databaseNamesOperation = new GetDatabaseNamesOperation(0, 20);
                 $command = $databaseNamesOperation->getCommand($conventions);
-                $executor->execute($store, $command);
+                $executor->execute($command);
                 $dbNames = $command->getResult();
                 // TODO: IMPLEMENT assertAs UTIL FOLLOWING API CONVENTION
                 $isStoreDbName = in_array($store->getDatabase(), $dbNames);

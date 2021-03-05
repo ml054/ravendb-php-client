@@ -9,6 +9,10 @@ final class StringUtils
         return empty($string);
     }
 
+    public static function isNull($string): bool
+    {
+        return null === $string;
+    }
     public static function isNotBlank($string): bool
     {
         return !empty($string);

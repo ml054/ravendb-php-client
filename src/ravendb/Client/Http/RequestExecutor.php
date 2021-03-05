@@ -2,7 +2,6 @@
 
 namespace RavenDB\Client\Http;
 
-use http\Env\Request;
 use RavenDB\Client\Auth\AuthOptions;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStore;
@@ -10,7 +9,6 @@ use RavenDB\Client\Documents\Operations\DatabaseHealthCheckOperation;
 use RavenDB\Client\Documents\Session\SessionInfo;
 use RavenDB\Client\Http\Logger\Log;
 use RavenDB\Client\Primitives\Closable;
-use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 class RequestExecutor implements Closable
 {
@@ -118,8 +116,7 @@ class RequestExecutor implements Closable
 
     public function execute(object $command, ?SessionInfo $sessionInfo = null): string
     {
-        // CompletableFuture<Void> topologyUpdate = _firstTopologyUpdate; TODO: CHECK WITH MARCIN FOR JAVA'S LIB.
-        // Java native package to check with Marcin
+        // TODO Java native package to check with Marcin
         $topologyUpdate = $this->_firstTopologyUpdate;
         /*
          *  if (topologyUpdate != null &&
@@ -172,5 +169,11 @@ class RequestExecutor implements Closable
     public function getConventions(): DocumentConventions
     {
         return $this->conventions;
+    }
+
+    public static function validateUrls(array $initialUrls, $certificate = null){
+        $requireHttps = $certificate !== null;
+
+
     }
 }

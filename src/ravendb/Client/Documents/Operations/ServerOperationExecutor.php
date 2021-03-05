@@ -14,7 +14,6 @@ class ServerOperationExecutor
     private DocumentStore $_store;
     private ClusterRequestExecutor $_requestExecutor;
     private ClusterRequestExecutor $_initialRequestExecutor;
-    /// ConcurrentMap is build-in to java missing for now in the below constructor TODO: CHECK WITH MARCIN HOW TO IMPLEMENT Map APPROACH
     public function __construct(DocumentStore $store, ClusterRequestExecutor $requestExecutor, ClusterRequestExecutor $initialRequestExecutor, ServerOperationExecutor $cache, string $nodeTag)
     {
         if(null === $store){

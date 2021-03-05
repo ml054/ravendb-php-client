@@ -4,6 +4,9 @@ namespace RavenDB\Client\Documents;
 
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
+use RavenDB\Client\Documents\Operations\OperationExecutor;
+use RavenDB\Client\Documents\Session\SessionOptions;
+use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
 use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Util\IDisposalNotification;
@@ -35,15 +38,15 @@ interface IDocumentStore extends IDisposalNotification
 
     public function getDatabase(): string;
 
-    public function getRequestExecutor(?string $databaseName): RequestExecutor; // accept null
+    public function getRequestExecutor(?string $databaseName): RequestExecutor;
 
     public function timeSeries(): TimeSeriesOperations; // TODO TimeSeriesOperations MIGRATION
 
     public function maintenance(): MaintenanceOperationExecutor;
 
-    public function operations(): OperationExecutor; // TODO OperationExecutor MIGRATION
+    public function operations(): OperationExecutor;
 
-    public function smuggler(): DatabaseSmuggler;// TODO DatabaseSmuggler MIGRATION
+    public function smuggler(): DatabaseSmuggler;
 
     public function setRequestTimeout(int $timeout, ?string $database): Closable;
 }

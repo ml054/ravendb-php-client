@@ -13,7 +13,7 @@ class DatabaseSmuggler
     private String $_databaseName;
     private ?RequestExecutor $_requestExecutor;
 
-    public function __construct(IDocumentStore $store, string $databaseName) {
+    public function __construct(IDocumentStore $store, ?string $databaseName=null) {
        $this->_store = $store;
        $this->_databaseName = ObjectUtils::firstNonNull($databaseName,$store->getDatabase());
        if(null !== $this->_databaseName){
@@ -22,5 +22,4 @@ class DatabaseSmuggler
            $this->_requestExecutor = null;
        }
     }
-
 }

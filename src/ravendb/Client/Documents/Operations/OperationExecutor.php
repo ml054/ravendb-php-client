@@ -16,7 +16,7 @@ class OperationExecutor
     private string $databaseName;
     private RequestExecutor $requestExecutor;
 
-    public function __construct(DocumentStoreBase|IDocumentStore $store, string $databaseName)
+    public function __construct(DocumentStoreBase|IDocumentStore $store, ?string $databaseName=null)
     {
         $this->databaseName = $databaseName;
         $this->store = $store;

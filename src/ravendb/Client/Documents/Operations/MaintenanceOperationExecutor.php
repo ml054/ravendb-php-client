@@ -15,7 +15,7 @@ class MaintenanceOperationExecutor
     private RequestExecutor $requestExecutor;
     private ServerOperationExecutor $serverOperationExecutor;
 
-    public function __construct(DocumentStore $store, string $databaseName)
+    public function __construct(DocumentStore $store, ?string $databaseName=null)
     {
         $this->store = $store;
         $this->databaseName = ObjectUtils::firstNonNull($databaseName,$store->getDatabase());
@@ -32,7 +32,7 @@ class MaintenanceOperationExecutor
             return $this->requestExecutor;
         }
 
-     //   $this->requestExecutor = null !== $this->databaseName ? $this->store->get
+     // TODO:  $this->requestExecutor = null !== $this->databaseName ? $this->store->get
         return $this->requestExecutor;
     }
 

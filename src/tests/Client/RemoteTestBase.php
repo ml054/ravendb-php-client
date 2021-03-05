@@ -13,13 +13,10 @@ use RavenDB\Tests\Client\Driver\RavenTestDriver;
 class RemoteTestBase extends RavenTestDriver implements Closable
 {
     private static int $_index = 0;
-
     private RavenServerLocator $locator;
     private RavenServerLocator $securedLocator;
-
     private static ?IDocumentStore $globalServer;
     private static ?Process $globalServerProcess; // TODO Class Process to implement
-
     private static ?IDocumentStore $globalSecuredServer;
     private static ?Process $globalSecuredServerProcess;
 
@@ -35,7 +32,6 @@ class RemoteTestBase extends RavenTestDriver implements Closable
 
     protected function customizeDbRecord(DatabaseRecord $dbRecord): void // TODO : JVM API MODEL TO MIGRATE
     {
-
     }
 
     private static function getGlobalServer(bool $secured): IDocumentStore
@@ -45,7 +41,6 @@ class RemoteTestBase extends RavenTestDriver implements Closable
 
     protected function customizeStore(DocumentStore $store): void // TODO : JVM API MODEL TO MIGRATE
     {
-
     }
 
     public function getSecuredDocumentStore(): DocumentStore
@@ -72,7 +67,7 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         }
     }
 
-    private static function killGlobalServerProcess(bool $secured, Process $process): void // TODO : CORRECTIONS UNUSED PARAM
+    private static function killGlobalServerProcess(bool $secured, Process $process): void // TODO : CORRECTIONS UNUSED
     {
         if ($secured) {
             $p = self::$globalSecuredServerProcess;
@@ -89,8 +84,7 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         RavenTestDriver::killProcess($p);
     }
 
-
-    public function getDocumentStore(?string $database = null, ?bool $secured = null, int $waitForIndexingTimeout = null): DocumentStore
+    public function getDocumentStore(?string $database = null, ?bool $secured = false, int $waitForIndexingTimeout = null): DocumentStore
     {
         $name = $database . "_" . ++self::$_index;
         self::reportInfo("getDocumentStore for db " . $database . ".");
@@ -101,19 +95,14 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         $this->customizeDbRecord($databaseRecord);
 
         $createDatabaseOperation = new CreateDatabaseOperation($databaseRecord);
-        $documentStore->maintenance();
-        $documentStore->server(); // TODO MIGRATION jvm source MaintenanceOperationExecutor
-        $documentStore->send($createDatabaseOperation); // TODO MIGRATION jvm source ServerOperationExecutor
-
+        $documentStore->maintenance()->server()->send($createDatabaseOperation);
         $store = new DocumentStore();
         $store->setUrls($documentStore->getUrls());
         $store->setDatabase($name);
         $this->customizeStore($store);
-        // hookLeakedConnectionCheck(store);
-        $store->initialize(); // TODO MIGRATION jvm source DocumentStore
-
+        $store->initialize();
         $this->setupDatabase($store);
-        if ($waitForIndexingTimeout != null) {
+        if ($waitForIndexingTimeout !== null) {
             waitForIndexing($store, $name, $waitForIndexingTimeout);
         }
 

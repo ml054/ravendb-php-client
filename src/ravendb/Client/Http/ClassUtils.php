@@ -8,7 +8,7 @@ use ReflectionClass;
 class ClassUtils
 {
     const STATICINIT = "staticInit";
-
+    // TODO: TO LAB MIGRATION REFLECTION -> CLOSURE
     public static function staticInit(object $provider)
     {
         if(!method_exists($provider,self::STATICINIT)){

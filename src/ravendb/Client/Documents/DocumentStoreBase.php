@@ -10,7 +10,7 @@ use RavenDB\Client\Primitives\Closable;
  * Class DocumentStoreBase
  * @package RavenDB\Client\Documents
  */
-abstract class DocumentStoreBase implements Closable
+abstract class DocumentStoreBase implements IDocumentStore
 {
     /**
      * @var bool
