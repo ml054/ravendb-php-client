@@ -57,9 +57,9 @@ class DocumentStore extends DocumentStoreBase
         return implode(',', $this->urls);
     }
 
-    public function setIdentifier(?string $identifier = null): ?string
+    public function setIdentifier(?string $identifier = null): void
     {
-        return $this->identifier = $identifier;
+         $this->identifier = $identifier;
     }
 
     /*@SuppressWarnings("EmptyTryBlock")
