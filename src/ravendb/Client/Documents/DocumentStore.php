@@ -21,12 +21,7 @@ use Ramsey\Uuid\Uuid;
  */
 class DocumentStore extends DocumentStoreBase
 {
-    /* private ExecutorService executorService = Executors.newCachedThreadPool();
-
-     private final ConcurrentMap<DatabaseChangesOptions, IDatabaseChanges> _databaseChanges = new ConcurrentHashMap<>();
-
-     private final ConcurrentMap<String, Lazy<EvictItemsFromCacheBasedOnChanges>> _aggressiveCacheChanges = new ConcurrentHashMap<>();
-
+    /*
      private final ConcurrentMap<String, Lazy<RequestExecutor>> requestExecutors = new ConcurrentSkipListMap<>(String.CASE_INSENSITIVE_ORDER);
 */
     private MultiDatabaseHiLoIdGenerator $_multiDbHiLo;
@@ -70,21 +65,6 @@ class DocumentStore extends DocumentStoreBase
     /*@SuppressWarnings("EmptyTryBlock")
     public void close() {
          EventHelper.invoke(beforeClose, this, EventArgs.EMPTY);
-
-         for (Lazy<EvictItemsFromCacheBasedOnChanges> value : _aggressiveCacheChanges.values()) {
-             if (!value.isValueCreated()) {
-                 continue;
-             }
-
-             value.getValue().close();
-         }
-
-         for (IDatabaseChanges changes : _databaseChanges.values()) {
-             try (CleanCloseable value = changes) {
-                 // try will close all values
-             }
-         }
-
          if (_multiDbHiLo != null) {
              try {
                  _multiDbHiLo.returnUnusedRange();
@@ -109,7 +89,6 @@ class DocumentStore extends DocumentStoreBase
              kvp.getValue().getValue().close();
          }
 
-         executorService.shutdown();
      }*/
 
     public function openSession(string|SessionOptions|null $database = null, ?SessionOptions $options = null): IDocumentStore
