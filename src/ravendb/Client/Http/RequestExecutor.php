@@ -173,7 +173,5 @@ class RequestExecutor implements Closable
 
     public static function validateUrls(array $initialUrls, $certificate = null){
         $requireHttps = $certificate !== null;
-
-
     }
 }

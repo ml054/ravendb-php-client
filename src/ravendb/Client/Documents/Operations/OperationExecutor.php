@@ -18,7 +18,6 @@ class OperationExecutor
 
     public function __construct(DocumentStoreBase|IDocumentStore $store, ?string $databaseName=null)
     {
-        $this->databaseName = $databaseName;
         $this->store = $store;
         $this->databaseName = $databaseName !== null ? $this->databaseName : $store->getDatabase();
 

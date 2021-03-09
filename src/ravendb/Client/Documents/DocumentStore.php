@@ -5,25 +5,20 @@ namespace RavenDB\Client\Documents;
 use InvalidArgumentException;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\Identity\MultiDatabaseHiLoIdGenerator;
+use RavenDB\Client\Documents\Indexes\IAbstractIndexCreationTask;
 use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
 use RavenDB\Client\Documents\Operations\OperationExecutor;
 use RavenDB\Client\Documents\Session\SessionOptions;
 use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
+use RavenDB\Client\Documents\TimeSeries\TimeSeriesOperations;
 use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Util\EventHandler;
 use RavenDB\Client\Util\StringUtils;
 use Ramsey\Uuid\Uuid;
 
-/**
- * Class DocumentStore
- * @package RavenDB\Client\Documents
- */
 class DocumentStore extends DocumentStoreBase
 {
-    /*
-     private final ConcurrentMap<String, Lazy<RequestExecutor>> requestExecutors = new ConcurrentSkipListMap<>(String.CASE_INSENSITIVE_ORDER);
-*/
     private MultiDatabaseHiLoIdGenerator $_multiDbHiLo;
     private MaintenanceOperationExecutor $maintenanceOperationExecutor;
     private OperationExecutor $operationExecutor;
@@ -41,14 +36,14 @@ class DocumentStore extends DocumentStoreBase
         $this->setDatabase($database);
     }
 
-    public function getIdentifier(): ?string
+    public function getIdentifier(): string
     {
         if (null !== $this->identifier) {
             return $this->identifier;
         }
 
         if (null === $this->urls) {
-            return null;
+            return false;
         }
 
         if (null !== $this->database) {
@@ -59,37 +54,8 @@ class DocumentStore extends DocumentStoreBase
 
     public function setIdentifier(?string $identifier = null): void
     {
-         $this->identifier = $identifier;
+        $this->identifier = $identifier;
     }
-
-    /*@SuppressWarnings("EmptyTryBlock")
-    public void close() {
-         EventHelper.invoke(beforeClose, this, EventArgs.EMPTY);
-         if (_multiDbHiLo != null) {
-             try {
-                 _multiDbHiLo.returnUnusedRange();
-             } catch (Exception e) {
-                 // ignore
-             }
-         }
-
-         if (subscriptions() != null) {
-             subscriptions().close();
-         }
-
-         disposed = true;
-
-         EventHelper.invoke(new ArrayList<>(afterClose), this, EventArgs.EMPTY);
-
-         for (Map.Entry<String, Lazy<RequestExecutor>> kvp : requestExecutors.entrySet()) {
-             if (!kvp.getValue().isValueCreated()) {
-                 continue;
-             }
-
-             kvp.getValue().getValue().close();
-         }
-
-     }*/
 
     public function openSession(string|SessionOptions|null $database = null, ?SessionOptions $options = null): IDocumentStore
     {
@@ -103,6 +69,7 @@ class DocumentStore extends DocumentStoreBase
             $this->assertInitialized();
             $this->ensureNotClosed();
             $sessionId = Uuid::uuid4()->toString(); // TODO: uncompleted method
+
         }
     }
 
@@ -201,5 +168,10 @@ class DocumentStore extends DocumentStoreBase
     public function setRequestTimeout(int $timeout, ?string $database = null): Closable
     {
         return $this->setRequestTimeout($timeout, null);
+    }
+
+    public function changes()
+    {
+
     }
 }

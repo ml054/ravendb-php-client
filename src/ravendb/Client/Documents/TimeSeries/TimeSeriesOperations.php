@@ -19,4 +19,6 @@ class TimeSeriesOperations
         $this->_store = $store;
         $this->_database = $database;
     }
+
+
 }
