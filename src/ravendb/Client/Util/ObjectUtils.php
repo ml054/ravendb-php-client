@@ -8,6 +8,6 @@ class ObjectUtils
 {
     public static function firstNonNull(string $databaseName, string $storeDatabase): string
     {
-        return "To Do";
+      return $databaseName;
     }
 }

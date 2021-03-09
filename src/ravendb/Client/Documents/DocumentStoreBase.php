@@ -4,7 +4,9 @@ namespace RavenDB\Client\Documents;
 
 use Exception;
 use InvalidArgumentException;
+use phpDocumentor\Reflection\Types\This;
 use RavenDB\Client\Primitives\Closable;
+use RavenDB\Client\Util\StringUtils;
 
 /**
  * Class DocumentStoreBase
@@ -19,7 +21,7 @@ abstract class DocumentStoreBase implements IDocumentStore
     /**
      * @var bool
      */
-    protected bool $initialized;
+    protected bool $initialized = false;
     /**
      * @var string|array
      */
@@ -27,7 +29,7 @@ abstract class DocumentStoreBase implements IDocumentStore
     /**
      * @var string|null
      */
-    protected string|null $database;
+    protected ?string $database = null;
 
     /**
      * @return bool
@@ -104,7 +106,7 @@ abstract class DocumentStoreBase implements IDocumentStore
     /**
      * @return string
      */
-    public function getDatabase(): string
+    public function getDatabase(): ?string
     {
         return $this->database;
     }
@@ -114,7 +116,7 @@ abstract class DocumentStoreBase implements IDocumentStore
      * @param string|null $database
      * @return string|null
      */
-    public function setDatabase(?string $database=null): ?string
+    public function setDatabase(?string $database = null): ?string
     {
         return $this->database = $database;
     }
@@ -140,7 +142,29 @@ abstract class DocumentStoreBase implements IDocumentStore
     {
     }
 
-    public function getEffectiveDatabase(string $database):self {
-        return self::getEffectiveDatabase($database);
+    public function getEffectiveDatabase(string $database): string
+    {
+              return self::effectiveDatabase($database);
+    }
+
+    public static function effectiveDatabase(string $database, ?IDocumentStore $store = null): string
+    {
+        if (null === $database) {
+            $database = $store->getDatabase();
+        }
+        /* TODO: CHECK improvement*/
+        if (StringUtils::isNotBlank($database)) {
+            return $database;
+        }
+
+        throw new InvalidArgumentException("Cannot determine database to operate on. " .
+            "Please either specify 'database' directly as an action parameter " .
+            "or set the default database to operate on using 'DocumentStore.setDatabase' method. " .
+            "Did you forget to pass 'database' parameter? ");
+    }
+
+    private function runServer(bool $secured)
+    {
+        // TODO
     }
 }

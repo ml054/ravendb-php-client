@@ -38,7 +38,7 @@ interface IDocumentStore extends IDisposalNotification
 
     public function bulkInsert(string $database): BulkInsertOperation;
 
-    public function getDatabase(): string;
+    public function getDatabase(): ?string;
 
     public function getRequestExecutor(?string $databaseName): RequestExecutor;
 

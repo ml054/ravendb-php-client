@@ -20,7 +20,7 @@ use Ramsey\Uuid\Uuid;
 class DocumentStore extends DocumentStoreBase
 {
     private MultiDatabaseHiLoIdGenerator $_multiDbHiLo;
-    private MaintenanceOperationExecutor $maintenanceOperationExecutor;
+    private ?MaintenanceOperationExecutor $maintenanceOperationExecutor=null;
     private OperationExecutor $operationExecutor;
     private DatabaseSmuggler $_smuggler;
     private ?string $identifier;
@@ -79,6 +79,27 @@ class DocumentStore extends DocumentStoreBase
             return $this;
         }
         $this->assertValidConfiguration();
+
+        /*
+         * TODO:
+        RequestExecutor.validateUrls(urls, getCertificate());
+
+        try {
+            if (getConventions().getDocumentIdGenerator() == null) { // don't overwrite what the user is doing
+                MultiDatabaseHiLoIdGenerator generator = new MultiDatabaseHiLoIdGenerator(this);
+                _multiDbHiLo = generator;
+
+                getConventions().setDocumentIdGenerator(generator::generateDocumentId);
+            }
+
+            getConventions().freeze();
+            initialized = true;
+        } catch (Exception e) {
+            close();
+            throw ExceptionsUtils.unwrapException(e);
+        }
+         * */
+        return $this;
     }
 
     protected function assertValidConfiguration(): void
@@ -117,18 +138,26 @@ class DocumentStore extends DocumentStoreBase
     {
         // TODO: Implement bulkInsert() method.
     }
+        /*
+         *  Supplier<RequestExecutor> createRequestExecutor = () -> {
+            RequestExecutor requestExecutor = RequestExecutor.create(getUrls(), effectiveDatabase, getCertificate(), getCertificatePrivateKeyPassword(), getTrustStore(), executorService, getConventions());
+            registerEvents(requestExecutor);
 
+            return requestExecutor;*/
     public function getRequestExecutor(?string $databaseName): RequestExecutor
     {
+
         try {
             $this->assertInitialized();
         } catch (\Exception $e) {
         }
+        $requestExecutor = RequestExecutor::create($this->getUrls(), $this->getDatabase(), null, $this->getConventions());
 
-        $databaseName = $this->getEffectiveDatabase($databaseName);
-        $executor = $this->getRequestExecutor($databaseName);
+        $db = $this->getEffectiveDatabase($databaseName);
+        $executor = $this->getRequestExecutor($db);
         if (null !== $executor) {
             // TODO: in progress
+            dd("here we go");
         }
     }
 
@@ -168,10 +197,5 @@ class DocumentStore extends DocumentStoreBase
     public function setRequestTimeout(int $timeout, ?string $database = null): Closable
     {
         return $this->setRequestTimeout($timeout, null);
-    }
-
-    public function changes()
-    {
-
     }
 }
