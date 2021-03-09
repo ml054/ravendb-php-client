@@ -21,7 +21,6 @@ class GetDatabaseNamesCommand extends RavenCommand
         $this->_pageSize = $_pageSize;
     }
 
-
     public function getCommand(DocumentConventions $conventions): RavenCommand{
         return new GetDatabaseNamesCommand($this->_start, $this->_pageSize);
     }
@@ -66,7 +65,6 @@ class GetDatabaseNamesCommand extends RavenCommand
         if (!is_array($databases)) {
             self::invalidResponseException(null);
         }
-
         $this->result = $databases;
     }
 }

@@ -6,7 +6,6 @@ use RavenDB\Client\Documents\Conventions\DocumentConventions;
 
 class GetDatabaseNamesOperation implements IServerOperation
 {
-
     /**
      * GetDatabaseNamesOperation constructor.
      * @param int $_start
@@ -14,6 +13,8 @@ class GetDatabaseNamesOperation implements IServerOperation
      */
     public function __construct(private int $_start, private int $_pageSize)
     {
+        $this->_start = $_start;
+        $this->_pageSize = $_pageSize;
     }
 
     /**

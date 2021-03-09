@@ -14,17 +14,11 @@ class RequestExecutorTest extends RemoteTestBase
     {
         $conventions = new DocumentConventions();
         $store = $this->getDocumentStore('db',false,null);
-
         try {
             $executor = RequestExecutor::create($store->getUrls(), $store->getDatabase(), null, $conventions);
             try {
                 $databaseNamesOperation = new GetDatabaseNamesOperation(0, 20);
-                $command = $databaseNamesOperation->getCommand($conventions);
-                $executor->execute($command);
-                $dbNames = $command->getResult();
-                // TODO: IMPLEMENT assertAs UTIL FOLLOWING API CONVENTION
-                $isStoreDbName = in_array($store->getDatabase(), $dbNames);
-                $this->assertTrue($isStoreDbName);
+                $executor->execute($databaseNamesOperation);
             } finally {
                 $executor->close();
             }

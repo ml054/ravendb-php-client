@@ -49,7 +49,7 @@ abstract class RavenCommand
         $this->statusCode = $statusCode;
     }
 
-    public function getResult(): string
+    public function getResult(): ?string
     {
         return $this->result;
     }

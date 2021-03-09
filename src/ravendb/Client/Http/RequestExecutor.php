@@ -114,23 +114,14 @@ class RequestExecutor implements Closable
         $this->_secondBroadcastAttemptTimeout = $secondBroadcastAttemptTimeout;
     }
 
-
-    public function execute(object $command, ?SessionInfo $sessionInfo = null):void
-    {
-        // TODO Java native package to check
-        $topologyUpdate = $this->_firstTopologyUpdate;
-        /*
-         *  if (topologyUpdate != null &&
-                (topologyUpdate.isDone() && !topologyUpdate.isCompletedExceptionally() && !topologyUpdate.isCancelled())
-                || _disableTopologyUpdates) {
-            CurrentIndexAndNode currentIndexAndNode = chooseNodeForRequest(command, sessionInfo);
-            execute(currentIndexAndNode.currentNode, currentIndexAndNode.currentIndex, command, true, sessionInfo);
-        } else {
-            unlikelyExecute(command, topologyUpdate, sessionInfo);
-        }*/
-           $this->execute($command,null);
+    public function execute(object $command, ?SessionInfo $sessionInfo = null):void{
+       $this->_execute($command,$sessionInfo) ;
     }
 
+    private function _execute(object $command, ?SessionInfo $sessionInfo = null):void{
+        /*$this->_execute($command,$sessionInfo)*/;
+        dd("Exec here");
+    }
 
     public function close()
     {

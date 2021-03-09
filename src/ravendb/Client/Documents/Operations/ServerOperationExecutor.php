@@ -12,18 +12,18 @@ use RavenDB\Client\Serverwide\Operations\IServerOperation;
 
 class ServerOperationExecutor implements Closable
 {
-    private ?String $_nodeTag=null;
+    private ?string $_nodeTag = null;
     private DocumentStore $_store;
     private RequestExecutor $_requestExecutor;
-    private ?RequestExecutor $_initialRequestExecutor=null;
+    private ?RequestExecutor $_initialRequestExecutor = null;
 
-    public function __construct(?DocumentStore $store=null, ?RequestExecutor $requestExecutor, ?RequestExecutor $initialRequestExecutor=null, ?ServerOperationExecutor $cache=null, ?string $nodeTag=null)
+    public function __construct(?DocumentStore $store = null, ?RequestExecutor $requestExecutor, ?RequestExecutor $initialRequestExecutor = null, ?ServerOperationExecutor $cache = null, ?string $nodeTag = null)
     {
-        if(null === $store){
-           throw new InvalidArgumentException("Store cannot be null");
+        if (null === $store) {
+            throw new InvalidArgumentException("Store cannot be null");
         }
 
-        if(null === $requestExecutor){
+        if (null === $requestExecutor) {
             throw new InvalidArgumentException("RequestExecutor cannot be null");
         }
         $this->_store = $store;
@@ -32,12 +32,11 @@ class ServerOperationExecutor implements Closable
         $this->_nodeTag = $nodeTag;
     }
 
-    public function send(IServerOperation|IVoidServerOperation $operation){
-
-   //     if($operation instanceof IVoidServerOperation){
-            $command = $operation->getCommand($this->_requestExecutor->getConventions());
-            $this->_requestExecutor->execute($command);
-     //   }
+    public function send(IServerOperation|IVoidServerOperation $operation)
+    {
+        // TODO: CHECK WITH MARCIN IF INTERFACE SHOULD BE CHECKED
+        $command = $operation->getCommand($this->_requestExecutor->getConventions());
+        $this->_requestExecutor->execute($command);
     }
 
     public function close()
