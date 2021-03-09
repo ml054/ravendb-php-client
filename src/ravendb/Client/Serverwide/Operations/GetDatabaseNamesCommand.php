@@ -3,6 +3,7 @@
 namespace RavenDB\Client\Serverwide\Operations;
 
 use Exception;
+use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStore;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Http\RavenCommand;
@@ -11,10 +12,19 @@ use RavenDB\Client\Http\HttpClient;
 
 class GetDatabaseNamesCommand extends RavenCommand
 {
-    public function __construct(private int $_start, private int $_pageSize)
+    private int $_start;
+    private int $_pageSize;
+
+    public function __construct(int $_start, int $_pageSize)
     {
+        $this->_start = $_start;
+        $this->_pageSize = $_pageSize;
     }
 
+
+    public function getCommand(DocumentConventions $conventions): RavenCommand{
+        return new GetDatabaseNamesCommand($this->_start, $this->_pageSize);
+    }
     public function isReadRequest(): bool
     {
         return true;
@@ -40,7 +50,7 @@ class GetDatabaseNamesCommand extends RavenCommand
      * @param bool $fromCache
      * @return array
      */
-    public function setResponse(string $response, bool $fromCache): array
+    public function setResponse(string $response, bool $fromCache): void
     {
         if (null === $response) {
             self::invalidResponseException(null);
@@ -57,6 +67,6 @@ class GetDatabaseNamesCommand extends RavenCommand
             self::invalidResponseException(null);
         }
 
-        return $databases;
+        $this->result = $databases;
     }
 }

@@ -19,7 +19,6 @@ class MaintenanceOperationExecutor
     {
         $this->store = $store;
         $this->databaseName = ObjectUtils::firstNonNull("db1", 'http://example.com');
-        /*        $this->databaseName = ObjectUtils::firstNonNull($databaseName,$store->getDatabase());*/
     }
 
     public function MaintenanceOperationExecutor(DocumentStore $store)

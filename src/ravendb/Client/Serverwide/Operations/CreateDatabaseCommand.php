@@ -14,8 +14,8 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
 {
     private DocumentConventions $conventions;
     private DatabaseRecord $databaseRecord;
-    private int $replicationFactor;
-    private string $etag;
+    private ?int $replicationFactor=null;
+    private ?string $etag=null;
     private string $databaseName;
 
     public function getRaftUniqueRequestId(): string
@@ -33,7 +33,7 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
         // TODO: Implement createRequest() method.
     }
 
-    public function __construct(DocumentConventions $conventions, DatabaseRecord $databaseRecord, int $replicationFactor, ?string $etag=null) {
+    public function __construct(DocumentConventions $conventions, DatabaseRecord $databaseRecord, ?int $replicationFactor=null, ?string $etag=null) {
 
         /* TODO: IMPORT
          *  super(DatabasePutResult.class);
@@ -43,7 +43,10 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
             this.etag = etag;
             this.databaseName = Optional.ofNullable(databaseRecord).map(x -> x.getDatabaseName()).orElseThrow(() -> new IllegalArgumentException("Database name is required"));
          * */
-        return new self($conventions, $databaseRecord, $replicationFactor, null);
+            $this->conventions = $conventions;
+            $this->databaseRecord = $databaseRecord;
+            $this->replicationFactor = $replicationFactor;
+            $this->etag = $etag;
     }
 
 }

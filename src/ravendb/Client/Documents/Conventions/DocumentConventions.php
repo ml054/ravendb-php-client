@@ -9,35 +9,35 @@ use RavenDB\Client\Http\ReadBalanceBehavior;
 
 class DocumentConventions
 {
-    private int $_maxHttpCacheSize;
-    private array $_listOfRegisteredIdConventions;
-    private bool $_frozen;
-    private ClientConfiguration $_originalConfiguration;
-    private bool $_saveEnumsAsIntegers;
-    private bool $_identityPartsSeparator;
-    private bool $_disableTopologyUpdates;
-    private bool $_useOptimisticConcurrency;
-    private bool $_throwIfQueryPageSizeIsNotSet;
-    private int $_maxNumberOfRequestsPerSession;
-    private int $_requestTimeout;
-    private int $_firstBroadcastAttemptTimeout;
-    private int $_secondBroadcastAttemptTimeout;
-    private LoadBalanceBehavior $_loadBalanceBehavior;
-    private ReadBalanceBehavior $_readBalanceBehavior;
+    private ?int $_maxHttpCacheSize=null;
+    private ?array $_listOfRegisteredIdConventions = null;
+    private ?bool $_frozen = null;
+    private ?ClientConfiguration $_originalConfiguration = null;
+    private ?bool $_saveEnumsAsIntegers = null;
+    private ?bool $_identityPartsSeparator = null;
+    private ?bool $_disableTopologyUpdates = null;
+    private ?bool $_useOptimisticConcurrency = null;
+    private ?bool $_throwIfQueryPageSizeIsNotSet = null;
+    private ?int $_maxNumberOfRequestsPerSession = null;
+    private ?int $_requestTimeout = null;
+    private ?int $_firstBroadcastAttemptTimeout = null;
+    private ?int $_secondBroadcastAttemptTimeout = null;
+    private ?LoadBalanceBehavior $_loadBalanceBehavior = null;
+    private ?ReadBalanceBehavior $_readBalanceBehavior = null;
     /*private ObjectMapper $_entityMapper; TODO : IMPORT THE CLASS*/
-    private bool $_useCompression;
+    private ?bool $_useCompression = null;
 
-    public function getMaxHttpCacheSize(): int
+    public function getMaxHttpCacheSize(): ?int
     {
         return $this->_maxHttpCacheSize;
     }
 
-    public function getRequestTimeout(): int
+    public function getRequestTimeout(): ?int
     {
         return $this->_requestTimeout;
     }
 
-    public function setRequestTimeout(int $requestTimeout)
+    public function setRequestTimeout(?int $requestTimeout)
     {
         $this->assertNotFrozen();
         $this->_requestTimeout = $requestTimeout;
@@ -48,6 +48,7 @@ class DocumentConventions
         $this->assertNotFrozen();
         $this->_maxHttpCacheSize = $maxHttpCacheSize;
     }
+
     // TODO: REFACTOR
     public function clone(): DocumentConventions
     {
@@ -75,7 +76,7 @@ class DocumentConventions
 
     /**
      * @throws IllegalStateException
-    */
+     */
     private function assertNotFrozen(): void
     {
         if ($this->_frozen) {
@@ -92,17 +93,17 @@ class DocumentConventions
         $this->_secondBroadcastAttemptTimeout = $secondBroadcastAttemptTimeout;
     }
 
-    public function getSecondBroadcastAttemptTimeout(): int
+    public function getSecondBroadcastAttemptTimeout(): ?int
     {
         return $this->_secondBroadcastAttemptTimeout;
     }
 
-    public function getFirstBroadcastAttemptTimeout(): int
+    public function getFirstBroadcastAttemptTimeout(): ?int
     {
         return $this->_firstBroadcastAttemptTimeout;
     }
 
-    public function setFirstBroadcastAttemptTimeout(int $firstBroadcastAttemptTimeout): void
+    public function setFirstBroadcastAttemptTimeout(?int $firstBroadcastAttemptTimeout): void
     {
         try {
             $this->assertNotFrozen();

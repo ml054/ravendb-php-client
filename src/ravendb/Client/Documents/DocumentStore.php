@@ -27,7 +27,7 @@ class DocumentStore extends DocumentStoreBase
 
     public function __construct(string|array $url = null, ?string $database = null)
     {
-        $this->setUrls($url);
+        $this->setUrls("http://example.com");
 
         if (StringUtils::isString($url)) {
             $this->setUrls([$url]);
@@ -130,8 +130,8 @@ class DocumentStore extends DocumentStoreBase
     }
 
     public function getConventions(): DocumentConventions
-    {
-        // TODO: Implement getConventions() method.
+    {   /*TODO: JUST FOR TESTING*/
+        return new DocumentConventions();
     }
 
     public function bulkInsert(string $database): BulkInsertOperation
@@ -151,14 +151,13 @@ class DocumentStore extends DocumentStoreBase
             $this->assertInitialized();
         } catch (\Exception $e) {
         }
-        $requestExecutor = RequestExecutor::create($this->getUrls(), $this->getDatabase(), null, $this->getConventions());
 
-        $db = $this->getEffectiveDatabase($databaseName);
-        $executor = $this->getRequestExecutor($db);
-        if (null !== $executor) {
-            // TODO: in progress
-            dd("here we go");
+        $requestExecutor = RequestExecutor::create($this->getUrls(), $databaseName, null, $this->getConventions());
+/*       $db = $this->getEffectiveDatabase($databaseName);*/
+        if (null !== $requestExecutor) {
+            return $requestExecutor;
         }
+
     }
 
     public function timeSeries(): TimeSeriesOperations

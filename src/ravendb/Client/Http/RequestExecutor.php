@@ -12,13 +12,13 @@ use RavenDB\Client\Primitives\Closable;
 
 class RequestExecutor implements Closable
 {
-    private AuthOptions $authOptions;
-    private string $_databaseName;
+    private ?AuthOptions $authOptions=null;
+    private ?string $_databaseName=null;
     private object $_lastReturnedResponse; // TODO expecting a date object
     private DocumentConventions $conventions;
-    private int $_defaultTimeout;
-    private int $_secondBroadcastAttemptTimeout;
-    private int $_firstBroadcastAttemptTimeout;
+    private ?int $_defaultTimeout=null;
+    private ?int $_secondBroadcastAttemptTimeout=null;
+    private ?int $_firstBroadcastAttemptTimeout=null;
     /// how to access
     private static DatabaseHealthCheckOperation $failureCheckOperation;
     public static string $requestPostProcessor; // TODO : Setting Consumer to string
@@ -35,9 +35,9 @@ class RequestExecutor implements Closable
     protected bool $_disableTopologyUpdates;
     protected bool $_disableClientConfigurationUpdates;
     protected string $lastServerVersion;
-    protected string $_firstTopologyUpdate; // type to confirm
+    protected ?string $_firstTopologyUpdate=null; // type to confirm
 
-    protected function __construct(string $databaseName, AuthOptions $authOptions, DocumentConventions $conventions, array $initialUrls)
+    protected function __construct(?string $databaseName=null, ?AuthOptions $authOptions=null, DocumentConventions $conventions, array $initialUrls)
     {
         $this->_databaseName = $databaseName;
         $this->authOptions = $authOptions;
@@ -93,7 +93,7 @@ class RequestExecutor implements Closable
         return $this->clientConfigurationEtag;
     }
 
-    public static function create(string|array $initialUrls, string $databaseName, AuthOptions $authOptions, DocumentConventions $conventions): self
+    public static function create(string|array $initialUrls, ?string $databaseName=null, ?AuthOptions $authOptions=null, DocumentConventions $conventions): self
     {
         return new RequestExecutor($databaseName, $authOptions, $conventions, $initialUrls);
     }
@@ -114,9 +114,10 @@ class RequestExecutor implements Closable
         $this->_secondBroadcastAttemptTimeout = $secondBroadcastAttemptTimeout;
     }
 
-    public function execute(object $command, ?SessionInfo $sessionInfo = null): string
+
+    public function execute(object $command, ?SessionInfo $sessionInfo = null):void
     {
-        // TODO Java native package to check with Marcin
+        // TODO Java native package to check
         $topologyUpdate = $this->_firstTopologyUpdate;
         /*
          *  if (topologyUpdate != null &&
@@ -127,9 +128,9 @@ class RequestExecutor implements Closable
         } else {
             unlikelyExecute(command, topologyUpdate, sessionInfo);
         }*/
-
-        $this->execute($command,null);
+           $this->execute($command,null);
     }
+
 
     public function close()
     {

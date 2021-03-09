@@ -71,7 +71,7 @@ abstract class DocumentStoreBase implements IDocumentStore
      * @param array|string $values
      * @return void
      */
-    public function setUrls(array|string $values): void
+    public function setUrls(string|array $values): void
     {
         if (null === $values) throw new InvalidArgumentException("value cannot be null");
 
