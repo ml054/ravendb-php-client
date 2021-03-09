@@ -13,10 +13,10 @@ class RequestExecutorTest extends RemoteTestBase
     public function testCanFetchDatabasesNames()
     {
         $conventions = new DocumentConventions();
-        $store = $this->getDocumentStore();
+        $store = $this->getDocumentStore('db',false,null);
 
         try {
-            $executor = RequestExecutor::create($store->getUrls(), 'db1', null, $conventions);
+            $executor = RequestExecutor::create($store->getUrls(), $store->getDatabase(), null, $conventions);
             try {
                 $databaseNamesOperation = new GetDatabaseNamesOperation(0, 20);
                 $command = $databaseNamesOperation->getCommand($conventions);
@@ -25,7 +25,6 @@ class RequestExecutorTest extends RemoteTestBase
                 // TODO: IMPLEMENT assertAs UTIL FOLLOWING API CONVENTION
                 $isStoreDbName = in_array($store->getDatabase(), $dbNames);
                 $this->assertTrue($isStoreDbName);
-               /// $this->assertThat();
             } finally {
                 $executor->close();
             }
