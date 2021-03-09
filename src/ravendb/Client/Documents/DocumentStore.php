@@ -83,7 +83,7 @@ class DocumentStore extends DocumentStoreBase
 
     protected function assertValidConfiguration(): void
     {
-        if (!StringUtils::isNull($this->urls) || StringUtils::isBlank($this->urls)) {
+        if (StringUtils::isNull($this->urls) || StringUtils::isBlank($this->urls)) {
             throw new InvalidArgumentException("Document store URLs cannot be empty");
         }
     }
@@ -132,7 +132,7 @@ class DocumentStore extends DocumentStoreBase
         }
     }
 
-    public function timeSeries(): TimeSeriesOperations // On go
+    public function timeSeries(): TimeSeriesOperations
     {
         // TODO: Implement timeSeries() method. Check with Marcin. Imported from Interface
     }
