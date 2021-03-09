@@ -32,6 +32,13 @@ class ServerOperationExecutor implements Closable
         $this->_nodeTag = $nodeTag;
     }
 
+    /*
+     * public void send(IVoidServerOperation operation) {
+        VoidRavenCommand command = operation.getCommand(_requestExecutor.getConventions());
+        _requestExecutor.execute(command);
+        }
+
+     * */
     public function send(IServerOperation|IVoidServerOperation $operation)
     {
         // TODO: CHECK WITH MARCIN IF INTERFACE SHOULD BE CHECKED

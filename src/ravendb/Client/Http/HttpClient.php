@@ -3,6 +3,7 @@
 namespace RavenDB\Client\Http;
 
 use Symfony\Component\HttpClient\CurlHttpClient;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -30,6 +31,9 @@ class HttpClient
 
     public function curlUrl(string $url, string $method = "GET"): ResponseInterface
     {
-        return $this->curl()->request($url, $method);
+        try {
+            return $this->curl()->request($url, $method);
+        } catch (TransportExceptionInterface $e) {
+        }
     }
 }

@@ -2,6 +2,8 @@
 
 namespace RavenDB\Client\Http;
 
+use Exception;
+use HttpRequest;
 use RavenDB\Client\Auth\AuthOptions;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStore;
@@ -9,7 +11,7 @@ use RavenDB\Client\Documents\Operations\DatabaseHealthCheckOperation;
 use RavenDB\Client\Documents\Session\SessionInfo;
 use RavenDB\Client\Http\Logger\Log;
 use RavenDB\Client\Primitives\Closable;
-
+use RavenDB\Client\Http\URL;
 class RequestExecutor implements Closable
 {
     private ?AuthOptions $authOptions=null;
@@ -36,7 +38,7 @@ class RequestExecutor implements Closable
     protected bool $_disableClientConfigurationUpdates;
     protected string $lastServerVersion;
     protected ?string $_firstTopologyUpdate=null; // type to confirm
-
+    protected string $setExec;
     protected function __construct(?string $databaseName=null, ?AuthOptions $authOptions=null, DocumentConventions $conventions, array $initialUrls)
     {
         $this->_databaseName = $databaseName;
@@ -114,14 +116,55 @@ class RequestExecutor implements Closable
         $this->_secondBroadcastAttemptTimeout = $secondBroadcastAttemptTimeout;
     }
 
-    public function execute(object $command, ?SessionInfo $sessionInfo = null):void{
-       $this->_execute($command,$sessionInfo) ;
+    public function execute(ServerNode $chosenNode, RavenCommand $command, &$url):void{
+       $command->createRequest($chosenNode,$command, $url);
     }
 
-    private function _execute(object $command, ?SessionInfo $sessionInfo = null):void{
-        /*$this->_execute($command,$sessionInfo)*/;
-        dd("Exec here");
+    private function createRequest(ServerNode $chosenNode, RavenCommand $command, &$url){
+        try{
+             $request = $command->createRequest($chosenNode, $url);
+                if(null === $request){
+                    return;
+                }
+                $builder = new HttpRequest($chosenNode,null,array());
+        }catch (Exception $e){
+
+        }
     }
+    /*
+     * private <TResult> HttpRequestBase createRequest(ServerNode node, RavenCommand<TResult> command, Reference<String> url) {
+        try {
+            HttpRequestBase request = command.createRequest(node, url);
+            if (request == null) {
+                return null;
+            }
+            URI builder = new URI(url.value);
+
+            if (requestPostProcessor != null) {
+                requestPostProcessor.accept(request);
+            }
+
+            if (command instanceof IRaftCommand) {
+                IRaftCommand raftCommand = (IRaftCommand) command;
+
+                String raftRequestString = "raft-request-id=" + raftCommand.getRaftUniqueRequestId();
+
+                builder = new URI(builder.getQuery() != null ? builder.toString() + "&" + raftRequestString : builder.toString() + "?" + raftRequestString);
+            }
+
+            if (shouldBroadcast(command)) {
+                command.setTimeout(ObjectUtils.firstNonNull(command.getTimeout(), _firstBroadcastAttemptTimeout));
+            }
+
+            request.setURI(builder);
+
+            return request;
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Unable to parse URL", e);
+        }
+    }
+*/
+
 
     public function close()
     {
@@ -161,9 +204,5 @@ class RequestExecutor implements Closable
     public function getConventions(): DocumentConventions
     {
         return $this->conventions;
-    }
-
-    public static function validateUrls(array $initialUrls, $certificate = null){
-        $requireHttps = $certificate !== null;
     }
 }

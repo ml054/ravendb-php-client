@@ -13,7 +13,7 @@ abstract class RavenCommand
     protected $responseType;
     protected int $timeout;
     protected bool $canCache;
-    protected bool $canCacheAggressively;
+/*    protected bool $canCacheAggressively;*/
     protected string $selectedNodeTag;
     protected int $numberOfAttempts;
     public const CLIENT_VERSION = "5.0.0";
@@ -62,11 +62,6 @@ abstract class RavenCommand
     public function canCache(): bool
     {
         return $this->canCache;
-    }
-
-    public function canCacheAggressively(): bool
-    {
-        return $this->canCacheAggressively;
     }
 
     public function getSelectedNodeTag(): string

@@ -4,10 +4,20 @@ namespace RavenDB\Client\Http;
 
 class ServerNode
 {
+    public const Role = [
+        "NONE",
+        "PROMOTABLE",
+        "MEMBER",
+        "REHAB"
+    ];
     private string $url;
     private string $database;
     private string $clusterTag;
     /*private Role $serverRole; TODO MIGRATION Role Class */
+
+    public function __construct()
+    {
+    }
 
     public function getUrl(): string
     {
@@ -60,3 +70,12 @@ class ServerNode
         }
     }
 }
+/* TODO:
+    @Override
+    public int hashCode() {
+        int result = url != null ? url.hashCode() : 0;
+        result = 31 * result + (database != null ? database.hashCode() : 0);
+        return result;
+    }
+}
+ * */

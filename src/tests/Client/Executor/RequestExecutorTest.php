@@ -3,7 +3,10 @@
 namespace RavenDB\Tests\Client\Executor;
 
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
+use RavenDB\Client\Documents\DocumentStore;
+use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\RequestExecutor;
+use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Serverwide\Operations\GetDatabaseNamesOperation;
 use RavenDB\Tests\Client\RemoteTestBase;
 
