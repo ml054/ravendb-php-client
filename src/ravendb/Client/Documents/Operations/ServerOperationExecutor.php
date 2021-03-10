@@ -26,7 +26,7 @@ class ServerOperationExecutor implements Closable
     public function send(IServerOperation $operation)
     {
         // TODO: CHECK WITH MARCIN IF INTERFACE SHOULD BE CHECKED
-        $command = $operation->getCommand($this->_store->getConventions());
+        $command = $operation->getCommand($this->_requestExecutor->getConventions());
         $this->_requestExecutor->execute($command);
     }
 

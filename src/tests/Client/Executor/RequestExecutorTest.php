@@ -2,31 +2,26 @@
 
 namespace RavenDB\Tests\Client\Executor;
 
-use Exception;
-use RavenDB\Client\Documents\Commands\GetNextOperationIdCommand;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Serverwide\Operations\GetDatabaseNamesOperation;
 use RavenDB\Tests\Client\RemoteTestBase;
+
 class RequestExecutorTest extends RemoteTestBase
 {
     // TODO: TEST RUN PENDING ON THE DEPENDENCIES MIGRATION
     public function testCanFetchDatabasesNames()
     {
         $conventions = new DocumentConventions();
-        $store = $this->getDocumentStore('db-1',false,null);
+        $store = $this->getDocumentStore();
         try {
             $executor = RequestExecutor::create($store->getUrls(), $store->getDatabase(), null, $conventions);
-          //  dd($executor);
             try {
                 $databaseNamesOperation = new GetDatabaseNamesOperation(0, 20);
                 $command = $databaseNamesOperation->getCommand($conventions);
                 $executor->execute($command);
-              //  dd($command->getResult());
-                $dbNames = $command->getResult();
-                // TODO: IMPLEMENT assertAs UTIL FOLLOWING API CONVENTION
-                $isStoreDbName = in_array($store->getDatabase(), $dbNames);
-                $this->assertTrue($isStoreDbName);
+                $dbNames[] = $command->getResult();
+                // TODO TEST
             } finally {
                 $executor->close();
             }
@@ -35,7 +30,23 @@ class RequestExecutorTest extends RemoteTestBase
         }
     }
 }
+/*
+ *  public void canFetchDatabasesNames() throws Exception {
+        DocumentConventions conventions = new DocumentConventions();
 
+        try (DocumentStore store = getDocumentStore()) {
+            try (RequestExecutor executor = RequestExecutor.create(store.getUrls(), store.getDatabase(), null, null, null, store.getExecutorService(), conventions)) {
+                GetDatabaseNamesOperation databaseNamesOperation = new GetDatabaseNamesOperation(0, 20);
+                RavenCommand<String[]> command = databaseNamesOperation.getCommand(conventions);
+                executor.execute(command);
+
+                String[] dbNames = command.getResult();RequestExecutor
+
+                assertThat(dbNames).contains(store.getDatabase());
+            }
+        }
+    }
+ * */
 /*
  * package net.ravendb.client.executor;
 public class RequestExecutorTest extends RemoteTestBase {

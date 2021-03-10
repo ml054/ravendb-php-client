@@ -18,13 +18,12 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
     private ?string $etag=null;
     private string $databaseName;
 
-    public function __construct(DocumentConventions $conventions,DatabaseRecord $databaseRecord,int $replicationFactor, ?int $etag){
+    public function __construct(DocumentConventions $conventions,DatabaseRecord $databaseRecord,int $replicationFactor){
         /* TODO: IMPORT
        * */
         $this->conventions = $conventions;
         $this->databaseRecord = $databaseRecord;
         $this->replicationFactor = $replicationFactor;
-        $this->etag = $etag;
     }
 
     public function getRaftUniqueRequestId(): string
@@ -34,14 +33,13 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
 
     public function isReadRequest(): bool
     {
-        // TODO: Implement isReadRequest() method.
+        return false;
     }
 
     public function createRequest(ServerNode $node, &$url)
     {
-        $url = $node->getUrl()."/admin/databases?name".$this->databaseName;
-        $url .= "&replicationFactor=".$this->replicationFactor;
-
+       // $url = $node->getUrl()."/admin/databases?name".$this->databaseName;
+      //  $url .= "&replicationFactor=".$this->replicationFactor;
     }
 }
 /*

@@ -20,8 +20,6 @@ class RemoteTestBase extends RavenTestDriver implements Closable
     private static ?IDocumentStore $globalSecuredServer;
     private static ?Process $globalSecuredServerProcess;
 
-
-
     public function close()
     {
     }
@@ -38,10 +36,10 @@ class RemoteTestBase extends RavenTestDriver implements Closable
 
     private static function getGlobalServer(bool $secured): ?IDocumentStore
     {
-       // TODO: return $secured ? self::$globalSecuredServer : self::$globalServer;
-       $documentStore = new DocumentStore('http://devtool.infra:9095/');
-       $documentStore->initialize();
-       return $documentStore;
+        // TODO: return $secured ? self::$globalSecuredServer : self::$globalServer;
+        $documentStore = new DocumentStore('http://devtool.infra:9095/','initdb_1');
+        $documentStore->initialize();
+        return $documentStore;
     }
 
     protected function customizeStore(DocumentStore $store): void // TODO : JVM API MODEL TO MIGRATE
@@ -91,7 +89,7 @@ class RemoteTestBase extends RavenTestDriver implements Closable
 
     public function getDocumentStore(?string $database = null, bool $secured = false, ?int $waitForIndexingTimeout = null): DocumentStore
     {
-        $name = $database . "_" . ++self::$_index;
+        $name = $database . "initdb_" . ++self::$_index;
         self::reportInfo("getDocumentStore for db " . $database . ".");
         $documentStore = self::getGlobalServer($secured);
         $databaseRecord = new DatabaseRecord();
@@ -100,18 +98,19 @@ class RemoteTestBase extends RavenTestDriver implements Closable
 
         $createDatabaseOperation = new CreateDatabaseOperation($databaseRecord,1);
         $documentStore->maintenance()->server()->send($createDatabaseOperation);
+
         $store = new DocumentStore();
         $store->setUrls($documentStore->getUrls());
         $store->setDatabase($name);
         $this->customizeStore($store);
         $store->initialize();
         $this->setupDatabase($store);
-       /* TODO :
-        *  if ($waitForIndexingTimeout !== null) {
-            waitForIndexing($store, $name, $waitForIndexingTimeout);
-        }
-       $documentStore->add($store);
-       */
+        /* TODO :
+         *  if ($waitForIndexingTimeout !== null) {
+             waitForIndexing($store, $name, $waitForIndexingTimeout);
+         }
+        $documentStore->add($store);
+        */
         return $store;
     }
 }

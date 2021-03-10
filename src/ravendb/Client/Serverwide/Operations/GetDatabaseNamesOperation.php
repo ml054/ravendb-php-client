@@ -27,5 +27,4 @@ class GetDatabaseNamesOperation implements IServerOperation
     {
          return new GetDatabaseNamesCommand($this->_start, $this->_pageSize);
     }
-
 }

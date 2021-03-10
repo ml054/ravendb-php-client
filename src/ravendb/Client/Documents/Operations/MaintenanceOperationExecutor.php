@@ -46,14 +46,6 @@ class MaintenanceOperationExecutor
 /*
 public class MaintenanceOperationExecutor {
 
-    public ServerOperationExecutor server() {
-        if (serverOperationExecutor != null) {
-            return serverOperationExecutor;
-        } else {
-            serverOperationExecutor = new ServerOperationExecutor(store);
-            return serverOperationExecutor;
-        }
-    }
 
     public MaintenanceOperationExecutor forDatabase(String databaseName) {
         if (StringUtils.equalsIgnoreCase(this.databaseName, databaseName)) {
@@ -61,19 +53,6 @@ public class MaintenanceOperationExecutor {
         }
 
         return new MaintenanceOperationExecutor(store, databaseName);
-    }
-
-    public void send(IVoidMaintenanceOperation operation) {
-        assertDatabaseNameSet();
-        VoidRavenCommand command = operation.getCommand(getRequestExecutor().getConventions());
-        getRequestExecutor().execute(command);
-    }
-
-    public <TResult> TResult send(IMaintenanceOperation<TResult> operation) {
-        assertDatabaseNameSet();
-        RavenCommand<TResult> command = operation.getCommand(getRequestExecutor().getConventions());
-        getRequestExecutor().execute(command);
-        return command.getResult();
     }
 
     public Operation sendAsync(IMaintenanceOperation<OperationIdResult> operation) {
@@ -86,12 +65,5 @@ public class MaintenanceOperationExecutor {
                 command.getResult().getOperationId(),
                 ObjectUtils.firstNonNull(command.getSelectedNodeTag(), command.getResult().getOperationNodeTag()));
     }
-
-    private void assertDatabaseNameSet() {
-        if (databaseName == null) {
-            throw new IllegalStateException("Cannot use maintenance without a database defined, did you forget to call forDatabase?");
-        }
-    }
 }
-
  * */
