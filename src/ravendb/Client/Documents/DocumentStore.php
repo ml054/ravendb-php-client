@@ -8,6 +8,7 @@ use RavenDB\Client\Documents\Identity\MultiDatabaseHiLoIdGenerator;
 use RavenDB\Client\Documents\Indexes\IAbstractIndexCreationTask;
 use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
 use RavenDB\Client\Documents\Operations\OperationExecutor;
+use RavenDB\Client\Documents\Session\DocumentSession;
 use RavenDB\Client\Documents\Session\SessionOptions;
 use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
 use RavenDB\Client\Documents\TimeSeries\TimeSeriesOperations;
@@ -16,19 +17,18 @@ use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Util\EventHandler;
 use RavenDB\Client\Util\StringUtils;
 use Ramsey\Uuid\Uuid;
+use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 class DocumentStore extends DocumentStoreBase
 {
     private MultiDatabaseHiLoIdGenerator $_multiDbHiLo;
-    private ?MaintenanceOperationExecutor $maintenanceOperationExecutor=null;
+    private ?MaintenanceOperationExecutor $maintenanceOperationExecutor = null;
     private OperationExecutor $operationExecutor;
     private DatabaseSmuggler $_smuggler;
     private ?string $identifier;
 
     public function __construct(string|array $url = null, ?string $database = null)
     {
-        $this->setUrls("http://example.com");
-
         if (StringUtils::isString($url)) {
             $this->setUrls([$url]);
         }
@@ -57,7 +57,7 @@ class DocumentStore extends DocumentStoreBase
         $this->identifier = $identifier;
     }
 
-    public function openSession(string|SessionOptions|null $database = null, ?SessionOptions $options = null): IDocumentStore
+    public function openSession(string|SessionOptions $database = null, ?SessionOptions $options = null): IDocumentStore
     {
 
         if (null !== $database && null === $options) {
@@ -69,7 +69,7 @@ class DocumentStore extends DocumentStoreBase
             $this->assertInitialized();
             $this->ensureNotClosed();
             $sessionId = Uuid::uuid4()->toString(); // TODO: uncompleted method
-
+            //TODO: $newSession = new DocumentSession($this, '');
         }
     }
 
@@ -138,26 +138,24 @@ class DocumentStore extends DocumentStoreBase
     {
         // TODO: Implement bulkInsert() method.
     }
-        /*
-         *  Supplier<RequestExecutor> createRequestExecutor = () -> {
-            RequestExecutor requestExecutor = RequestExecutor.create(getUrls(), effectiveDatabase, getCertificate(), getCertificatePrivateKeyPassword(), getTrustStore(), executorService, getConventions());
-            registerEvents(requestExecutor);
 
-            return requestExecutor;*/
-    public function getRequestExecutor(?string $databaseName): RequestExecutor
+    /*
+     *  Supplier<RequestExecutor> createRequestExecutor = () -> {
+        RequestExecutor requestExecutor = RequestExecutor.create(getUrls(), effectiveDatabase, getCertificate(), getCertificatePrivateKeyPassword(), getTrustStore(), executorService, getConventions());
+        registerEvents(requestExecutor);
+
+        return requestExecutor;*/
+    public function getRequestExecutor(?string $database): RequestExecutor
     {
+        $database = $this->internalGetRequestExecutor($database);
+        return $database;
+        //dd($database);
+    }
 
-        try {
-            $this->assertInitialized();
-        } catch (\Exception $e) {
-        }
-
-        $requestExecutor = RequestExecutor::create($this->getUrls(), $databaseName, null, $this->getConventions());
-/*       $db = $this->getEffectiveDatabase($databaseName);*/
-        if (null !== $requestExecutor) {
-            return $requestExecutor;
-        }
-
+    private function internalGetRequestExecutor($databaseName):RequestExecutor
+    {
+            $conventions = new DocumentConventions();
+            return RequestExecutor::create(null,$databaseName,null,$conventions);
     }
 
     public function timeSeries(): TimeSeriesOperations
@@ -172,7 +170,7 @@ class DocumentStore extends DocumentStoreBase
         } catch (\Exception $e) {
         }
         if (null === $this->maintenanceOperationExecutor) {
-            $this->maintenanceOperationExecutor = new MaintenanceOperationExecutor($this);
+            $this->maintenanceOperationExecutor = new MaintenanceOperationExecutor($this, $this->getDatabase());
         }
         return $this->maintenanceOperationExecutor;
     }
@@ -198,3 +196,7 @@ class DocumentStore extends DocumentStoreBase
         return $this->setRequestTimeout($timeout, null);
     }
 }
+
+/*
+
+  */

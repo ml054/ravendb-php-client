@@ -4,9 +4,8 @@ namespace RavenDB\Client\Serverwide\Operations;
 
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Http\RavenCommand;
-use RavenDB\Client\Http\ServerNode;
 
-class GetDatabaseNamesOperation extends RavenCommand
+class GetDatabaseNamesOperation implements IServerOperation
 {
     const OperationResultType =[ "OperationId", "CommandResult" , "PatchResult"];
     /**
@@ -26,17 +25,7 @@ class GetDatabaseNamesOperation extends RavenCommand
      */
     public function getCommand(?DocumentConventions $conventions = null): RavenCommand
     {
-        return new GetDatabaseNamesCommand($this->_start, $this->_pageSize);
+         return new GetDatabaseNamesCommand($this->_start, $this->_pageSize);
     }
 
-    public function isReadRequest(): bool
-    {
-        // TODO: Implement isReadRequest() method.
-    }
-
-    public function createRequest(ServerNode $node, &$url)
-    {
-        // TODO: Implement createRequest() method.
-
-    }
 }

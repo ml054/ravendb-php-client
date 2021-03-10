@@ -17,7 +17,7 @@ abstract class RavenCommand
     protected string $selectedNodeTag;
     protected int $numberOfAttempts;
     public const CLIENT_VERSION = "5.0.0";
-    protected string $result;
+    protected ?object $result=null;
     public $failoverTopologyEtag = -2;
 
     public abstract function isReadRequest(): bool;
@@ -49,12 +49,12 @@ abstract class RavenCommand
         $this->statusCode = $statusCode;
     }
 
-    public function getResult(): ?string
+    public function getResult(): ?object
     {
         return $this->result;
     }
 
-    public function setResult(mixed $result): void
+    public function setResult(object|null $result): void
     {
         $this->result = $result;
     }

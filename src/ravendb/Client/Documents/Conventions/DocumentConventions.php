@@ -25,7 +25,7 @@ class DocumentConventions
     private ?LoadBalanceBehavior $_loadBalanceBehavior = null;
     private ?ReadBalanceBehavior $_readBalanceBehavior = null;
     /*private ObjectMapper $_entityMapper; TODO : IMPORT THE CLASS*/
-    private ?bool $_useCompression = null;
+    private ?bool $_useCompression=null;
 
     public function getMaxHttpCacheSize(): ?int
     {
@@ -37,7 +37,7 @@ class DocumentConventions
         return $this->_requestTimeout;
     }
 
-    public function setRequestTimeout(?int $requestTimeout)
+    public function setRequestTimeout(int $requestTimeout)
     {
         $this->assertNotFrozen();
         $this->_requestTimeout = $requestTimeout;

@@ -18,6 +18,15 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
     private ?string $etag=null;
     private string $databaseName;
 
+    public function __construct(DocumentConventions $conventions,DatabaseRecord $databaseRecord,int $replicationFactor, ?int $etag){
+        /* TODO: IMPORT
+       * */
+        $this->conventions = $conventions;
+        $this->databaseRecord = $databaseRecord;
+        $this->replicationFactor = $replicationFactor;
+        $this->etag = $etag;
+    }
+
     public function getRaftUniqueRequestId(): string
     {
         // TODO: Implement getRaftUniqueRequestId() method.
@@ -30,28 +39,11 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
 
     public function createRequest(ServerNode $node, &$url)
     {
-        // TODO: Implement createRequest() method.
+        $url = $node->getUrl()."/admin/databases?name".$this->databaseName;
+        $url .= "&replicationFactor=".$this->replicationFactor;
+
     }
-
-    public function __construct(DocumentConventions $conventions, DatabaseRecord $databaseRecord, ?int $replicationFactor=null, ?string $etag=null) {
-
-        /* TODO: IMPORT
-         *  super(DatabasePutResult.class);
-            this.conventions = conventions;
-            this.databaseRecord = databaseRecord;
-            this.replicationFactor = replicationFactor;
-            this.etag = etag;
-            this.databaseName = Optional.ofNullable(databaseRecord).map(x -> x.getDatabaseName()).orElseThrow(() -> new IllegalArgumentException("Database name is required"));
-         * */
-            $this->conventions = $conventions;
-            $this->databaseRecord = $databaseRecord;
-            $this->replicationFactor = $replicationFactor;
-            $this->etag = $etag;
-    }
-
 }
-
-
 /*
 
         TODO:
@@ -84,11 +76,6 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
             }
 
             result = mapper.readValue(response, DatabasePutResult.class);
-        }
-
-        @Override
-        public boolean isReadRequest() {
-            return false;
         }
 
         @Override

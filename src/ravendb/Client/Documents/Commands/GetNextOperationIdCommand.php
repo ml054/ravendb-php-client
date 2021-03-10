@@ -11,6 +11,11 @@ class GetNextOperationIdCommand extends RavenCommand
 {
     private string $_nodeTag;
 
+    public function __construct()
+    {
+        //TODO : super(Long.class)
+    }
+
     public function getNodeTag(): string
     {
         return $this->_nodeTag;
@@ -21,10 +26,9 @@ class GetNextOperationIdCommand extends RavenCommand
         return false;
     }
 
-    public function createRequest(ServerNode|DocumentStore $node, &$url): string
+    public function createRequest(ServerNode $node, &$url): string
     {
-        $node->setUrls($node->getUrls());
-        $url = $node->getUrls() . "/databases/" . $node->getDatabase() . "/operations/next-operation-id";
+        $url = $node->getUrl() . "/databases/" . $node->getDatabase() . "/operations/next-operation-id";
         return (new HttpClient())->curlRequest($url);
     }
 

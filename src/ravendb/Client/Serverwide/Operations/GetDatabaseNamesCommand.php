@@ -21,18 +21,14 @@ class GetDatabaseNamesCommand extends RavenCommand
         $this->_pageSize = $_pageSize;
     }
 
-    public function getCommand(DocumentConventions $conventions): RavenCommand{
-        return new GetDatabaseNamesCommand($this->_start, $this->_pageSize);
-    }
     public function isReadRequest(): bool
     {
         return true;
     }
 
-    public function createRequest(DocumentStore|ServerNode $node, &$url): string
+    public function createRequest(ServerNode $node, &$url): string
     {
-        $node->setUrls($url);
-        $requestURL = $node->getUrls() . "/databases?start=" . $this->_start . "&pageSize=" . $this->_pageSize . "&namesOnly=true";
+        $requestURL = $node->getUrl() . "/databases?start=" . $this->_start . "&pageSize=" . $this->_pageSize . "&namesOnly=true";
         return (new HttpClient())->curlRequest($requestURL);
     }
 

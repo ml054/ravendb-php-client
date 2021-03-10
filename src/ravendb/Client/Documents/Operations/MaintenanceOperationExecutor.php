@@ -4,35 +4,23 @@ namespace RavenDB\Client\Documents\Operations;
 
 use RavenDB\Client\Documents\DocumentStore;
 use RavenDB\Client\Exceptions\IllegalStateException;
+use RavenDB\Client\Http\ClusterRequestExecutor;
 use RavenDB\Client\Http\RequestExecutor;
-use RavenDB\Client\Util\ObjectUtils;
-use RavenDB\Client\Util\StringUtils;
 
 class MaintenanceOperationExecutor
 {
     private DocumentStore $store;
-    private string $databaseName;
-    private ?RequestExecutor $requestExecutor = null;
-    private ?ServerOperationExecutor $serverOperationExecutor = null;
+    private ?string $databaseName=null;
+    private ?ClusterRequestExecutor $requestExecutor=null;
+    private ?ServerOperationExecutor $serverOperationExecutor=null;
 
-    public function __construct(DocumentStore $store, ?string $databaseName = null)
+    public function __construct(DocumentStore $store, ?string $databaseName=null)
     {
         $this->store = $store;
-        $this->databaseName = ObjectUtils::firstNonNull("db1", 'http://example.com');
-    }
-
-    public function MaintenanceOperationExecutor(DocumentStore $store)
-    {
-        //TODO: $this(store, null);
-    }
-
-    private function getRequestExecutor(): RequestExecutor
-    {
-        if ($this->requestExecutor !== null) {
-            return $this->requestExecutor;
-        }
-        $this->requestExecutor = $this->databaseName != null ? $this->store->getRequestExecutor($this->databaseName) : null;
-        return $this->requestExecutor;
+        /*
+         * TODO : this.databaseName = ObjectUtils.firstNonNull(databaseName, store.getDatabase());
+         * */
+        $this->databaseName = $this->store->getDatabase();
     }
 
     public function server(): ServerOperationExecutor
@@ -40,40 +28,23 @@ class MaintenanceOperationExecutor
         if ($this->serverOperationExecutor !== null) {
             return $this->serverOperationExecutor;
         } else {
-            $this->serverOperationExecutor = new ServerOperationExecutor($this->store,$this->getRequestExecutor());
+            // TODO: CHECK WITH MARCIN FOR THE EXECUTOR BIND TO THE STORE
+            $this->serverOperationExecutor = new ServerOperationExecutor($this->store,$this->store->getRequestExecutor($this->store->getDatabase()));
             return $this->serverOperationExecutor;
         }
     }
 
-    public function forDatabase(string $databaseName): MaintenanceOperationExecutor
+    private function getRequestExecutor(): RequestExecutor
     {
-        if (StringUtils::equalsIgnoreCase($this->databaseName, $databaseName)) {
-            return $this;
+        if ($this->requestExecutor !== null) {
+            return $this->requestExecutor;
         }
-        return new MaintenanceOperationExecutor($this->store, $this->databaseName);
-    }
-
-    /**
-     * @throws IllegalStateException
-     */
-    private function assertDatabaseNameSet(): void
-    {
-        if ($this->databaseName === null) {
-            throw new IllegalStateException("Cannot use maintenance without a database defined, did you forget to call forDatabase?");
-        }
+        $this->requestExecutor = $this->databaseName !== null ? $this->store->getRequestExecutor($this->databaseName) : null;
+        return $this->requestExecutor;
     }
 }
 /*
- *
-
-    private RequestExecutor getRequestExecutor() {
-        if (requestExecutor != null) {
-            return requestExecutor;
-        }
-
-        requestExecutor = this.databaseName != null ? store.getRequestExecutor(this.databaseName) : null;
-        return requestExecutor;
-    }
+public class MaintenanceOperationExecutor {
 
     public ServerOperationExecutor server() {
         if (serverOperationExecutor != null) {
@@ -121,4 +92,6 @@ class MaintenanceOperationExecutor
             throw new IllegalStateException("Cannot use maintenance without a database defined, did you forget to call forDatabase?");
         }
     }
+}
+
  * */
