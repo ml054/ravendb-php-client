@@ -115,6 +115,114 @@ class RequestExecutor implements Closable
         $this->_secondBroadcastAttemptTimeout = $secondBroadcastAttemptTimeout;
     }
 
+    // TODO : TASK ASSIGNED AFTER THE CURRENT TEST (GetClusterTopologyTest) SUCCESS -> IMPLEMENT REQUEST TO SERVER
+    public function internalExecute()
+    {
+        /*
+         *     public <TResult> void execute(ServerNode chosenNode, Integer nodeIndex, RavenCommand<TResult> command, boolean shouldRetry, SessionInfo sessionInfo, Reference<HttpRequestBase> requestRef) {
+        if (command.failoverTopologyEtag == INITIAL_TOPOLOGY_ETAG) {
+            command.failoverTopologyEtag = INITIAL_TOPOLOGY_ETAG;
+            if (_nodeSelector != null && _nodeSelector.getTopology() != null) {
+                Topology topology = _nodeSelector.getTopology();
+                if (topology.getEtag() != null) {
+                    command.failoverTopologyEtag = topology.getEtag();
+                }
+            }
+        }
+
+        Reference<String> urlRef = new Reference<>();
+        HttpRequestBase request = createRequest(chosenNode, command, urlRef);
+
+        if (request == null) {
+            return;
+        }
+
+        if (requestRef != null) {
+            requestRef.value = request;
+        }
+
+        //noinspection SimplifiableConditionalExpression
+        boolean noCaching = sessionInfo != null ? sessionInfo.isNoCaching() : false;
+
+        Reference<String> cachedChangeVectorRef = new Reference<>();
+        Reference<String> cachedValue = new Reference<>();
+
+        try (HttpCache.ReleaseCacheItem cachedItem = getFromCache(command, !noCaching, urlRef.value, cachedChangeVectorRef, cachedValue)) {
+            if (cachedChangeVectorRef.value != null) {
+                if (tryGetFromCache(command, cachedItem, cachedValue.value)) {
+                    return;
+                }
+            }
+
+            setRequestHeaders(sessionInfo, cachedChangeVectorRef.value, request);
+
+            command.numberOfAttempts = command.numberOfAttempts + 1;
+            int attemptNum = command.numberOfAttempts;
+            EventHelper.invoke(_onBeforeRequest, this, new BeforeRequestEventArgs(_databaseName, urlRef.value, request, attemptNum));
+
+            CloseableHttpResponse response = sendRequestToServer(chosenNode, nodeIndex, command, shouldRetry, sessionInfo, request, urlRef.value);
+
+            if (response == null) {
+                return;
+            }
+
+            CompletableFuture<Void> refreshTask = refreshIfNeeded(chosenNode, response);
+
+            command.statusCode = response.getStatusLine().getStatusCode();
+
+            ResponseDisposeHandling responseDispose = ResponseDisposeHandling.AUTOMATIC;
+
+            try {
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
+                    EventHelper.invoke(_onSucceedRequest, this, new SucceedRequestEventArgs(_databaseName, urlRef.value, response, request, attemptNum));
+
+                    cachedItem.notModified();
+
+                    try {
+                        if (command.getResponseType() == RavenCommandResponseType.OBJECT) {
+                            command.setResponse(cachedValue.value, true);
+                        }
+                    } catch (IOException e) {
+                        throw ExceptionsUtils.unwrapException(e);
+                    }
+
+                    return;
+                }
+
+                if (response.getStatusLine().getStatusCode() >= 400) {
+                    if (!handleUnsuccessfulResponse(chosenNode, nodeIndex, command, request, response, urlRef.value, sessionInfo, shouldRetry)) {
+                        Header dbMissingHeader = response.getFirstHeader("Database-Missing");
+                        if (dbMissingHeader != null && dbMissingHeader.getValue() != null) {
+                            throw new DatabaseDoesNotExistException(dbMissingHeader.getValue());
+                        }
+
+                        throwFailedToContactAllNodes(command, request);
+                    }
+                    return; // we either handled this already in the unsuccessful response or we are throwing
+                }
+
+                EventHelper.invoke(_onSucceedRequest, this, new SucceedRequestEventArgs(_databaseName, urlRef.value, response, request, attemptNum));
+
+                responseDispose = command.processResponse(cache, response, urlRef.value);
+                _lastReturnedResponse = new Date();
+            } finally {
+                if (responseDispose == ResponseDisposeHandling.AUTOMATIC) {
+                    IOUtils.closeQuietly(response, null);
+                }
+
+                try {
+                    refreshTask.get();
+                } catch (Exception e) {
+                    //noinspection ThrowFromFinallyBlock
+                    throw ExceptionsUtils.unwrapException(e);
+                }
+            }
+        }
+    }
+
+         * */
+    }
+
     /*
      * TODO: COMPLETE THE EXECUTE COMMAND*/
     public function execute(RavenCommand $command)
@@ -123,7 +231,7 @@ class RequestExecutor implements Closable
         $node->setUrl('http://devtool.infra:9095');
         $url = $node->getUrl();
         try {
-            $request = $command->createRequest($node,$url);
+            $request = $command->createRequest($node, $url);
 
             if ($request === null) {
                 return null;
@@ -144,7 +252,7 @@ class RequestExecutor implements Closable
                 command.timeout = command.timeout ?? this.firstBroadcastAttemptTimeout;
             }
             req.uri = builder.toString();*/
-            $command->setResponse($request,false) ;
+            $command->setResponse($request, false);
         } catch (InvalidUrlException $e) {
             throw new InvalidArgumentException('Unable to parse URL');
         } catch (\Exception $e) {
@@ -195,6 +303,7 @@ class RequestExecutor implements Closable
             throw new InvalidArgumentException('Unable to parse URL');
         }
     }
+
     public function _executeOnSpecificNode(RavenCommand $command, ?array $sessionInfo = null, ?object $options = null)
     {
         if ($command->failoverTopologyEtag === RequestExecutor::$INITIAL_TOPOLOGY_ETAG) {
