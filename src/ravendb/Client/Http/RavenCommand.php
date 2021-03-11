@@ -10,15 +10,15 @@ abstract class RavenCommand
 {
     protected $resultClass;
     protected int $statusCode;
-    protected $responseType;
     protected int $timeout;
     protected bool $canCache;
 /*    protected bool $canCacheAggressively;*/
     protected string $selectedNodeTag;
     protected int $numberOfAttempts;
     public const CLIENT_VERSION = "5.0.0";
-    protected object $result;
+    protected string|array $result;
     public $failoverTopologyEtag = -2;
+    protected RavenCommandResponseType $responseType;
 
     public abstract function isReadRequest(): bool;
 
@@ -49,7 +49,7 @@ abstract class RavenCommand
         $this->statusCode = $statusCode;
     }
 
-    public function getResult(): ?object
+    public function getResult(): array|null
     {
         return $this->result;
     }
@@ -122,87 +122,6 @@ abstract class RavenCommand
     }
 }
 /*
-public abstract class RavenCommand<TResult> {
-
-    protected final Class<TResult> resultClass;
-    protected TResult result;
-    protected int statusCode;
-    protected RavenCommandResponseType responseType;
-    protected Duration timeout;
-    protected boolean canCache;
-    protected boolean canCacheAggressively;
-    protected String selectedNodeTag;
-    protected int numberOfAttempts;
-    protected final ObjectMapper mapper = JsonExtensions.getDefaultMapper();
-
-    public long failoverTopologyEtag = -2;
-
-    public abstract boolean isReadRequest();
-
-    public RavenCommandResponseType getResponseType() {
-        return responseType;
-    }
-
-    public Duration getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(Duration timeout) {
-        this.timeout = timeout;
-    }
-
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
-
-    public TResult getResult() {
-        return result;
-    }
-
-    public void setResult(TResult result) {
-        this.result = result;
-    }
-
-    public boolean canCache() {
-        return canCache;
-    }
-
-    public boolean canCacheAggressively() {
-        return canCacheAggressively;
-    }
-
-    public String getSelectedNodeTag() {
-        return selectedNodeTag;
-    }
-
-    public int getNumberOfAttempts() {
-        return numberOfAttempts;
-    }
-
-    public void setNumberOfAttempts(int numberOfAttempts) {
-        this.numberOfAttempts = numberOfAttempts;
-    }
-
-    protected RavenCommand(Class<TResult> resultClass) {
-        this.resultClass = resultClass;
-        responseType = RavenCommandResponseType.OBJECT;
-        this.canCache = true;
-        this.canCacheAggressively = true;
-    }
-
-    protected RavenCommand(RavenCommand<TResult> copy) {
-        this.resultClass = copy.resultClass;
-        this.canCache = copy.canCache;
-        this.canCacheAggressively = copy.canCacheAggressively;
-        this.selectedNodeTag = copy.selectedNodeTag;
-        this.responseType = copy.responseType;
-    }
-
-    public abstract HttpRequestBase createRequest(ServerNode node, Reference<String> url);
 
     public void setResponse(String response, boolean fromCache) throws IOException {
         if (responseType == RavenCommandResponseType.EMPTY || responseType == RavenCommandResponseType.RAW) {

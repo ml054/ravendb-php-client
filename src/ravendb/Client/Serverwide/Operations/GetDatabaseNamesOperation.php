@@ -8,17 +8,18 @@ use RavenDB\Client\Http\RavenCommand;
 class GetDatabaseNamesOperation implements IServerOperation
 {
     const OperationResultType =[ "OperationId", "CommandResult" , "PatchResult"];
+    private int $_start;
+    private int $_pageSize;
     /**
      * GetDatabaseNamesOperation constructor.
      * @param int $_start
      * @param int $_pageSize
      */
-    public function __construct(private int $_start, private int $_pageSize)
+    public function __construct(int $_start, int $_pageSize)
     {
         $this->_start = $_start;
         $this->_pageSize = $_pageSize;
     }
-
     /**
      * @param DocumentConventions|null $conventions
      * @return RavenCommand
