@@ -22,7 +22,7 @@ abstract class RavenCommand
 
     public abstract function isReadRequest(): bool;
 
-    public abstract function createRequest(ServerNode $node, &$url);
+    public abstract function createRequest(ServerNode $node, string &$url);
 
     public function setTimeout(int $timeout): void
     {
@@ -49,7 +49,7 @@ abstract class RavenCommand
         $this->statusCode = $statusCode;
     }
 
-    public function getResult(): array|null
+    public function getResult(): array|string
     {
         return $this->result;
     }

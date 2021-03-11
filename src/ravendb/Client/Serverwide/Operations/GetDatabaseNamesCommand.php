@@ -47,7 +47,6 @@ class GetDatabaseNamesCommand extends RavenCommand
      */
     public function setResponse(string $response, bool $fromCache): void
     {
-
         if (null === $response) {
             self::invalidResponseException(null);
         }

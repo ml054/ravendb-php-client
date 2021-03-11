@@ -10,7 +10,6 @@ use RavenDB\Client\Util\AssertUtils;
 
 class RequestExecutorTest extends RemoteTestBase
 {
-    // TODO: TEST RUN PENDING ON THE DEPENDENCIES MIGRATION
     public function testCanFetchDatabasesNames()
     {
         $conventions = new DocumentConventions();

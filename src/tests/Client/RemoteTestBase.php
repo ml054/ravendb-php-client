@@ -20,7 +20,6 @@ class RemoteTestBase extends RavenTestDriver implements Closable
     private static ?IDocumentStore $globalSecuredServer;
     private static ?Process $globalSecuredServerProcess;
 
-
     public function close()
     {
     }
@@ -38,7 +37,7 @@ class RemoteTestBase extends RavenTestDriver implements Closable
     private static function getGlobalServer(bool $secured): ?IDocumentStore
     {
         // TODO: return $secured ? self::$globalSecuredServer : self::$globalServer;
-        $documentStore = new DocumentStore('http://devtool.infra:9095/','initdb_1');
+        $documentStore = new DocumentStore('http://devtool.infra:9095/', 'initdb_1');
         $documentStore->initialize();
         return $documentStore;
     }
@@ -97,7 +96,7 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         $databaseRecord->setDatabaseName($name);
         $this->customizeDbRecord($databaseRecord);
 
-        $createDatabaseOperation = new CreateDatabaseOperation($databaseRecord,1);
+        $createDatabaseOperation = new CreateDatabaseOperation($databaseRecord, 1);
         $documentStore->maintenance()->server()->send($createDatabaseOperation);
 
         $store = new DocumentStore();

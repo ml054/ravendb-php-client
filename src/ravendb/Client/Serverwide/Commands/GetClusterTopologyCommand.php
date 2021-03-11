@@ -4,59 +4,62 @@
 namespace RavenDB\Client\Serverwide\Commands;
 
 
+use HttpResponseException;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
 
+// TODO : CLASS IMPORTED
 class GetClusterTopologyCommand extends RavenCommand
 {
+    private null|string $_debugTag;
+
+    public function __construct(?string $debugTag = null)
+    {
+        //TODO super(ClusterTopologyResponse.class);
+        $this->_debugTag = $debugTag === null ? null : $debugTag;
+    }
+
+    /*TODO: CONFIRM WHAT OPTIONS TO IMPLEMENT
+     * */
+    public function createRequest(ServerNode $node, string &$url): string
+    {
+        $url = $node->getUrl() . "/cluster/topology";
+        if ($this->_debugTag !== null) $url .= "?" . $this->_debugTag;
+        $requestOptions = [
+            CURLOPT_URL => $url,
+            CURLOPT_PORT => 9095,
+            CURLOPT_RETURNTRANSFER=>true
+            /* TODO: CONFIRM WITH MARCIN WHICH OPTIONS TO PRESERV
+            CURLOPT_VERBOSE,
+            CURLOPT_HEADER,
+            CURLOPT_SSLVERSION,
+            CURLOPT_SSLCERT,
+            CURLOPT_SSLKEY,
+            CURLOPT_CAINFO,
+            CURLOPT_POST,
+            CURLOPT_SSL_VERIFYPEER,
+            CURLOPT_HTTPHEADER*/
+        ];
+        /* TODO : createRequest IS NOT EXPECTED TO SEND THE REQUEST : REQUEST SENDER TO DO WITHOUT curl_close AS IT IS INTERNALLY MANAGED
+        $curlUrl = curl_init();
+        curl_setopt_array($curlUrl, $requestOptions);
+        $result = curl_exec($curlUrl);
+        return $result;*/
+        return json_encode($requestOptions);
+    }
+
+    public function setResponse(string $response, bool $fromCache)
+    {
+        // TODO : THROWING A REGULAR EXCEPTION
+        if (null === $response) {
+            throw new HttpResponseException();
+        }
+        // TODO: ORIGINAL result = mapper.readValue(response, resultClass);
+        $this->result = $response;
+    }
+
     public function isReadRequest(): bool
     {
-        // TODO: Implement isReadRequest() method.
-    }
-
-    public function createRequest(ServerNode $node, &$url)
-    {
-        // TODO: Implement createRequest() method.
-    }
-}
-/*
- * public class GetClusterTopologyCommand extends RavenCommand<ClusterTopologyResponse> {
-
-    private final String _debugTag;
-
-    public GetClusterTopologyCommand() {
-        super(ClusterTopologyResponse.class);
-
-        _debugTag = null;
-    }
-
-    public GetClusterTopologyCommand(String debugTag) {
-        super(ClusterTopologyResponse.class);
-        _debugTag = debugTag;
-    }
-
-    @Override
-    public HttpRequestBase createRequest(ServerNode node, Reference<String> url) {
-        url.value = node.getUrl() + "/cluster/topology";
-
-        if (_debugTag != null)
-            url.value += "?" + _debugTag;
-
-        return new HttpGet();
-    }
-
-    @Override
-    public void setResponse(String response, boolean fromCache) throws IOException {
-        if (response == null) {
-            throwInvalidResponse();
-        }
-
-        result = mapper.readValue(response, resultClass);
-    }
-
-    @Override
-    public boolean isReadRequest() {
         return true;
     }
 }
- * */

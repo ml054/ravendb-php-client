@@ -145,7 +145,7 @@ class DocumentStore extends DocumentStoreBase
         registerEvents(requestExecutor);
 
         return requestExecutor;*/
-    public function getRequestExecutor(?string $database): RequestExecutor
+    public function getRequestExecutor(?string $database=null): RequestExecutor
     {
         $database = $this->internalGetRequestExecutor($database);
         return $database;
