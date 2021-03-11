@@ -5,9 +5,8 @@ namespace RavenDB\Tests\Client\Executor;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Serverwide\Operations\GetDatabaseNamesOperation;
-use RavenDB\Client\Util\StringUtils;
 use RavenDB\Tests\Client\RemoteTestBase;
-use function PHPUnit\Framework\arrayHasKey;
+use RavenDB\Client\Util\AssertUtils;
 
 class RequestExecutorTest extends RemoteTestBase
 {
@@ -22,9 +21,8 @@ class RequestExecutorTest extends RemoteTestBase
                 $databaseNamesOperation = new GetDatabaseNamesOperation(0, 20);
                 $command = $databaseNamesOperation->getCommand($conventions);
                 $executor->execute($command);
-                $dbNames = array_flip($command->getResult());
-                // TODO: extends Assert from PHPUnit assert Cont
-                $this->assertArrayHasKey($store->getDatabase(), $dbNames);
+                $dbNames = $command->getResult();
+                AssertUtils::assertThat($dbNames)::contains($store->getDatabase());
             } finally {
                 $executor->close();
             }
@@ -33,7 +31,7 @@ class RequestExecutorTest extends RemoteTestBase
         }
     }
 }
-/*
+/* TODO:
  *  public void canFetchDatabasesNames() throws Exception {
         DocumentConventions conventions = new DocumentConventions();
 
