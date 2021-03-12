@@ -1,28 +1,28 @@
 <?php
 
 namespace RavenDB\Client\Http;
-
-use RavenDB\Client\Util\Map;
-
+// TODO : REMOVE ALL JAVA Map approach -> php Assoc Array
 class ClusterTopology
 {
     private string $lastNodeId;
     private string $topologyId;
     private string $etag;
-    // TODO : JAVA IMPLEMENTATION OF Mapping TO ACCESS DATA STRUCTURE THE SAME WAY IN PHP. NOW POSSIBLE TO CONVERT SUCH VARIABLES : private Map<String, String> members;
-    private Map|array $members;
-    private Map|array $promotables;
-    private Map|array $watchers;
+    // TODO : AS INSTRUCTED java Map -> php Array : file update in progress. Standard php dev for specific java language lib
+    private array $members;
+    private array $promotables;
+    private array $watchers;
 
     public function contains(string $node): bool
     {
+        /*TODO: Standard PHP approach
+
         if ($this->members !== null && $this->members->containsKey($node)) {
             return true;
         }
         if ($this->promotables !== null && $this->promotables->containsKey($node)) {
             return true;
         }
-        return $this->watchers !== null && $this->watchers->containsKey($node);
+        return $this->watchers !== null && $this->watchers->containsKey($node);*/
     }
 
     public function getUrlFromTag(?string $tag): string|null
@@ -30,6 +30,7 @@ class ClusterTopology
         if ($tag === null) {
             return null;
         }
+       /* TODO: Standard php aproach to implement
         if ($this->members !== null && $this->members->containsKey($tag)) {
             return $this->members->get($tag);
         }
@@ -40,19 +41,17 @@ class ClusterTopology
 
         if ($this->watchers !== null && $this->watchers->containsKey($tag)) {
             return $this->watchers->get($tag);
-        }
+        }*/
         return null;
     }
 
 
-    public function getAllNodes(): Map
+    public function getAllNodes(): array
     {
-        $result = []; // TODO CHECK HOW TO MAP THE RESULT IN A HashMap array : Map<String, String> result = new HashMap<>();
+       // TODO : Standard php array to implement
+         $result = [];
         if ($this->members !== null) {
-            // TODO FOR LOOP
-            /* for (Map.Entry<String, String> entry : members.entrySet()) {
-                 result.put(entry.getKey(), entry.getValue());
-             }*/
+           // foreach($this->members)
         }
 
         if ($this->promotables !== null) {
@@ -91,7 +90,7 @@ class ClusterTopology
         $this->topologyId = $topologyId;
     }
 
-    public function getMembers(): Map
+    public function getMembers(): array
     {
         return $this->members;
     }
@@ -101,7 +100,7 @@ class ClusterTopology
         $this->members = $members;
     }
 
-    public function getPromotables(): Map
+    public function getPromotables(): array
     {
         return $this->promotables;
     }
@@ -111,7 +110,7 @@ class ClusterTopology
         $this->promotables = $promotables;
     }
 
-    public function getWatchers(): Map
+    public function getWatchers(): array
     {
         return $this->watchers;
     }

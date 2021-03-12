@@ -285,7 +285,7 @@ class RequestExecutor implements Closable
             throw new InvalidArgumentException('Unable to parse URL');
         }
     }
-
+    // TODO MANDATORY
     public function _executeOnSpecificNode(RavenCommand $command, ?array $sessionInfo = null, ?object $options = null)
     {
         if ($command->failoverTopologyEtag === RequestExecutor::$INITIAL_TOPOLOGY_ETAG) {
@@ -329,7 +329,7 @@ class RequestExecutor implements Closable
            + ` ${ shouldRetry ? "with" : "without" } retry.`);
 
        let url: string;
-       const req = this._createRequest(chosenNode, command, u => url = u);
+       const req = this._createRequest(chosenNode, command, u => url = u); // TODO : extract the url from
 
        if (!req) {
            return null;

@@ -15,7 +15,7 @@ class GetClusterTopologyTest extends RemoteTestBase
             $command = new GetClusterTopologyCommand();
             $store->getRequestExecutor()->execute($command);
             $result = json_decode($command->getResult(), true);
-            // TODO : COMPLIANCE TO IMPLEMENT ::: ClusterTopologyResponse result = command.getResult();
+            // TODO : COMPLIANCE TO IMPLEMENT ::: ClusterTopologyResponse result = command.getResult(); Php Standard not java Map Approach
             AssertUtils::assertThat($result)::isNotNull();
             /*AssertUtils::assertThat($result["Leader"])::isNotEmpty();
             AssertUtils::assertThat($result["NodeTag"])::isNotEmpty();
