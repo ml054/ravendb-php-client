@@ -1,58 +1,67 @@
 <?php
 
-
 namespace RavenDB\Client\Http;
-
 
 class ClusterTopologyResponse
 {
+    private string $leader;
+    private string $nodeTag;
+    private ClusterTopology $topology;
+    private string $etag;
+    private NodeStatus $status;
+
+    public function getLeader(): string
+    {
+        return $this->leader;
+    }
+
+    public function setLeader(string $leader): void
+    {
+        $this->leader = $leader;
+    }
+
+    public function getNodeTag(): string
+    {
+        return $this->nodeTag;
+    }
+
+    public function setNodeTag(string $nodeTag): void
+    {
+        $this->nodeTag = $nodeTag;
+    }
+
+    public function getTopology(): ClusterTopology
+    {
+        return $this->topology;
+    }
+
+    public function setTopology(ClusterTopology $topology): void
+    {
+        $this->topology = $topology;
+    }
+
+    public function getEtag(): string
+    {
+        return $this->etag;
+    }
+
+    public function setEtag(string $etag): void
+    {
+        $this->etag = $etag;
+    }
+
+    public function getStatus(): NodeStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(NodeStatus $status): void
+    {
+        $this->status = $status;
+    }
 }
-/* TODO:
- *public class ClusterTopologyResponse {
-    private String leader;
-    private String nodeTag;
-    private ClusterTopology topology;
-    private long etag;
-    private Map<String, NodeStatus> status;
+/* PHP-MIGRATION-STATUS : EMPTY SOURCE CLASS BODY - MEANS ALL RESOURCES ARE IMPORTED. TO CLEAN ONCE VALIDATED
+public class ClusterTopologyResponse {
 
-    public String getLeader() {
-        return leader;
-    }
-
-    public void setLeader(String leader) {
-        this.leader = leader;
-    }
-
-    public String getNodeTag() {
-        return nodeTag;
-    }
-
-    public void setNodeTag(String nodeTag) {
-        this.nodeTag = nodeTag;
-    }
-
-    public ClusterTopology getTopology() {
-        return topology;
-    }
-
-    public void setTopology(ClusterTopology topology) {
-        this.topology = topology;
-    }
-
-    public Map<String, NodeStatus> getStatus() {
-        return status;
-    }
-
-    public void setStatus(Map<String, NodeStatus> status) {
-        this.status = status;
-    }
-
-    public long getEtag() {
-        return etag;
-    }
-
-    public void setEtag(long etag) {
-        this.etag = etag;
-    }
 }
  * */

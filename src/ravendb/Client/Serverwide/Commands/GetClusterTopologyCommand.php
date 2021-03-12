@@ -1,14 +1,9 @@
 <?php
-
-
 namespace RavenDB\Client\Serverwide\Commands;
-
 
 use HttpResponseException;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
-
-// TODO : CLASS IMPORTED
 
 class GetClusterTopologyCommand extends RavenCommand
 {

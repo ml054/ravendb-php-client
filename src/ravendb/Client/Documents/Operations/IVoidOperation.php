@@ -1,8 +1,6 @@
 <?php
 
-
 namespace RavenDB\Client\Documents\Operations;
-
 
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\IDocumentStore;

@@ -3,7 +3,6 @@
 namespace RavenDB\Client\Documents\Operations;
 
 use RavenDB\Client\Documents\DocumentStore;
-use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Http\ClusterRequestExecutor;
 use RavenDB\Client\Http\RequestExecutor;
 

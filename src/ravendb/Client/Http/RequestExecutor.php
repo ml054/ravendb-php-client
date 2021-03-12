@@ -2,40 +2,41 @@
 
 namespace RavenDB\Client\Http;
 
+use DateTime;
 use InvalidArgumentException;
 use PharIo\Manifest\InvalidUrlException;
-use RavenDB\Client\Auth\AuthOptions;
+use RavenDB\Client\Auth\AuthOptions; // TODO CLASS DESIGNED TO MIGRATE KeyStore, keyPassword, KeyStore FROM JAVA EXECUTOR
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\Operations\DatabaseHealthCheckOperation;
 use RavenDB\Client\Http\Logger\Log;
 use RavenDB\Client\Primitives\Closable;
-
+// TODO REMINDER : createRequest method should NEVER send request to server. Request to server should NEVER be closed. Internal process in place
 class RequestExecutor implements Closable
 {
-    private ?AuthOptions $authOptions = null;
+    private ?array $authOptions = null;
     private ?string $_databaseName = null;
-    private object $_lastReturnedResponse; // TODO expecting a date object
+    private DateTime $_lastReturnedResponse;
     private DocumentConventions $conventions;
     private ?int $_defaultTimeout = null;
     private ?int $_secondBroadcastAttemptTimeout = null;
     private ?int $_firstBroadcastAttemptTimeout = null;
     /// how to access
     private static DatabaseHealthCheckOperation $failureCheckOperation;
-    public static string $requestPostProcessor; // TODO : Setting Consumer to string
+    public static string $requestPostProcessor;
     public static string $CLIENT_VERSION = "5.0.0";
     private Log $logger;
     // private HttpCache $cache; TODO : IMPLEMENTATION PENDING ON GO
-    protected NodeSelector $_nodeSelector;  // TODO: CHECK FOR IMPORT
+    protected NodeSelector $_nodeSelector;
     private static int $INITIAL_TOPOLOGY_ETAG = -2;
     public static string $configureHttpClient;
-    private CloseableHttpClient $_httpClient;
+    /* private CloseableHttpClient $_httpClient;*/
     protected float $clientConfigurationEtag;
-    private Timer $_updateTopologyTimer;// TODO: TIMER CHECK FOR IMPORT
+    private DateTime $_updateTopologyTimer;
     protected float $topologyEtag;
     protected bool $_disableTopologyUpdates;
     protected bool $_disableClientConfigurationUpdates;
     protected string $lastServerVersion;
-    protected ?string $_firstTopologyUpdate = null; // type to confirm
+    protected ?string $_firstTopologyUpdate = null;
     protected string $setExec;
     protected object $obj;
 
@@ -64,25 +65,6 @@ class RequestExecutor implements Closable
     {
         return $this->_nodeSelector !== null ? $this->_nodeSelector->getTopology() : null; //TODO MIGRATION : wait on go
     }
-
-    public function getHttpClient(): CloseableHttpClient
-    {
-        $httpClient = $this->_httpClient;
-        if ($httpClient != null) {
-            return $httpClient;
-        }
-
-        return $this->_httpClient = $this->createHttpClient();
-    }
-
-    private function createHttpClient(): HttpClient
-    {
-        // ConcurrentMap<String, CloseableHttpClient> httpClientCache = getHttpClientCache();
-
-        // $name = getHttpClientName();
-
-        // return httpClientCache.computeIfAbsent(name, n -> createClient());
-    } // TODO: CHECK FOR IMPORT
 
     public function getTopologyEtag(): float
     {

@@ -2,7 +2,6 @@
 
 namespace RavenDB\Client\Documents\Commands;
 
-use RavenDB\Client\Documents\DocumentStore;
 use RavenDB\Client\Http\HttpClient;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;

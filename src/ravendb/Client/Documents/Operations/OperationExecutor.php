@@ -1,8 +1,6 @@
 <?php
 
-
 namespace RavenDB\Client\Documents\Operations;
-
 
 use RavenDB\Client\Documents\DocumentStoreBase;
 use RavenDB\Client\Documents\IDocumentStore;
@@ -16,7 +14,7 @@ class OperationExecutor
     private string $databaseName;
     private RequestExecutor $requestExecutor;
 
-    public function __construct(DocumentStoreBase|IDocumentStore $store, ?string $databaseName=null)
+    public function __construct(DocumentStoreBase|IDocumentStore $store, ?string $databaseName = null)
     {
         $this->store = $store;
         $this->databaseName = $databaseName !== null ? $this->databaseName : $store->getDatabase();

@@ -13,7 +13,7 @@ class ServerNode
     private string $url;
     private string $database;
     private string $clusterTag;
-    /*private Role $serverRole; TODO MIGRATION Role Class */
+    /*private Role $serverRole; TODO Mantis#5  MIGRATION Role Class */
 
     public function __construct()
     {

@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 // TODO: to add further going more assertions
 class AssertUtils
 {
-    static private array|string $elements;
+    static private array|string|object $elements;
 
     public static function assertThat(array|string|object $element): self
     {

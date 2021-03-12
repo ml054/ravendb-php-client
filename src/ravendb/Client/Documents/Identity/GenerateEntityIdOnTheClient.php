@@ -1,8 +1,6 @@
 <?php
 
-
 namespace RavenDB\Client\Documents\Identity;
-
 
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 

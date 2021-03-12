@@ -8,16 +8,14 @@ use RavenDB\Client\Documents\Identity\MultiDatabaseHiLoIdGenerator;
 use RavenDB\Client\Documents\Indexes\IAbstractIndexCreationTask;
 use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
 use RavenDB\Client\Documents\Operations\OperationExecutor;
-use RavenDB\Client\Documents\Session\DocumentSession;
 use RavenDB\Client\Documents\Session\SessionOptions;
 use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
 use RavenDB\Client\Documents\TimeSeries\TimeSeriesOperations;
-use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Primitives\Closable;
+use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Util\EventHandler;
 use RavenDB\Client\Util\StringUtils;
 use Ramsey\Uuid\Uuid;
-use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 class DocumentStore extends DocumentStoreBase
 {
@@ -139,17 +137,10 @@ class DocumentStore extends DocumentStoreBase
         // TODO: Implement bulkInsert() method.
     }
 
-    /*
-     *  Supplier<RequestExecutor> createRequestExecutor = () -> {
-        RequestExecutor requestExecutor = RequestExecutor.create(getUrls(), effectiveDatabase, getCertificate(), getCertificatePrivateKeyPassword(), getTrustStore(), executorService, getConventions());
-        registerEvents(requestExecutor);
-
-        return requestExecutor;*/
     public function getRequestExecutor(?string $database=null): RequestExecutor
     {
         $database = $this->internalGetRequestExecutor($database);
         return $database;
-        //dd($database);
     }
 
     private function internalGetRequestExecutor($databaseName):RequestExecutor
