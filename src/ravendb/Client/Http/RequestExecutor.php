@@ -258,7 +258,7 @@ class RequestExecutor implements Closable
         }
     }
     // TODO MANDATORY this method is called `execute` in c# and java code
-    public function _executeOnSpecificNode(RavenCommand $command, ?array $sessionInfo = null, ?object $options = null)
+    public function _executeOnSpecificNode(RavenCommand $command, ?array $sessionInfo = null, ?object $options = null): string
     {
         if ($command->failoverTopologyEtag === RequestExecutor::$INITIAL_TOPOLOGY_ETAG) {
             $command->failoverTopologyEtag = RequestExecutor::$INITIAL_TOPOLOGY_ETAG;
@@ -278,7 +278,7 @@ class RequestExecutor implements Closable
     }
 
     // TODO : Mandatory : DO NOT CLOSE THE CONNECTION
-    private function send(ServerNode $node,RavenCommand $command ): bool|string|array
+    private function send(ServerNode $node,RavenCommand $command ): string
     {
         $requestOptions = $command->createRequest($node);
         $curlUrl = curl_init();
