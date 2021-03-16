@@ -282,7 +282,6 @@ class RequestExecutor implements Closable
         $requestOptions = $command->createRequest($node);
         $curlUrl = curl_init();
         curl_setopt_array($curlUrl, $requestOptions);
-     //   dd(curl_exec($curlUrl));
         return curl_exec($curlUrl);
     }
 
