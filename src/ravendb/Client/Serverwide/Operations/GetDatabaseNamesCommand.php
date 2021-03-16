@@ -32,7 +32,6 @@ class GetDatabaseNamesCommand extends RavenCommand
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true
         ];
-        dd(__CLASS__);
 
     }
 
