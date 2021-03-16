@@ -14,17 +14,17 @@ class GetClusterTopologyTest extends RemoteTestBase
         try {
             $command = new GetClusterTopologyCommand();
             $store->getRequestExecutor()->execute($command);
-            $result = json_decode($command->getResult(), true);
+            $result = json_decode($command->getResult());
             // TODO : COMPLIANCE TO IMPLEMENT ::: ClusterTopologyResponse result = command.getResult(); Php Standard not java Map Approach
             AssertUtils::assertThat($result)::isNotNull();
-            /*AssertUtils::assertThat($result["Leader"])::isNotEmpty();
-            AssertUtils::assertThat($result["NodeTag"])::isNotEmpty();
-            $topology = $result["Topology"];
+            AssertUtils::assertThat($result->Leader)::isNotEmpty();
+            AssertUtils::assertThat($result->NodeTag)::isNotEmpty();
+            $topology = $result->Topology;
             AssertUtils::assertThat($topology)::isNotNull();
-            AssertUtils::assertThat($topology["TopologyId"])::isNotNull();
-            AssertUtils::assertThat($topology["Members"])::hasSize(1);
-            AssertUtils::assertThat($topology["Watchers"])::hasSize(0);
-            AssertUtils::assertThat($topology["Promotables"])::hasSize(0);*/
+            AssertUtils::assertThat($topology->TopologyId)::isNotNull();
+            AssertUtils::assertThat($topology->Members)::hasSize(1);
+            AssertUtils::assertThat($topology->Watchers)::hasSize(0);
+            AssertUtils::assertThat($topology->Promotables)::hasSize(0);
         } finally {
             $store->close();
         }

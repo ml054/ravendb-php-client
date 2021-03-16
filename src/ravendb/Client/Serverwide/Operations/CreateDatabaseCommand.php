@@ -16,7 +16,7 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
     private DatabaseRecord $databaseRecord;
     private ?int $replicationFactor=null;
     private ?string $etag=null;
-    private string $databaseName;
+    private ?string $databaseName=null;
 
     public function __construct(DocumentConventions $conventions,DatabaseRecord $databaseRecord,int $replicationFactor){
         /* TODO: IMPORT
@@ -36,10 +36,14 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
         return false;
     }
 
-    public function createRequest(ServerNode $node, &$url)
+    public function createRequest(ServerNode $node):array
     {
-       // $url = $node->getUrl()."/admin/databases?name".$this->databaseName;
-      //  $url .= "&replicationFactor=".$this->replicationFactor;
+         $url = $node->getUrl()."/admin/databases?name".$this->databaseName;
+        $url .= "&replicationFactor=".$this->replicationFactor;
+        return [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true
+        ];
     }
 }
 /*

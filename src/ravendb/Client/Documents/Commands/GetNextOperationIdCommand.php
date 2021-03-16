@@ -25,10 +25,14 @@ class GetNextOperationIdCommand extends RavenCommand
         return false;
     }
 
-    public function createRequest(ServerNode $node, &$url): string
+    public function createRequest(ServerNode $node): array
     {
         $url = $node->getUrl() . "/databases/" . $node->getDatabase() . "/operations/next-operation-id";
-        return (new HttpClient())->curlRequest($url);
+        //if ($this->_debugTag !== null) $url .= "?" . $this->_debugTag;
+        return [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true
+        ];
     }
 
     public function setResponse(string $response, bool $fromCache)

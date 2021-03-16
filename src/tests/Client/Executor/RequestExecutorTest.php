@@ -20,8 +20,11 @@ class RequestExecutorTest extends RemoteTestBase
                 $databaseNamesOperation = new GetDatabaseNamesOperation(0, 20);
                 $command = $databaseNamesOperation->getCommand($conventions);
                 $executor->execute($command);
+                dd($executor);
                 $dbNames = $command->getResult();
-                AssertUtils::assertThat($dbNames)::contains($store->getDatabase());
+               // dd($dbNames);
+             //   dd($dbNames);
+//                AssertUtils::assertThat($dbNames)::contains($store->getDatabase());
             } finally {
                 $executor->close();
             }

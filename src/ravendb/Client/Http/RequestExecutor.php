@@ -10,6 +10,7 @@ use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\Operations\DatabaseHealthCheckOperation;
 use RavenDB\Client\Http\Logger\Log;
 use RavenDB\Client\Primitives\Closable;
+
 // TODO REMINDER : createRequest method should NEVER send request to server. Request to server should NEVER be closed. Internal process in place
 class RequestExecutor implements Closable
 {
@@ -26,7 +27,7 @@ class RequestExecutor implements Closable
     public static string $CLIENT_VERSION = "5.0.0";
     private Log $logger;
     // private HttpCache $cache; TODO : IMPLEMENTATION PENDING ON GO
-    protected NodeSelector $_nodeSelector;
+    protected ?NodeSelector $_nodeSelector=null;
     private static int $INITIAL_TOPOLOGY_ETAG = -2;
     public static string $configureHttpClient;
     /* private CloseableHttpClient $_httpClient;*/
@@ -209,36 +210,7 @@ class RequestExecutor implements Closable
      * TODO: COMPLETE THE EXECUTE COMMAND*/
     public function execute(RavenCommand $command)
     {
-        $node = new ServerNode();
-        $node->setUrl('http://devtool.infra:9095');
-        $url = $node->getUrl();
-        try {
-            $request = $command->createRequest($node, $url);
-
-            if ($request === null) {
-                return null;
-            }
-            /* TODO :
-             * if (RequestExecutor.requestPostProcessor) {
-                RequestExecutor.requestPostProcessor(req);
-            }
-
-            if (command["getRaftUniqueRequestId"]) {
-                const raftCommand = command as unknown as IRaftCommand;
-
-                const raftRequestString = "raft-request-id=" + raftCommand.getRaftUniqueRequestId();
-
-                builder = new URL(builder.search ? builder.toString() + "&" + raftRequestString : builder.toString() + "?" + raftRequestString);
-            }
-            if (this._shouldBroadcast(command)) {
-                command.timeout = command.timeout ?? this.firstBroadcastAttemptTimeout;
-            }
-            req.uri = builder.toString();*/
-            $command->setResponse($request, false);
-        } catch (InvalidUrlException $e) {
-            throw new InvalidArgumentException('Unable to parse URL');
-        } catch (\Exception $e) {
-        }
+        $this->_executeOnSpecificNode($command,null,null);
     }
 
     /* TODO :
@@ -257,10 +229,10 @@ class RequestExecutor implements Closable
                command.timeout = command.timeout ?? this.firstBroadcastAttemptTimeout;
            }
            req.uri = builder.toString();*/
-    private function createRequest(ServerNode $node, RavenCommand $command, $url)
+    private function createRequest(ServerNode $node, RavenCommand $command): ?array
     {
         try {
-            $request = $command->createRequest($node, $url);
+            $request = $command->createRequest($node);
             if ($request === null) {
                 return null;
             }
@@ -285,24 +257,36 @@ class RequestExecutor implements Closable
             throw new InvalidArgumentException('Unable to parse URL');
         }
     }
-    // TODO MANDATORY
+    // TODO MANDATORY this method is called `execute` in c# and java code
     public function _executeOnSpecificNode(RavenCommand $command, ?array $sessionInfo = null, ?object $options = null)
     {
         if ($command->failoverTopologyEtag === RequestExecutor::$INITIAL_TOPOLOGY_ETAG) {
             $command->failoverTopologyEtag = RequestExecutor::$INITIAL_TOPOLOGY_ETAG;
 
-            $node = new ServerNode();
-            $node->setUrl('http://devtool.infra:9095');
-            return $this->createRequest($node, $command, $node->getUrl());
-            /*TODO
-             * if($this->_nodeSelector && $this->_nodeSelector->getTopology()){
+            /*TODO TO COMPLETE*/
+             if($this->_nodeSelector && $this->_nodeSelector->getTopology()){
                 $topology = $this->_nodeSelector->getTopology();
                 if($topology->etag()){
                     $command->failoverTopologyEtag = $this->getTopologyEtag();
                 }
-            }*/
+            }
         }
+        $node = new ServerNode();
+        $node->setUrl('http://devtool.infra:9095');
+        return $this->send($node,$command);
     }
+
+    // TODO : Mandatory : DO NOT CLOSE THE CONNECTION
+    private function send(ServerNode $node,RavenCommand $command ): bool|string|array
+    {
+        $requestOptions = $command->createRequest($node);
+        $curlUrl = curl_init();
+        curl_setopt_array($curlUrl, $requestOptions);
+     //   dd(curl_exec($curlUrl));
+        return curl_exec($curlUrl);
+    }
+
+
 
     // TODO
 

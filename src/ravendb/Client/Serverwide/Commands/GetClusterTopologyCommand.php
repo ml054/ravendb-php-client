@@ -24,14 +24,14 @@ class GetClusterTopologyCommand extends RavenCommand
     public function createRequest(ServerNode $node): array
     {
         $url = $node->getUrl() . "/cluster/topology";
-        if ($this->_debugTag !== null) $url .= "?" . $this->_debugTag;
+        //if ($this->_debugTag !== null) $url .= "?" . $this->_debugTag;
         return [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true
         ];
     }
 
-    public function setResponse(string $response, bool $fromCache)
+    public function setResponse(string|array $response, bool $fromCache)
     {
         // TODO : THROWING A REGULAR EXCEPTION
         if (null === $response) {

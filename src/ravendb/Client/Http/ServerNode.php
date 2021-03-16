@@ -11,7 +11,7 @@ class ServerNode
         "REHAB"
     ];
     private string $url;
-    private string $database;
+    private ?string $database=null;
     private string $clusterTag;
     /*private Role $serverRole; TODO Mantis#5  MIGRATION Role Class */
 
@@ -29,7 +29,7 @@ class ServerNode
         $this->url = $url;
     }
 
-    public function getDatabase(): string
+    public function getDatabase(): ?string
     {
         return $this->database;
     }
@@ -71,7 +71,7 @@ class ServerNode
     }
 }
 /* TODO:
-    @Override
+    @Override33333333333333333333333333333333
     public int hashCode() {
         int result = url != null ? url.hashCode() : 0;
         result = 31 * result + (database != null ? database.hashCode() : 0);

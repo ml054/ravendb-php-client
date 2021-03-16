@@ -9,6 +9,11 @@ class NodeSelector
    // private ExecutorService $executorService; // TODO : EXECUTOR SERVICE OUT OF PHP SCOPE FOR NOW
     private DateTime $_updateFastestNodeTimer;
     private NodeSelectorState $_state;
+
+    public function getTopology()
+    {
+        return "";
+    }
 }
 /*  TODO: SOURCE CODE REFERENCE(S) ( [] NODEJS | [x] JAVA )
 class NodeSelector {

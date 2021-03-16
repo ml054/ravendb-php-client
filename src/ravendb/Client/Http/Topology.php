@@ -24,8 +24,3 @@ class Topology
         $this->nodes = $nodes;
     }
 }
-/* PHP-MIGRATION-STATUS : EMPTY SOURCE CLASS BODY - MEANS ALL RESOURCES ARE IMPORTED. TO CLEAN ONCE VALIDATED
-public class Topology {
-
-}
- * */

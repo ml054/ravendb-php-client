@@ -8,7 +8,7 @@ use RavenDB\Client\Exceptions\IllegalStateException;
 
 abstract class RavenCommand
 {
-    protected $resultClass;
+    protected object $resultClass;
     protected int $statusCode;
     protected int $timeout;
     protected bool $canCache;
@@ -16,9 +16,9 @@ abstract class RavenCommand
     protected string $selectedNodeTag;
     protected int $numberOfAttempts;
     public const CLIENT_VERSION = "5.0.0";
-    protected string|array $result;
-    public $failoverTopologyEtag = -2;
-    protected RavenCommandResponseType $responseType;
+    protected null|string|array $result=null;
+    public int $failoverTopologyEtag = -2;
+    protected ?RavenCommandResponseType $responseType=null;
 
     public abstract function isReadRequest(): bool;
 
@@ -49,7 +49,7 @@ abstract class RavenCommand
         $this->statusCode = $statusCode;
     }
 
-    public function getResult(): array|string
+    public function getResult(): array|string|null
     {
         return $this->result;
     }
@@ -90,7 +90,7 @@ abstract class RavenCommand
     /**
      * @throws
     */
-    public function setResponse(string $response, bool $fromCache) // TODO : CONFIRM THE SCOPE OF THE UNUSED PARAMETERS response and fromCache
+    public function setResponse(string|array $response, bool $fromCache) // TODO : CONFIRM THE SCOPE OF THE UNUSED PARAMETERS response and fromCache
     {
 
         if ($this->responseType == RavenCommandResponseType::EMPTY || $this->responseType == RavenCommandResponseType::RAW) {
@@ -109,7 +109,7 @@ abstract class RavenCommand
         $this->resultClass = $resultClass;
         $this->responseType = RavenCommandResponseType::OBJECT;
         $this->canCache = true;
-        $this->canCacheAggressively = true;
+        $canCacheAggressively = true;
     }
 
     protected function urlEncode(string $value): string

@@ -17,6 +17,7 @@ class GetDatabaseNamesOperation implements IServerOperation
      */
     public function __construct(int $_start, int $_pageSize)
     {
+
         $this->_start = $_start;
         $this->_pageSize = $_pageSize;
     }
@@ -26,6 +27,6 @@ class GetDatabaseNamesOperation implements IServerOperation
      */
     public function getCommand(?DocumentConventions $conventions = null): RavenCommand
     {
-         return new GetDatabaseNamesCommand($this->_start, $this->_pageSize);
+        return new GetDatabaseNamesCommand($this->_start, $this->_pageSize);
     }
 }

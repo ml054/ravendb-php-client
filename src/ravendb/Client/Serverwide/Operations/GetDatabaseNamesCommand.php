@@ -3,12 +3,9 @@
 namespace RavenDB\Client\Serverwide\Operations;
 
 use Exception;
-use RavenDB\Client\Documents\Conventions\DocumentConventions;
-use RavenDB\Client\Documents\DocumentStore;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
-use RavenDB\Client\Http\HttpClient;
 
 class GetDatabaseNamesCommand extends RavenCommand
 {
@@ -17,6 +14,7 @@ class GetDatabaseNamesCommand extends RavenCommand
 
     public function __construct(int $_start, int $_pageSize)
     {
+
         $this->_start = $_start;
         $this->_pageSize = $_pageSize;
     }
@@ -26,10 +24,16 @@ class GetDatabaseNamesCommand extends RavenCommand
         return true;
     }
 
-    public function createRequest(ServerNode $node, &$url): string
+    public function createRequest(ServerNode $node): array
     {
-        $requestURL = $node->getUrl() . "/databases?start=" . $this->_start . "&pageSize=" . $this->_pageSize . "&namesOnly=true";
-        return (new HttpClient())->curlRequest($requestURL);
+
+        $url = $node->getUrl() ."/databases?start=".$this->_start."&pageSize=".$this->_pageSize."&namesOnly=true";
+        return [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true
+        ];
+        dd(__CLASS__);
+
     }
 
     public static function invalidResponseException(?Exception $cause)
@@ -41,24 +45,21 @@ class GetDatabaseNamesCommand extends RavenCommand
     }
 
     /**
-     * @param string $response
+     * @param string|array $response
      * @param bool $fromCache
      * @return void
      */
-    public function setResponse(string $response, bool $fromCache): void
+    public function setResponse(string|array $response, bool $fromCache): void
     {
+
         if (null === $response) {
             self::invalidResponseException(null);
         }
-        $names = json_decode($response);
-        if (!property_exists($names, "Databases")) {
+        if(!isset($response) || !is_array($response) ){
             self::invalidResponseException(null);
         }
-        $databases = $names->Databases;
-        if (!is_array($databases)) {
-            self::invalidResponseException(null);
-        }
-        $this->result = $databases;
+
+        $this->result = $response;
     }
 }
 /*
