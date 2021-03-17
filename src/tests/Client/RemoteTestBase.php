@@ -87,7 +87,12 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         RavenTestDriver::killProcess($p);
     }
 
-    public function getDocumentStore(?string $database = null, bool $secured = false, ?int $waitForIndexingTimeout = null): DocumentStore
+    public function getDocumentStore(): ?IDocumentStore
+    {
+        return self::getGlobalServer(false);
+    }
+    /*TODO SEE COMMENTS BELOW THE METHOD AND CHECK WITH MARCIN*/
+    public function _getDocumentStore(?string $database = null, bool $secured = false, ?int $waitForIndexingTimeout = null): DocumentStore
     {
         $name = $database . "initdb_" . ++self::$_index;
         self::reportInfo("getDocumentStore for db " . $database . ".");
@@ -113,4 +118,5 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         */
         return $store;
     }
+    /*TODO CONFIRM WITH MARCIN IF THIS 3rd METHODS IS ONLY FOR CreateDatabaseOperation*/
 }

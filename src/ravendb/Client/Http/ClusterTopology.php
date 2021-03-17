@@ -14,34 +14,30 @@ class ClusterTopology
 
     public function contains(string $node): bool
     {
-        /*TODO: Standard PHP approach
-
-        if ($this->members !== null && $this->members->containsKey($node)) {
+        if($this->members && $this->members[$node]){
             return true;
         }
-        if ($this->promotables !== null && $this->promotables->containsKey($node)) {
+        if($this->promotables && $this->promotables[$node]){
             return true;
         }
-        return $this->watchers !== null && $this->watchers->containsKey($node);*/
+        return $this->watchers && $this->watchers[$node];
     }
 
     public function getUrlFromTag(?string $tag): string|null
     {
-        if ($tag === null) {
+        if (!$tag) {
             return null;
         }
-       /* TODO: Standard php aproach to implement
-        if ($this->members !== null && $this->members->containsKey($tag)) {
-            return $this->members->get($tag);
+        if($this->members && $this->members[$tag]){
+            return true;
+        }
+        if($this->promotables && $this->promotables[$tag]){
+            return true;
+        }
+        if($this->watchers && $this->watchers[$tag]){
+            return true;
         }
 
-        if ($this->promotables !== null && $this->promotables->containsKey($tag)) {
-            return $this->promotables->get($tag);
-        }
-
-        if ($this->watchers !== null && $this->watchers->containsKey($tag)) {
-            return $this->watchers->get($tag);
-        }*/
         return null;
     }
 
@@ -51,7 +47,7 @@ class ClusterTopology
        // TODO : Standard php array to implement
          $result = [];
         if ($this->members !== null) {
-           // foreach($this->members)
+         //  foreach($this->members)
         }
 
         if ($this->promotables !== null) {
@@ -131,7 +127,50 @@ class ClusterTopology
     }
 }
 /* PHP-MIGRATION-STATUS : EMPTY SOURCE CLASS BODY - MEANS ALL RESOURCES ARE IMPORTED. TO CLEAN ONCE VALIDATED
-class ClusterTopology {
+export class ClusterTopology {
 
+    public lastNodeId: string;
+    public topologyId: string;
+    public etag: number;
+
+    public members: { [key: string]: string };
+    public promotables: { [key: string]: string };
+    public watchers: { [key: string]: string };
+
+    public contains(node: string) {
+        if (this.members && this.members[node]) {
+            return true;
+        }
+        if (this.promotables && this.promotables[node]) {
+            return true;
+        }
+
+        return this.watchers && this.watchers[node];
+    }
+
+    public getUrlFromTag(tag: string): string {
+        if (!tag) {
+            return null;
+        }
+
+        if (this.members && this.members[tag]) {
+            return this.members[tag];
+        }
+
+        if (this.promotables && this.promotables[tag]) {
+            return this.promotables[tag];
+        }
+
+        if (this.watchers && this.watchers[tag]) {
+            return this.watchers[tag];
+        }
+
+        return null;
+    }
+
+    public getAllNodes(): { [tag: string]: string } {
+        return Object.assign({}, this.members, this.promotables, this.watchers);
+    }
 }
+
  * */

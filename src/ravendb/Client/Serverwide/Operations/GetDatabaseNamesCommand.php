@@ -3,7 +3,6 @@
 namespace RavenDB\Client\Serverwide\Operations;
 
 use Exception;
-use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
 
@@ -14,7 +13,6 @@ class GetDatabaseNamesCommand extends RavenCommand
 
     public function __construct(int $_start, int $_pageSize)
     {
-
         $this->_start = $_start;
         $this->_pageSize = $_pageSize;
     }
@@ -26,21 +24,11 @@ class GetDatabaseNamesCommand extends RavenCommand
 
     public function createRequest(ServerNode $node): array
     {
-
         $url = $node->getUrl() ."/databases?start=".$this->_start."&pageSize=".$this->_pageSize."&namesOnly=true";
         return [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true
         ];
-
-    }
-
-    public static function invalidResponseException(?Exception $cause)
-    {
-        try {
-            parent::throwInvalidResponse($cause);
-        } catch (IllegalStateException $e) {
-        }
     }
 
     /**
@@ -48,17 +36,63 @@ class GetDatabaseNamesCommand extends RavenCommand
      * @param bool $fromCache
      * @return void
      */
-    public function setResponse(string|array $response, bool $fromCache): void
+    public function setResponse(string|array $response, bool $fromCache):void
     {
-
         if (null === $response) {
-            self::invalidResponseException(null);
+            self::throwInvalidResponse(null);
+            return;
         }
-        if(!isset($response) || !is_array($response) ){
-            self::invalidResponseException(null);
+        /*
+         * TODO : CHECK WITH MARCIN IF UTILS IS NEEDED HERE
+         * JsonNode names = mapper.readTree(response);
+            if (!names.has("Databases")) {
+                throwInvalidResponse();
+            }
+         * */
+        $jsonObject = json_decode($response);
+        if(!property_exists($jsonObject,'Databases')){
+            self::throwInvalidResponse(null);
         }
 
-        $this->result = $response;
+        $databases = $jsonObject->Databases;
+        if(!is_array($databases)){
+            self::throwInvalidResponse();
+        }
+
+        // TODO CHECK WITH MARCIN IF THIS LOOP IS TO IMPLEMENT
+
+        $databaseNames = [] ;
+        $dbNames = $databases;
+        for( $i=0; $i< count($databases); $i++){
+            $databaseNames[$i] = $dbNames[$i];
+        }
+        $this->result = $databaseNames;
+
+        /*
+         * public void setResponse(String response, boolean fromCache) throws IOException {
+            if (response == null) {
+                throwInvalidResponse();
+                return;
+            }
+
+            JsonNode names = mapper.readTree(response);
+            if (!names.has("Databases")) {
+                throwInvalidResponse();
+            }
+
+            JsonNode databases = names.get("Databases");
+            if (!databases.isArray()) {
+                throwInvalidResponse();
+            }
+            ArrayNode dbNames = (ArrayNode) databases;
+            String[] databaseNames = new String[dbNames.size()];
+            for (int i = 0; i < dbNames.size(); i++) {
+                databaseNames[i] = dbNames.get(i).asText();
+            }
+            result = databaseNames;
+
+        }
+         * */
     }
 }
 /*
@@ -85,30 +119,7 @@ class GetDatabaseNamesCommand extends RavenCommand
         }
 
         @Override
-        public void setResponse(String response, boolean fromCache) throws IOException {
-            if (response == null) {
-                throwInvalidResponse();
-                return;
-            }
 
-            JsonNode names = mapper.readTree(response);
-            if (!names.has("Databases")) {
-                throwInvalidResponse();
-            }
-
-            JsonNode databases = names.get("Databases");
-            if (!databases.isArray()) {
-                throwInvalidResponse();
-            }
-            ArrayNode dbNames = (ArrayNode) databases;
-            String[] databaseNames = new String[dbNames.size()];
-            for (int i = 0; i < dbNames.size(); i++) {
-                databaseNames[i] = dbNames.get(i).asText();
-            }
-
-            result = databaseNames;
-
-        }
     }
 }
 

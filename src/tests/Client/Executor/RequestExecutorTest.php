@@ -5,8 +5,8 @@ namespace RavenDB\Tests\Client\Executor;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Serverwide\Operations\GetDatabaseNamesOperation;
-use RavenDB\Tests\Client\RemoteTestBase;
 use RavenDB\Client\Util\AssertUtils;
+use RavenDB\Tests\Client\RemoteTestBase;
 
 class RequestExecutorTest extends RemoteTestBase
 {
@@ -20,11 +20,8 @@ class RequestExecutorTest extends RemoteTestBase
                 $databaseNamesOperation = new GetDatabaseNamesOperation(0, 20);
                 $command = $databaseNamesOperation->getCommand($conventions);
                 $executor->execute($command);
-                dd($executor);
                 $dbNames = $command->getResult();
-               // dd($dbNames);
-             //   dd($dbNames);
-//                AssertUtils::assertThat($dbNames)::contains($store->getDatabase());
+                AssertUtils::assertThat($dbNames)::contains($store->getDatabase());
             } finally {
                 $executor->close();
             }
@@ -42,9 +39,7 @@ class RequestExecutorTest extends RemoteTestBase
                 GetDatabaseNamesOperation databaseNamesOperation = new GetDatabaseNamesOperation(0, 20);
                 RavenCommand<String[]> command = databaseNamesOperation.getCommand(conventions);
                 executor.execute(command);
-
-                String[] dbNames = command.getResult();RequestExecutor
-
+                String[] dbNames = command.getResult();
                 assertThat(dbNames).contains(store.getDatabase());
             }
         }

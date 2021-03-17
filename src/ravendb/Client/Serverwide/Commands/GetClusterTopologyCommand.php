@@ -1,4 +1,5 @@
 <?php
+
 namespace RavenDB\Client\Serverwide\Commands;
 
 use HttpResponseException;
@@ -15,16 +16,10 @@ class GetClusterTopologyCommand extends RavenCommand
         $this->_debugTag = $debugTag === null ? null : $debugTag;
     }
 
-    /*  TODO : createRequest IS NOT EXPECTED TO SEND THE REQUEST : REQUEST SENDER TO DO WITHOUT curl_close AS IT IS INTERNALLY MANAGED
-        $curlUrl = curl_init();
-        curl_setopt_array($curlUrl, $requestOptions);
-        $result = curl_exec($curlUrl);
-        return $result;
-    */
     public function createRequest(ServerNode $node): array
     {
         $url = $node->getUrl() . "/cluster/topology";
-        //if ($this->_debugTag !== null) $url .= "?" . $this->_debugTag;
+        if ($this->_debugTag !== null) $url .= "?" . $this->_debugTag;
         return [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true
@@ -46,3 +41,45 @@ class GetClusterTopologyCommand extends RavenCommand
         return true;
     }
 }
+/*TODO SOURCE
+public class GetClusterTopologyCommand extends RavenCommand<ClusterTopologyResponse> {
+
+    private final String _debugTag;
+
+    public GetClusterTopologyCommand() {
+        super(ClusterTopologyResponse.class);
+
+        _debugTag = null;
+    }
+
+    public GetClusterTopologyCommand(String debugTag) {
+        super(ClusterTopologyResponse.class);
+        _debugTag = debugTag;
+    }
+
+    @Override
+    public HttpRequestBase createRequest(ServerNode node, Reference<String> url) {
+        url.value = node.getUrl() + "/cluster/topology";
+
+        if (_debugTag != null)
+            url.value += "?" + _debugTag;
+
+        return new HttpGet();
+    }
+
+    @Override
+    public void setResponse(String response, boolean fromCache) throws IOException {
+        if (response == null) {
+            throwInvalidResponse();
+        }
+
+        result = mapper.readValue(response, resultClass);
+    }
+
+    @Override
+    public boolean isReadRequest() {
+        return true;
+    }
+}
+
+*/
