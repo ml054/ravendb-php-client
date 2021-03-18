@@ -14,10 +14,9 @@ use Symfony\Component\Serializer\Serializer;
 class GetClusterTopologyCommand extends RavenCommand
 {
     private null|string $_debugTag;
-    // TODO CHECK WITH MARCIN FOR IMPLEMENTATION OF THE TRANSFORMER
+
     public function __construct(?string $debugTag = null)
     {
-        //TODO super(ClusterTopologyResponse.class);
         $this->_debugTag = $debugTag === null ? null : $debugTag;
     }
 
@@ -37,7 +36,6 @@ class GetClusterTopologyCommand extends RavenCommand
         if (null === $response) {
             throw new HttpResponseException();
         }
-        // TODO: ORIGINAL result = mapper.readValue(response, resultClass);
         $maxDepthHandler = function ($innerObject, $outerObject, string $attributeName, string $format = null, array $context = []) {};
         $defaultContext = [
             AbstractObjectNormalizer::MAX_DEPTH_HANDLER => $maxDepthHandler,
