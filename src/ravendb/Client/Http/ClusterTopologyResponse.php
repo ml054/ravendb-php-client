@@ -3,11 +3,11 @@
 namespace RavenDB\Client\Http;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class ClusterTopologyResponse extends \ArrayObject
+class ClusterTopologyResponse
 {
     private string $leader;
     private string $nodeTag;
-    private ClusterTopology $topology;
+    public ClusterTopology $topology;
     private string $etag;
     private NodeStatus $status;
     // TODO : TO HAVE THE TRANSFORMER WORK.
@@ -15,15 +15,7 @@ class ClusterTopologyResponse extends \ArrayObject
     // TODO CHECK WITH MARCIN : BLOCKING POINT : in php a child class cannot have 2 parents
     private array $children;
 
-    public function __construct(?string $attributes=null)
-    {
-        $this->attributes = $attributes;
-    }
 
-    /*public function __get($id): array
-    {
-        return $this->children[$id];
-    }*/
 
     public function getLeader(): string
     {
