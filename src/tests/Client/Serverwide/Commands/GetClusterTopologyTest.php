@@ -15,13 +15,16 @@ class GetClusterTopologyTest extends RemoteTestBase
         try {
             $command = new GetClusterTopologyCommand(null );
             $store->getRequestExecutor()->execute($command);
+
             /**
              * @var ClusterTopologyResponse $result
             */
+
             $result = $command->getResult();
             AssertUtils::assertThat($result)::isNotNull();
             AssertUtils::assertThat($result->getLeader())::isNotEmpty();
             AssertUtils::assertThat($result->getNodeTag())::isNotEmpty();
+
             $topology = $result->getTopology();
             AssertUtils::assertThat($topology)::isNotNull();
             AssertUtils::assertThat($topology->getTopologyId())::isNotNull();
