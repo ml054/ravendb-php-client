@@ -30,7 +30,7 @@ class GetClusterTopologyCommand extends RavenCommand
             CURLOPT_RETURNTRANSFER => true
         ];
     }
-    // TODO : IMPLEMENT SYMFONY COMPONENT
+    // TODO : IMPLEMENT SYMFONY COMPONENT. Check with Marcin
     public function setResponse(string|array $response, bool $fromCache): ClusterTopologyResponse
     {
         // TODO : THROWING A REGULAR EXCEPTION
@@ -55,7 +55,7 @@ class GetClusterTopologyCommand extends RavenCommand
         $topologyData = $object->topology;
 
         // MAPPING ClusterTopology with reponse data
-        $topology = (new ClusterTopology());
+        $topology = new ClusterTopology();
         $topology->setEtag($topologyData->etag);
         $topology->setMembers($topologyData->members);
         $topology->setLastNodeId($topologyData->last_node_id);
