@@ -22,7 +22,7 @@ class RequestExecutor implements Closable
     private ?int $_defaultTimeout = null;
     private ?int $_secondBroadcastAttemptTimeout = null;
     private ?int $_firstBroadcastAttemptTimeout = null;
-    private ?int $numberOfServerRequests;
+    private ?int $numberOfServerRequests=null;
     /// how to access
     private static DatabaseHealthCheckOperation $failureCheckOperation;
     public static string $requestPostProcessor;
@@ -89,6 +89,34 @@ class RequestExecutor implements Closable
         //$executor = new createForSingleNodeWithoutConfigurationUpdates($databaseName, $authOptions, $conventions, $initialUrls);
         // TODO MIGRATION TO COMPLETE FROM JVM SOURCE
     }
+
+    public static function createForSingleNodeWithoutConfigurationUpdates(string $url, string $databaseName, AuthOptions $authOptions,DocumentConventions $conventions){
+        // final String[] initialUrls = validateUrls(new String[]{url}, certificate); TODO
+
+    }
+    /**
+     *  public static RequestExecutor createForSingleNodeWithoutConfigurationUpdates(String url, String databaseName, KeyStore certificate, char[] keyPassword, KeyStore trustStore, ExecutorService executorService, DocumentConventions conventions) {
+    final String[] initialUrls = validateUrls(new String[]{url}, certificate);
+
+    RequestExecutor executor = new RequestExecutor(databaseName, certificate, keyPassword, trustStore, conventions, executorService, initialUrls);
+
+    Topology topology = new Topology();
+    topology.setEtag(-1L);
+
+    ServerNode serverNode = new ServerNode();
+    serverNode.setDatabase(databaseName);
+    serverNode.setUrl(initialUrls[0]);
+    topology.setNodes(Collections.singletonList(serverNode));
+
+    executor._nodeSelector = new NodeSelector(topology, executorService);
+    executor.topologyEtag = INITIAL_TOPOLOGY_ETAG;
+    executor._disableTopologyUpdates = true;
+    executor._disableClientConfigurationUpdates = true;
+
+    return executor;
+    }
+
+     */
 
     public function getSecondBroadcastAttemptTimeout(): int
     {
@@ -485,7 +513,7 @@ class RequestExecutor implements Closable
         return $this->lastServerVersion;
     }
 
-    public function getDefaultTimeout(): int
+    public function getDefaultTimeout(): ?int
     {
         return $this->_defaultTimeout;
     }

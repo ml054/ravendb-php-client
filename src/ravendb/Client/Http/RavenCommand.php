@@ -3,22 +3,27 @@
 namespace RavenDB\Client\Http;
 
 use Exception;
+use http\Env\Response;
 use http\Exception\RuntimeException;
+use HttpResponse;
+use InvalidArgumentException;
 use RavenDB\Client\Exceptions\IllegalStateException;
-
+use RavenDB\Client\Util\StringUtils;
+use CurlHandle;
 abstract class RavenCommand
 {
     protected object $resultClass;
     protected int $statusCode;
-    protected int $timeout;
+    protected ?int $timeout=null;
     protected bool $canCache;
-/*    protected bool $canCacheAggressively;*/
+    /*    protected bool $canCacheAggressively;*/
     protected string $selectedNodeTag;
     protected int $numberOfAttempts;
     public const CLIENT_VERSION = "5.0.0";
     protected null|string|array $result=null;
     public int $failoverTopologyEtag = -2;
-    protected ?RavenCommandResponseType $responseType=null;
+    protected RavenCommandResponseType|string $responseType;
+    private ServerNode|array $failedNodes;
 
     public abstract function isReadRequest(): bool;
 
@@ -39,7 +44,7 @@ abstract class RavenCommand
         return $this->responseType;
     }
 
-    public function getTimeout(): int
+    public function getTimeout(): ?int
     {
         return $this->timeout;
     }
@@ -89,11 +94,11 @@ abstract class RavenCommand
     }
     /**
      * @throws
-    */
+     */
     public function setResponse(string|array $response, bool $fromCache) // TODO : CONFIRM THE SCOPE OF THE UNUSED PARAMETERS response and fromCache
     {
 
-        if ($this->responseType == RavenCommandResponseType::EMPTY || $this->responseType == RavenCommandResponseType::RAW) {
+        if ($this->responseType === RavenCommandResponseType::EMPTY || $this->responseType === RavenCommandResponseType::RAW) {
             try {
                 $this->throwInvalidResponse();
             } catch (IllegalStateException $e) {
@@ -108,8 +113,8 @@ abstract class RavenCommand
     {
         $this->resultClass = $resultClass;
         $this->responseType = RavenCommandResponseType::OBJECT;
-        $this->canCache = true;
-        $canCacheAggressively = true;
+        // $this->canCache = true; TODO : not yet in php scope
+        // $canCacheAggressively = true;
     }
 
     protected function urlEncode(string $value): string
@@ -120,94 +125,76 @@ abstract class RavenCommand
             throw new RuntimeException($e);
         }
     }
-}
-/*
 
-    public void setResponse(String response, boolean fromCache) throws IOException {
-        if (responseType == RavenCommandResponseType.EMPTY || responseType == RavenCommandResponseType.RAW) {
-            throwInvalidResponse();
-        }
-
-        throw new UnsupportedOperationException(responseType.name() + " command must override the setResponse method which expects response with the following type: " + responseType);
-    }
-
-    public CloseableHttpResponse send(CloseableHttpClient client, HttpRequestBase request) throws IOException {
-        return client.execute(request);
-    }
-
-    @SuppressWarnings("unused")
-    public void setResponseRaw(CloseableHttpResponse response, InputStream stream) {
-        throw new UnsupportedOperationException("When " + responseType + " is set to Raw then please override this method to handle the response. ");
-    }
-
-    private Map<ServerNode, Exception> failedNodes;
-
-    public Map<ServerNode, Exception> getFailedNodes() {
-        return failedNodes;
-    }
-
-    public void setFailedNodes(Map<ServerNode, Exception> failedNodes) {
-        this.failedNodes = failedNodes;
-    }
-
-    @SuppressWarnings("unused")
-    protected String urlEncode(String value) {
-        try {
-            return URLEncoder.encode(value, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+    public static function ensureIsNotNullOrString(string $value, string $name):void {
+        if (StringUtils::isNotBlank($value)) {
+            throw new InvalidArgumentException($name ." cannot be null or empty");
         }
     }
 
-    public static void ensureIsNotNullOrString(String value, String name) {
-        if (StringUtils.isEmpty(value)) {
-            throw new IllegalArgumentException(name + " cannot be null or empty");
-        }
+    /**
+     * @param string $response
+     * @param string|object $stream
+     * @throws Exception
+     * @SuppressWarnings("unused")  /* TODO : CHECK WITH MARCIN
+     */
+    public function setResponseRaw(string $response, string|object $stream): void {
+        throw new Exception("When " .$this->responseType. " is set to Raw then please override this method to handle the response. ");
+    }
+    public function getFailedNodes():ServerNode {
+        return $this->failedNodes;
     }
 
-    public boolean isFailedWithNode(ServerNode node) {
-        return failedNodes != null && failedNodes.containsKey(node);
+    public function setFailedNodes(array $failedNodes): void {
+        $this->failedNodes = $failedNodes;
     }
 
-    public ResponseDisposeHandling processResponse(HttpCache cache, CloseableHttpResponse response, String url) {
-        HttpEntity entity = response.getEntity();
+    public function isFailedWithNode(ServerNode $node):bool {
+        return $this->failedNodes !== null && array_key_exists($node,$this->failedNodes); // TODO : failedNodes.containsKey()
+    }
 
-        if (entity == null) {
-            return ResponseDisposeHandling.AUTOMATIC;
+    public function processResponse(string $cache, string $response, string $url): string
+    {
+        $entity = $response->getEntity(); // TODO CHECK IF CloseableHttpResponse IS TO IMPLEMENT
+
+        if(null === $entity){
+            return ResponseDisposeHandling::AUTOMATIC;
         }
 
-        if (responseType == RavenCommandResponseType.EMPTY || response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
-            return ResponseDisposeHandling.AUTOMATIC;
+        if ($this->responseType === RavenCommandResponseType::EMPTY || $response->getStatusLine()->getStatusCode() === HttpStatus::SC_NO_CONTENT) { // TODO
+            return ResponseDisposeHandling::AUTOMATIC;
         }
 
         try {
-            if (responseType == RavenCommandResponseType.OBJECT) {
-                Long contentLength = entity.getContentLength();
-                if (contentLength == 0) {
-                    HttpClientUtils.closeQuietly(response);
-                    return ResponseDisposeHandling.AUTOMATIC;
+            if ($this->responseType == RavenCommandResponseType::OBJECT) {
+                $contentLength = $entity->getContentLength();
+                if ($contentLength === 0) {
+                   // HttpClientUtils.closeQuietly(response); // TODO CHECK WITH MARCIN IF HERE CURL SHOULD CLOSE THE SESSION
+                    return ResponseDisposeHandling::AUTOMATIC;
                 }
 
                 // we intentionally don't dispose the reader here, we'll be using it
                 // in the command, any associated memory will be released on context reset
-                String json = IOUtils.toString(entity.getContent(), StandardCharsets.UTF_8);
-                if (cache != null) //precaution
+                //String json = IOUtils.toString(entity.getContent(), StandardCharsets.UTF_8);
+               /* if (cache !== null) //precaution
                 {
                     cacheResponse(cache, url, response, json);
                 }
-                setResponse(json, false);
-                return ResponseDisposeHandling.AUTOMATIC;
+                $this->setResponse($json, false);*/
+                return ResponseDisposeHandling::AUTOMATIC;
             } else {
-                setResponseRaw(response, entity.getContent());
+                $this->setResponseRaw($response, $entity->getContent());
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            HttpClientUtils.closeQuietly(response);
-        }
-
-        return ResponseDisposeHandling.AUTOMATIC;
+        } catch (Exception $e) {
+        throw new RuntimeException($e);
+  //  } finally {
+       // HttpClientUtils.closeQuietly(response); // TODO
     }
+        return ResponseDisposeHandling::AUTOMATIC;
+    }
+}
+/*
+
 
     protected void cacheResponse(HttpCache cache, String url, CloseableHttpResponse response, String responseJson) {
         if (!canCache()) {

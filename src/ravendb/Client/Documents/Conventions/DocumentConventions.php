@@ -24,7 +24,7 @@ class DocumentConventions
     private ?int $_secondBroadcastAttemptTimeout = null;
     private ?LoadBalanceBehavior $_loadBalanceBehavior = null;
     private ?ReadBalanceBehavior $_readBalanceBehavior = null;
-    /*private ObjectMapper $_entityMapper; TODO : IMPORT THE CLASS*/
+    private ObjectMapper $_entityMapper; /*TODO : IMPORT THE CLASS*/
     private ?bool $_useCompression=null;
 
     public function getMaxHttpCacheSize(): ?int

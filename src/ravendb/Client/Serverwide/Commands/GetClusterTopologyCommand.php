@@ -3,13 +3,15 @@
 namespace RavenDB\Client\Serverwide\Commands;
 
 use HttpResponseException;
+use RavenDB\Client\Http\ClusterTopologyResponse;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
+use RavenDB\Client\Util\GetClusterTopologyAttributesTransformer;
 
 class GetClusterTopologyCommand extends RavenCommand
 {
     private null|string $_debugTag;
-
+    // TODO CHECK WITH MARCIN FOR IMPLEMENTATION OF THE TRANSFORMER
     public function __construct(?string $debugTag = null)
     {
         //TODO super(ClusterTopologyResponse.class);
@@ -25,7 +27,29 @@ class GetClusterTopologyCommand extends RavenCommand
             CURLOPT_RETURNTRANSFER => true
         ];
     }
+/* TODO Model from Nodejs : Implement the transformer
+ * public async setResponseAsync(bodyStream: stream.Stream, fromCache: boolean): Promise<string> {
+        if (!bodyStream) {
+            this._throwInvalidResponse();
+        }
 
+        let body: string = null;
+        const result = await this._pipeline<ClusterTopologyResponse>()
+            .collectBody(b => body = b)
+            .parseJsonSync()
+            .objectKeysTransform({
+                defaultTransform: "camel",
+                ignorePaths: [/topology\.(members|promotables|watchers|allNodes)\./i]
+            })
+            .process(bodyStream);
+
+        const clusterTpl = Object.assign(new ClusterTopology(), result.topology);
+        this.result = Object.assign(result as ClusterTopologyResponse, { topology: clusterTpl });
+        this.result.status = new Map(Object.entries(this.result.status));
+        return body;
+    }
+
+ * */
     public function setResponse(string|array $response, bool $fromCache)
     {
         // TODO : THROWING A REGULAR EXCEPTION
