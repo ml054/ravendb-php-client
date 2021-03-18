@@ -277,7 +277,7 @@ class RequestExecutor implements Closable
         if ($command->failoverTopologyEtag === RequestExecutor::$INITIAL_TOPOLOGY_ETAG) {
             $command->failoverTopologyEtag = RequestExecutor::$INITIAL_TOPOLOGY_ETAG;
 
-            /*TODO TO COMPLETE*/
+            /*TODO TO RETRIEVE THE PROPER TOPOLOGIES METHODS*/
              if($this->_nodeSelector && $this->_nodeSelector->getTopology()){
                 $topology = $this->_nodeSelector->getTopology();
                 if($topology->etag()){
@@ -431,10 +431,10 @@ class RequestExecutor implements Closable
     {
         $curlUrl = curl_init();
         curl_setopt_array($curlUrl, (array)$request);
-        // TODO VALIDATE THE APPROACH WITH MARCIN : INJECTING CURL RESPONSE A RESULT
+        // TODO VALIDATE THE APPROACH WITH MARCIN : INJECTING CURL RESPONSE AS RESULT
         try {
             $this->numberOfServerRequests++;
-            $timeout = $command->getTimeout() || $this->getDefaultTimeout();
+           // $timeout = $command->getTimeout() || $this->getDefaultTimeout();
 
             // TODO COMPLETE THE IMPLEMENTATION OF _sendRequestToServer
             $command->setResponse(curl_exec($curlUrl), false);
