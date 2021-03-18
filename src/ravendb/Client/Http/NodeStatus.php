@@ -8,8 +8,8 @@ class NodeStatus
 {
     private bool $connected;
     private string $errorDetails;
-    private DateTime $lastSend;
-    private DateTime $lastReply;
+    private DateTime $lastSend; // TODO : DateTimeInterface
+    private DateTime $lastReply; // TODO : DateTimeInterface
     private string $lastSentMessage;
     private string $lastMatchingIndex;
 
