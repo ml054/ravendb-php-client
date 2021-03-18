@@ -55,7 +55,7 @@ class GetClusterTopologyCommand extends RavenCommand
         // INITIATE TOPOLOGY - TOPOLOGY DATA FROM RESPONSE
         $topologyData = $object->topology;
 
-        // MAPPING ClusterTopology with reponse data
+        // MAPPING ClusterTopology with response data
         $topology = new ClusterTopology();
         $topology->setEtag($topologyData->etag);
         $topology->setMembers($topologyData->members);
@@ -76,6 +76,7 @@ class GetClusterTopologyCommand extends RavenCommand
         $clusterTopologyResponse->setStatus($status);
         $clusterTopologyResponse->setNodeTag($object->node_tag);
         $clusterTopologyResponse->setTopologyResponse($arrayToString);
+
         return $this->result = $clusterTopologyResponse;
     }
     public function isReadRequest(): bool
