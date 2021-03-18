@@ -3,7 +3,7 @@
 namespace RavenDB\Client\Http;
 
 use DateTime;
-
+// TODO : IF NON NULL TOPOLOGY NODESTATUS SHOULD BE IMPLEMENTED
 class NodeStatus
 {
     private bool $connected;
