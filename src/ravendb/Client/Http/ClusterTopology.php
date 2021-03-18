@@ -122,7 +122,7 @@ class ClusterTopology
     }
 
     /**
-     * TODO check with Marcin. Using regular settings for setAllNodes
+     * TODO check with Marcin. Using regular setter for setAllNodes
      * @param array|object $all_nodes
      */
     public function setAllNodes(object|array $all_nodes): void
