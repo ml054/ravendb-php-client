@@ -1,12 +1,15 @@
 <?php
-
 namespace RavenDB\Client\Serverwide\Commands;
-
 use HttpResponseException;
+use RavenDB\Client\Http\ClusterTopology;
 use RavenDB\Client\Http\ClusterTopologyResponse;
+use RavenDB\Client\Http\NodeStatus;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
-use RavenDB\Client\Util\GetClusterTopologyAttributesTransformer;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class GetClusterTopologyCommand extends RavenCommand
 {
@@ -27,39 +30,54 @@ class GetClusterTopologyCommand extends RavenCommand
             CURLOPT_RETURNTRANSFER => true
         ];
     }
-/* TODO Model from Nodejs : Implement the transformer
- * public async setResponseAsync(bodyStream: stream.Stream, fromCache: boolean): Promise<string> {
-        if (!bodyStream) {
-            this._throwInvalidResponse();
-        }
-
-        let body: string = null;
-        const result = await this._pipeline<ClusterTopologyResponse>()
-            .collectBody(b => body = b)
-            .parseJsonSync()
-            .objectKeysTransform({
-                defaultTransform: "camel",
-                ignorePaths: [/topology\.(members|promotables|watchers|allNodes)\./i]
-            })
-            .process(bodyStream);
-
-        const clusterTpl = Object.assign(new ClusterTopology(), result.topology);
-        this.result = Object.assign(result as ClusterTopologyResponse, { topology: clusterTpl });
-        this.result.status = new Map(Object.entries(this.result.status));
-        return body;
-    }
-
- * */
-    public function setResponse(string|array $response, bool $fromCache)
+    // TODO : IMPLEMENT SYMFONY COMPONENT
+    public function setResponse(string|array $response, bool $fromCache): ClusterTopologyResponse
     {
         // TODO : THROWING A REGULAR EXCEPTION
         if (null === $response) {
             throw new HttpResponseException();
         }
         // TODO: ORIGINAL result = mapper.readValue(response, resultClass);
-        $this->result = $response;
-    }
+        $maxDepthHandler = function ($innerObject, $outerObject, string $attributeName, string $format = null, array $context = []) {};
+        $defaultContext = [
+            AbstractObjectNormalizer::MAX_DEPTH_HANDLER => $maxDepthHandler,
+        ];
+        $data = json_decode($response);
+        $normalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter(), null, null, null, null, $defaultContext);
+        $serializer = new Serializer([$normalizer]);
 
+        // normalizing properties/attributes. Data model convention name : snake_case as per the output
+        $result = $serializer->normalize($data, null, [ AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true ]);
+        // turning to object to access normalized properties TODO: improve
+        $object = json_decode(json_encode($result));
+
+        // INITIATE TOPOLOGY - TOPOLOGY DATA FROM RESPONSE
+        $topologyData = $object->topology;
+
+        // MAPPING ClusterTopology with reponse data
+        $topology = (new ClusterTopology());
+        $topology->setEtag($topologyData->etag);
+        $topology->setMembers($topologyData->members);
+        $topology->setLastNodeId($topologyData->last_node_id);
+        $topology->setPromotables($topologyData->promotables);
+        $topology->setTopologyId($topologyData->topology_id);
+        $topology->setWatchers($topologyData->watchers);
+        $topology->setAllNodes($topologyData->all_nodes);
+
+        // STATUS INFO MAPPING
+        $status = new NodeStatus();
+
+        // BUILDING THE RESPONSE ClusterTopologyResponse
+        $clusterTopologyResponse = new ClusterTopologyResponse();
+        $clusterTopologyResponse->setLeader($object->leader);
+        $clusterTopologyResponse->setTopology($topology);
+        $clusterTopologyResponse->setEtag($object->etag);
+        $clusterTopologyResponse->setStatus($status);
+        $clusterTopologyResponse->setNodeTag($object->node_tag);
+        $clusterTopologyResponse->setTopologyResponse($result);
+
+        return $this->result = $clusterTopologyResponse;
+    }
     public function isReadRequest(): bool
     {
         return true;

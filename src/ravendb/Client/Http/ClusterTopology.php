@@ -4,14 +4,14 @@ namespace RavenDB\Client\Http;
 // TODO : REMOVE ALL JAVA Map approach -> php Assoc Array
 class ClusterTopology
 {
-    private string $lastNodeId;
-    private string $topologyId;
+    private string $last_node_id;
+    private ?string $topology_id;
     private string $etag;
     // TODO : AS INSTRUCTED java Map -> php Array : file update in progress. Standard php dev for specific java language lib
-    private array $members;
-    private array $promotables;
-    private array $watchers;
-
+    private array|object $members;
+    private array|object $promotables;
+    private array|object $watchers;
+    private array|object $all_nodes;
     public function contains(string $node): bool
     {
         if($this->members && $this->members[$node]){
@@ -45,48 +45,43 @@ class ClusterTopology
     public function getAllNodes(): array
     {
        // TODO : Standard php array to implement
-         $result = [];
-        if ($this->members !== null) {
-         //  foreach($this->members)
-        }
-
-        if ($this->promotables !== null) {
-            // TODO FOR LOOP
-            /*for (Map.Entry<String, String> entry : promotables.entrySet()) {
-                result.put(entry.getKey(), entry.getValue());
-            }*/
-        }
-
-        if ($this->watchers !== null) {
-            // TODO FOR LOOP
-            /*for (Map.Entry<String, String> entry : watchers.entrySet()) {
-                result.put(entry.getKey(), entry.getValue());
-            }*/
-        }
-        return $result;
     }
 
+    /**
+     * @return string
+     */
     public function getLastNodeId(): string
     {
-        return $this->lastNodeId;
+        return $this->last_node_id;
     }
 
-    public function setLastNodeId(string $lastNodeId): void
+    /**
+     * @param string $last_node_id
+     */
+    public function setLastNodeId(string $last_node_id): void
     {
-        $this->lastNodeId = $lastNodeId;
+        $this->last_node_id = $last_node_id;
     }
 
+    /**
+     * @return string
+     */
     public function getTopologyId(): string
     {
-        return $this->topologyId;
+        return $this->topology_id;
     }
 
-    public function setTopologyId(string $topologyId): void
+    /**
+     * @param string $topology_id
+     */
+    public function setTopologyId(string $topology_id): void
     {
-        $this->topologyId = $topologyId;
+        $this->topology_id = $topology_id;
     }
 
-    public function getMembers(): array
+
+
+    public function getMembers(): array|object
     {
         return $this->members;
     }
@@ -125,6 +120,16 @@ class ClusterTopology
     {
         $this->etag = $etag;
     }
+
+    /**
+     * TODO check with Marcin. Using regular settings for setAllNodes
+     * @param array|object $all_nodes
+     */
+    public function setAllNodes(object|array $all_nodes): void
+    {
+        $this->all_nodes = $all_nodes;
+    }
+
 }
 /* PHP-MIGRATION-STATUS : EMPTY SOURCE CLASS BODY - MEANS ALL RESOURCES ARE IMPORTED. TO CLEAN ONCE VALIDATED
 export class ClusterTopology {

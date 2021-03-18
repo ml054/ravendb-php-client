@@ -5,10 +5,12 @@ namespace RavenDB\Client\Http;
 class ClusterTopologyResponse
 {
     private string $leader;
-    private string $nodeTag;
+    private string $node_tag; // TODO CHANGING TO snake_case. To check with Marcin. As per php OOP standards
     public ClusterTopology $topology;
     private string $etag;
     private NodeStatus $status;
+    // TODO : ADDING THE RESPONSE BODY
+    private string|array $topology_response;
 
     public function getLeader(): string
     {
@@ -22,12 +24,12 @@ class ClusterTopologyResponse
 
     public function getNodeTag(): string
     {
-        return $this->nodeTag;
+        return $this->node_tag;
     }
 
     public function setNodeTag(string $nodeTag): void
     {
-        $this->nodeTag = $nodeTag;
+        $this->node_tag = $nodeTag;
     }
 
     public function getTopology(): ClusterTopology
@@ -59,6 +61,23 @@ class ClusterTopologyResponse
     {
         $this->status = $status;
     }
+
+    /**
+     * @return string
+     */
+    public function getTopologyResponse(): string|array
+    {
+        return $this->topology_response;
+    }
+
+    /**
+     * @param string|array $topology_response
+     */
+    public function setTopologyResponse(string|array $topology_response): void
+    {
+        $this->topology_response = $topology_response;
+    }
+
 }
 /* PHP-MIGRATION-STATUS : EMPTY SOURCE CLASS BODY - MEANS ALL RESOURCES ARE IMPORTED. TO CLEAN ONCE VALIDATED
 public class ClusterTopologyResponse {

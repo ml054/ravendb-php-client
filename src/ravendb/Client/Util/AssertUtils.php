@@ -10,7 +10,7 @@ class AssertUtils
 
     public static function assertThat(array|string|object $element): self
     {
-        $encode = is_object($element) ? json_encode($element) : $element;
+        $encode = is_object($element) ? array($element) : $element;
         self::$elements = $encode;
         return new self;
     }

@@ -20,7 +20,7 @@ abstract class RavenCommand
     protected string $selectedNodeTag;
     protected int $numberOfAttempts;
     public const CLIENT_VERSION = "5.0.0";
-    protected null|string|array $result=null;
+    protected null|string|array|object $result=null;
     public int $failoverTopologyEtag = -2;
     protected RavenCommandResponseType|string $responseType;
     private ServerNode|array $failedNodes;
@@ -54,7 +54,7 @@ abstract class RavenCommand
         $this->statusCode = $statusCode;
     }
 
-    public function getResult(): array|string|null
+    public function getResult(): array|string|null|object
     {
         return $this->result;
     }
