@@ -1,8 +1,7 @@
 <?php
 
 namespace RavenDB\Client\Http;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
+// TODO INJECT THE CLASS RESPONSE
 class ClusterTopologyResponse
 {
     private string $leader;
@@ -10,12 +9,6 @@ class ClusterTopologyResponse
     public ClusterTopology $topology;
     private string $etag;
     private NodeStatus $status;
-    // TODO : TO HAVE THE TRANSFORMER WORK.
-    private ?string $attributes;
-    // TODO CHECK WITH MARCIN : BLOCKING POINT : in php a child class cannot have 2 parents
-    private array $children;
-
-
 
     public function getLeader(): string
     {
@@ -65,16 +58,6 @@ class ClusterTopologyResponse
     public function setStatus(NodeStatus $status): void
     {
         $this->status = $status;
-    }
-
-    // TODO : Serializer
-    public static function serializer($result,$property){
-        $data = serialize($result);
-        $unserialize = json_decode(unserialize($data,['allowed_access'=>true]));
-        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
-            ->disableExceptionOnInvalidPropertyPath()
-            ->getPropertyAccessor();
-        return $propertyAccessor->getValue($unserialize, $property);
     }
 }
 /* PHP-MIGRATION-STATUS : EMPTY SOURCE CLASS BODY - MEANS ALL RESOURCES ARE IMPORTED. TO CLEAN ONCE VALIDATED
