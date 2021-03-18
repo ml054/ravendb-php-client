@@ -38,6 +38,9 @@ abstract class RavenCommand
     {
         return $this->statusCode;
     }
+    /**
+     * TODO REQUESTED IMPLEMENT THE RESPONSE TYPE
+    */
 
     public function getResponseType(): RavenCommandResponseType
     {
