@@ -20,7 +20,7 @@ class GetClusterTopologyTest extends RemoteTestBase
             */
             $result = $command->getResult();
             AssertUtils::assertThat($result)::isNotNull();
-            AssertUtils::assertThat($result->getLeader())::isNotEmpty(); // TODO : MAPPER SHOULD TRIGGER THE GETTER
+            AssertUtils::assertThat($result->getLeader())::isNotEmpty();
             AssertUtils::assertThat($result->getNodeTag())::isNotEmpty();
             $topology = $result->getTopology();
             AssertUtils::assertThat($topology)::isNotNull();
