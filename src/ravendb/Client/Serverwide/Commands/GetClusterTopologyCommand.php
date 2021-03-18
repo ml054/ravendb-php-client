@@ -46,10 +46,11 @@ class GetClusterTopologyCommand extends RavenCommand
         $normalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter(), null, null, null, null, $defaultContext);
         $serializer = new Serializer([$normalizer]);
 
-        // normalizing properties/attributes. Data model convention name : snake_case as per the output
+        // normalizing properties/attributes. Data model convention name : snake_case as per the output. Return and array
         $result = $serializer->normalize($data, null, [ AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true ]);
         // turning to object to access normalized properties TODO: improve
-        $object = json_decode(json_encode($result));
+        $arrayToString = json_encode($result);
+        $object = json_decode($arrayToString);
 
         // INITIATE TOPOLOGY - TOPOLOGY DATA FROM RESPONSE
         $topologyData = $object->topology;
@@ -74,8 +75,7 @@ class GetClusterTopologyCommand extends RavenCommand
         $clusterTopologyResponse->setEtag($object->etag);
         $clusterTopologyResponse->setStatus($status);
         $clusterTopologyResponse->setNodeTag($object->node_tag);
-        $clusterTopologyResponse->setTopologyResponse($result);
-
+        $clusterTopologyResponse->setTopologyResponse($arrayToString);
         return $this->result = $clusterTopologyResponse;
     }
     public function isReadRequest(): bool
