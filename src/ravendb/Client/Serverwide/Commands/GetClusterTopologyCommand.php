@@ -46,9 +46,9 @@ class GetClusterTopologyCommand extends RavenCommand
 
         // normalizing properties/attributes. Data model convention name : snake_case as per the output. Return and array
         $result = $serializer->normalize($data, null, [ AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true ]);
-        // turning to object to access normalized properties TODO: improve
-        $arrayToString = json_encode($result);
-        $object = json_decode($arrayToString);
+        // turning to object to access normalized properties TODO: improve Later : refactory
+        $arrayToString = json_encode($result); // TODO REMOVE TO AVOIR
+        $object = json_decode($arrayToString); // TODO MAP THE OBJECT ONLY
 
         // INITIATE TOPOLOGY - TOPOLOGY DATA FROM RESPONSE
         $topologyData = $object->topology;
@@ -63,7 +63,8 @@ class GetClusterTopologyCommand extends RavenCommand
         $topology->setWatchers($topologyData->watchers);
         $topology->setAllNodes($topologyData->all_nodes);
 
-        // STATUS INFO MAPPING
+        // STATUS INFO MAPPING TODO : CHECK WITH MARCIN IF IT SHOULD BE GENERATED IN CASE OF NOT NULL
+        //
         $status = new NodeStatus();
 
         // BUILDING THE RESPONSE ClusterTopologyResponse
@@ -74,7 +75,8 @@ class GetClusterTopologyCommand extends RavenCommand
         $clusterTopologyResponse->setStatus($status);
         $clusterTopologyResponse->setNodeTag($object->node_tag);
         $clusterTopologyResponse->setTopologyResponse($arrayToString);
-
+        dd($clusterTopologyResponse->getTopologyResponse());
+        /// TODO : check with Marcin if it can be with return statment. Original being void
         return $this->result = $clusterTopologyResponse;
     }
     public function isReadRequest(): bool
