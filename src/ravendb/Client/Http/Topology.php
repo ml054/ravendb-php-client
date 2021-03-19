@@ -1,11 +1,11 @@
 <?php
 
 namespace RavenDB\Client\Http;
-
+// TODO : CHECK WITH MARCIN IF TO INJECT IN THE CLUSTER TOPOLOGY RESPONSE
 class Topology
 {
     private string $etag;
-    private ServerNode|array $nodes;
+    private ServerNode $nodes;
 
     public function getEtag(): string
     {

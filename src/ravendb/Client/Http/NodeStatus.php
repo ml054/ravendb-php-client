@@ -7,11 +7,11 @@ use DateTime;
 class NodeStatus
 {
     private bool $connected;
-    private string $errorDetails;
+    private string $errorDetails; // TODO : SNAKE
     private DateTime $lastSend; // TODO : DateTimeInterface
-    private DateTime $lastReply; // TODO : DateTimeInterface
+    private DateTime $lastReply; // TODO : DateTimeInterface SNAKE
     private string $lastSentMessage;
-    private string $lastMatchingIndex;
+    private string $lastMatchingIndex; // TODO LONG IN JAVA
 
     public function isConnected(): bool
     {

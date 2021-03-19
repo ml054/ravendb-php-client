@@ -12,7 +12,7 @@ class ClusterTopology
     private array|object $promotables;
     private array|object $watchers;
     private array|object $all_nodes;
-    public function contains(string $node): bool
+    /*public function contains(string $node): bool
     {
         if($this->members && $this->members[$node]){
             return true;
@@ -39,7 +39,7 @@ class ClusterTopology
         }
 
         return null;
-    }
+    }*/
 
 
     public function getAllNodes(): array

@@ -40,7 +40,7 @@ interface IDocumentStore extends IDisposalNotification
 
     public function getDatabase(): ?string;
 
-    public function getRequestExecutor(?string $databaseName): RequestExecutor;
+    public function getRequestExecutor(?string $databaseName=null): RequestExecutor;
 
     public function timeSeries(): TimeSeriesOperations;
 
