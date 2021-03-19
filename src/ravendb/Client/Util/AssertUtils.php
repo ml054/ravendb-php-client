@@ -3,7 +3,8 @@
 namespace RavenDB\Client\Util;
 
 use PHPUnit\Framework\TestCase;
-// TODO: to add further going more assertions
+// TODO: remove static approach for assertThat. Map it in a controller and call assertThat with invocation of AssertUtils class constructor
+// to acces $this methods
 class AssertUtils
 {
     static private array|string|object $elements;
