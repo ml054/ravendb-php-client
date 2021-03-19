@@ -29,7 +29,7 @@ class GetClusterTopologyCommand extends RavenCommand
             CURLOPT_RETURNTRANSFER => true
         ];
     }
-    // TODO : IMPLEMENT SYMFONY COMPONENT. Check with Marcin + PHP STANDARD OBJECT DEPENDENCIE INJECTIONS
+    // TODO : AFTER REVIEW : DYNAMIC INJECTIONS OF CLASS AND RELOCATE THE MAPPER SERVICE IN A STANDALONE FILE. WORK IN PROGRESS
     public function setResponse(string|array $response, bool $fromCache): ClusterTopologyResponse
     {
         // TODO : THROWING A REGULAR EXCEPTION
