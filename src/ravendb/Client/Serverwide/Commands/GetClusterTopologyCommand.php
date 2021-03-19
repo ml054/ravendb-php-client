@@ -47,7 +47,7 @@ class GetClusterTopologyCommand extends RavenCommand
         // normalizing properties/attributes. Data model convention name : snake_case as per the output. Return and array
         $result = $serializer->normalize($data, null, [ AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true ]);
         // turning to object to access normalized properties TODO: improve Later : refactory
-        $arrayToString = json_encode($result); // TODO REMOVE TO AVOIR
+        $arrayToString = json_encode($result); // TODO REMOVE TO AVOID PERF ISSUES
         $object = json_decode($arrayToString); // TODO MAP THE OBJECT ONLY
 
         // INITIATE TOPOLOGY - TOPOLOGY DATA FROM RESPONSE
