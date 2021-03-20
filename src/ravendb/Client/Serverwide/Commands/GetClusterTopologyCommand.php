@@ -30,6 +30,7 @@ class GetClusterTopologyCommand extends RavenCommand
         ];
     }
     // TODO : AFTER REVIEW : create a mapper standalone that will mount and return object dependencies and NOT stdclass from the response. In progress
+    // In 2 steps : response -> Symfony Normalizer
     public function setResponse(string|array $response, bool $fromCache): ClusterTopologyResponse
     {
         // TODO : THROWING A REGULAR EXCEPTION
