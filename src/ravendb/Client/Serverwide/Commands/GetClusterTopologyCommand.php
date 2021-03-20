@@ -29,7 +29,7 @@ class GetClusterTopologyCommand extends RavenCommand
             CURLOPT_RETURNTRANSFER => true
         ];
     }
-    // TODO : AFTER REVIEW : DYNAMIC INJECTIONS OF CLASS AND RELOCATE THE MAPPER SERVICE IN A STANDALONE FILE. WORK IN PROGRESS
+    // TODO : AFTER REVIEW : create a mapper standalone that will mount and return object dependencies and NOT stdclass from the response. In progress
     public function setResponse(string|array $response, bool $fromCache): ClusterTopologyResponse
     {
         // TODO : THROWING A REGULAR EXCEPTION
