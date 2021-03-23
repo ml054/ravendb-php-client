@@ -11,7 +11,7 @@ class ClusterTopology
     private array|object $promotables;
     private array|object $watchers;
     public array|object $all_nodes;
-    // TODO Object to improvement : Goal : Dynamically create the properties
+    // TODO Subject to improvement : Goal : Dynamically create/assign the properties. To remove getter/setter and all properties public
     public function mapOptions(array $topologyData):self
     {
         foreach ($topologyData["topology"] as $field=>$value){
