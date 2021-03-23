@@ -12,35 +12,31 @@ class ClusterTopology
     private array|object $promotables;
     private array|object $watchers;
     private array|object $all_nodes;
-    /*public function contains(string $node): bool
-    {
-        if($this->members && $this->members[$node]){
-            return true;
+
+    public function __construct(array $config = array()){
+        try {
+            $this->mapOptions($config);
+        } catch (\Exception $e) {
         }
-        if($this->promotables && $this->promotables[$node]){
-            return true;
-        }
-        return $this->watchers && $this->watchers[$node];
     }
 
-    public function getUrlFromTag(?string $tag): string|null
+    public function mapOptions(array $options)
     {
-        if (!$tag) {
-            return null;
+        $_methods = get_class_methods($this);
+        foreach ($options as $key => $value) {
+            $method = 'set' . ucfirst($key);
+            if (in_array($method, $_methods)) {
+                $this->$method($value);
+            } else {
+                throw new \Exception('Invalid method name');
+            }
         }
-        if($this->members && $this->members[$tag]){
-            return true;
-        }
-        if($this->promotables && $this->promotables[$tag]){
-            return true;
-        }
-        if($this->watchers && $this->watchers[$tag]){
-            return true;
-        }
+        return $this;
+    }
 
-        return null;
-    }*/
-
+    public function mapOption($key, $value){
+        return $this->mapOptions([$key, $value]);
+    }
 
     public function getAllNodes(): array
     {
