@@ -46,14 +46,14 @@ class ObjectMapper
      * @throws Exception
      */
    public function genericMapper(string $response, object $targetClass):object{
-        if(!is_object($targetClass)){
+
+       if(!is_object($targetClass)){
             throw new Exception('Please provide a target class');
         }
 
-        if(null === $response){
+       if(null === $response){
             throw new Exception('Please provide a valid response');
         }
-
        // TODO REMOVE MAX
        $maxDepthHandler = function ($innerObject, $outerObject, string $attributeName, string $format = null, array $context = []) {};
        $defaultContext = [
@@ -66,9 +66,11 @@ class ObjectMapper
 
        // TODO IMPLEMENT THE CLUSTER TOPOLOGY RESPONSE OBJECT AND NOT ClusterTopology (compliance)
        $target = new $targetClass();
-       if(!method_exists($targetClass,'mapOtions')){
+       if(!method_exists($targetClass,'mapOptions')){
+
            throw new Exception('You need to implement the mapOptions method on the target class');
        }
+
        $target->mapOptions($result);
        return $target;
    }
