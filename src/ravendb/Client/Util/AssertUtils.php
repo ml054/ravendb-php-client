@@ -35,4 +35,9 @@ class AssertUtils
     {
         TestCase::assertCount($size, static::$elements);
     }
+
+    public static function classExists()
+    {
+       // TestCase::assertInstanceOf(static::$elements); TODO WRITE THE TEST
+    }
 }

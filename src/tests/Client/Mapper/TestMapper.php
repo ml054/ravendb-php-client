@@ -3,15 +3,13 @@
 namespace RavenDB\Tests\Client\Mapper;
 
 use PHPUnit\Framework\TestCase;
-use RavenDB\Client\Serverwide\Mapper\Annotations\AnnotationsMapper;
+use RavenDB\Client\Serverwide\Mapper\Annotations\MapperProperties;
 use RavenDB\Client\Serverwide\Mapper\Annotations\MyAnnotation;
 use RavenDB\Client\Serverwide\Mapper\CaseStudy\Order;
 use RavenDB\Client\Serverwide\Mapper\CaseStudy\OrderLine;
 use RavenDB\Client\Serverwide\Mapper\ObjectMapper;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use RavenDB\Client\Util\AssertUtils;
-use RavenDB\Client\Util\StringUtils;
 use ReflectionClass;
 
 class TestMapper extends TestCase
@@ -19,13 +17,11 @@ class TestMapper extends TestCase
     // TODO : CENTRALIZED ANNOTATION MAPPER RETURNING ARRAY OF DEPENDENCIES
     public function testMapper()
     {
-        $objectMapper = new ObjectMapper();
-        $order = new Order();
-        $orderLine = new OrderLine();
-        $reflectionClass = new ReflectionClass(AnnotationsMapper::class);
-        $property = $reflectionClass->getProperty('myProperty');
+        $reflectionClass = new ReflectionClass(Order::class);
+        $property = $reflectionClass->getProperty('map');
         $reader = new AnnotationReader();
-        $myAnnotation = $reader->getPropertyAnnotation($property, MyAnnotation::class);
-        AssertUtils::assertThat($myAnnotation->myProperty)::isNotEmpty();
+        $myAnnotation = $reader->getPropertyAnnotation($property, MyAnnotation::class); // Output : class as a string
+        /// TODO : IMPROVE, ANNOTATION READER ALLOW THE ACCESS TO PROPERTY META INFORMATION THAT CAN BE INJECTED AND RETRIEVED
+        AssertUtils::assertThat($myAnnotation->mapObject)::isNotEmpty();
     }
 }

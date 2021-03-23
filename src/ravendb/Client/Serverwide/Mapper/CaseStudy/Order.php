@@ -2,14 +2,14 @@
 
 namespace RavenDB\Client\Serverwide\Mapper\CaseStudy;
 use DateTimeInterface;
-/**
- * @OderLine(className="OrderLine")
- */
+use RavenDB\Client\Serverwide\Mapper\Annotations\MyAnnotation;
+
 class Order {
     public DateTimeInterface $orderDate;
     public int $id;
     public string $name;
-    public OrderLine $singleItem;
-    public array $itemsArray;
-    public array $itemsAsMap;
+    /**
+     * @MyAnnotation(mapObject="RavenDB\Client\Serverwide\Mapper\CaseStudy\OrderLine")
+     */
+    private string $map;
 }
