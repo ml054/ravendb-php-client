@@ -18,7 +18,7 @@ class GetClusterTopologyTest extends RemoteTestBase
             $store->getRequestExecutor()->execute($command);
             /**
              * @var ClusterTopology $result
-             * TODO Check the AssertUtils todo comments
+             * TODO Check the AssertUtils todo comments implement responseType to respect compliances
             */
             $result = $command->getResult();
             dd($result->last_node_id);
