@@ -8,6 +8,7 @@ use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Serverwide\Mapper\ObjectMapper;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -48,7 +49,7 @@ class GetClusterTopologyCommand extends RavenCommand
      * @param bool $fromCache
      * @return ClusterTopologyResponse
      * @throws HttpResponseException
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function setResponseStatic(string|array $response, bool $fromCache): ClusterTopologyResponse
     {
