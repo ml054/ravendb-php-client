@@ -32,6 +32,7 @@ class ObjectMapper
        if(!array_key_exists('topology',$result)){
            throw new Exception('Wrong topology response type');
        }
+       // TODO IMPLEMENT THE CLUSTER TOPOLOGY RESPONSE OBJECT AND NOT ClusterTopology (compliance)
        $topology = new ClusterTopology();
        $topology->mapOptions($result);
        return $topology;
