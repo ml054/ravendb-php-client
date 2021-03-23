@@ -67,11 +67,13 @@ class ObjectMapper
        // TODO IMPLEMENT THE CLUSTER TOPOLOGY RESPONSE OBJECT AND NOT ClusterTopology (compliance)
        $target = new $targetClass();
        if(!method_exists($targetClass,'mapOptions')){
-
            throw new Exception('You need to implement the mapOptions method on the target class');
        }
-
        $target->mapOptions($result);
        return $target;
+   }
+
+   public function mapSource(object $source, object $destination){
+      //  dd($destination);
    }
 }
