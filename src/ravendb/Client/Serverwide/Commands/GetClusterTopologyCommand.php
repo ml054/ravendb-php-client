@@ -40,7 +40,7 @@ class GetClusterTopologyCommand extends RavenCommand
             throw new HttpResponseException();
         }
         $mapper = new ObjectMapper();
-        return $this->result = $mapper->topology($response);
+        return $this->result = $mapper->genericMapper($response,new ClusterTopology());
     }
 
     /**
