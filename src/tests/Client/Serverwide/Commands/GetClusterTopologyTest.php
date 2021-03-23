@@ -2,6 +2,7 @@
 
 namespace RavenDB\Tests\Client\Serverwide\Commands;
 
+use RavenDB\Client\Http\ClusterTopology;
 use RavenDB\Client\Http\ClusterTopologyResponse;
 use RavenDB\Client\Serverwide\Commands\GetClusterTopologyCommand;
 use RavenDB\Client\Util\AssertUtils;
@@ -16,11 +17,13 @@ class GetClusterTopologyTest extends RemoteTestBase
             $command = new GetClusterTopologyCommand();
             $store->getRequestExecutor()->execute($command);
             /**
-             * @var ClusterTopologyResponse $result
+             * @var ClusterTopology $result
              * TODO Check the AssertUtils todo comments
             */
             $result = $command->getResult();
-            AssertUtils::assertThat($result)::isNotNull();
+            dd($result->last_node_id);
+
+            /*AssertUtils::assertThat($result)::isNotNull();
             AssertUtils::assertThat($result->getLeader())::isNotEmpty();
             AssertUtils::assertThat($result->getNodeTag())::isNotEmpty();
 
@@ -29,7 +32,7 @@ class GetClusterTopologyTest extends RemoteTestBase
             AssertUtils::assertThat($topology->getTopologyId())::isNotNull();
             AssertUtils::assertThat($topology->getMembers())::hasSize(1); // TODO CHECK WITH MARCIN, OBJECT CONVERTED TO ARRAY FOR ITERATION
             AssertUtils::assertThat($topology->getWatchers())::hasSize(0);
-            AssertUtils::assertThat($topology->getPromotables())::hasSize(0);
+            AssertUtils::assertThat($topology->getPromotables())::hasSize(0);*/
         } finally {
             $store->close();
         }

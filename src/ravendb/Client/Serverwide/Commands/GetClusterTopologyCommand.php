@@ -6,6 +6,8 @@ use RavenDB\Client\Http\ClusterTopologyResponse;
 use RavenDB\Client\Http\NodeStatus;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
+use RavenDB\Client\Serverwide\Mapper\ObjectMapper;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -22,6 +24,7 @@ class GetClusterTopologyCommand extends RavenCommand
 
     public function createRequest(ServerNode $node): array
     {
+
         $url = $node->getUrl() . "/cluster/topology";
         if ($this->_debugTag !== null) $url .= "?" . $this->_debugTag;
         return [
@@ -31,8 +34,25 @@ class GetClusterTopologyCommand extends RavenCommand
     }
     // TODO : AFTER REVIEW : create a mapper standalone that will mount and return object dependencies and NOT stdclass from the response. In progress
     // In 2 steps : response -> Symfony Normalizer
-    public function setResponse(string|array $response, bool $fromCache): ClusterTopologyResponse
+    public function setResponse(string|array $response, bool $fromCache): ClusterTopology
     {
+        if (null === $response) {
+            throw new HttpResponseException();
+        }
+        $mapper = new ObjectMapper();
+        return $this->result = $mapper->topology($response);
+    }
+
+    /**
+     * @param string|array $response
+     * @param bool $fromCache
+     * @return ClusterTopologyResponse
+     * @throws HttpResponseException
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     */
+    public function setResponseStatic(string|array $response, bool $fromCache): ClusterTopologyResponse
+    {
+
         // TODO : THROWING A REGULAR EXCEPTION
         if (null === $response) {
             throw new HttpResponseException();
@@ -45,8 +65,9 @@ class GetClusterTopologyCommand extends RavenCommand
         $normalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter(), null, null, null, null, $defaultContext);
         $serializer = new Serializer([$normalizer]);
 
-        // normalizing properties/attributes. Data model convention name : snake_case as per the output. Return and array
+        // normalizing properties/attributes. Data model convention name : snake_case as per the output. Return an array
         $result = $serializer->normalize($data, null, [ AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true ]);
+
         // turning to object to access normalized properties TODO: improve Later : refactory
         $arrayToString = json_encode($result); // TODO REMOVE TO AVOID PERF ISSUES
         $object = json_decode($arrayToString); // TODO MAP THE OBJECT ONLY
@@ -64,7 +85,6 @@ class GetClusterTopologyCommand extends RavenCommand
         $topology->setWatchers($topologyData->watchers);
         $topology->setAllNodes($topologyData->all_nodes);
 
-        // STATUS INFO MAPPING TODO : CHECK WITH MARCIN IF IT SHOULD BE GENERATED IN CASE OF NOT NULL
         //
         $status = new NodeStatus();
 
@@ -76,8 +96,7 @@ class GetClusterTopologyCommand extends RavenCommand
         $clusterTopologyResponse->setStatus($status);
         $clusterTopologyResponse->setNodeTag($object->node_tag);
         $clusterTopologyResponse->setTopologyResponse($arrayToString);
-        dd($clusterTopologyResponse->getTopologyResponse());
-        /// TODO : check with Marcin if it can be with return statment. Original being void
+   //     $clusterTopologyResponse->getTopologyResponse(); // todo should return an object
         return $this->result = $clusterTopologyResponse;
     }
     public function isReadRequest(): bool

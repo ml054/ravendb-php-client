@@ -4,38 +4,20 @@ namespace RavenDB\Client\Http;
 // TODO : REMOVE ALL JAVA Map approach -> php Assoc Array
 class ClusterTopology
 {
-    private string $last_node_id;
-    private ?string $topology_id;
+    public string $last_node_id;
+    public ?string $topology_id;
     private string $etag;
-    // TODO : AS INSTRUCTED java Map -> php Array : file update in progress. Standard php dev for specific java language lib
     private array|object $members;
     private array|object $promotables;
     private array|object $watchers;
-    private array|object $all_nodes;
-
-    public function __construct(array $config = array()){
-        try {
-            $this->mapOptions($config);
-        } catch (\Exception $e) {
-        }
-    }
-
-    public function mapOptions(array $options)
+    public array|object $all_nodes;
+    // TODO Object to improvement : Goal : Dynamically create the properties
+    public function mapOptions(array $topologyData):self
     {
-        $_methods = get_class_methods($this);
-        foreach ($options as $key => $value) {
-            $method = 'set' . ucfirst($key);
-            if (in_array($method, $_methods)) {
-                $this->$method($value);
-            } else {
-                throw new \Exception('Invalid method name');
-            }
+        foreach ($topologyData["topology"] as $field=>$value){
+            $this->{$field} = $value;
         }
         return $this;
-    }
-
-    public function mapOption($key, $value){
-        return $this->mapOptions([$key, $value]);
     }
 
     public function getAllNodes(): array
