@@ -3,7 +3,6 @@
 namespace RavenDB\Tests\Client\Serverwide\Commands;
 
 use RavenDB\Client\Http\ClusterTopology;
-use RavenDB\Client\Http\ClusterTopologyResponse;
 use RavenDB\Client\Serverwide\Commands\GetClusterTopologyCommand;
 use RavenDB\Client\Util\AssertUtils;
 use RavenDB\Tests\Client\RemoteTestBase;
@@ -21,10 +20,8 @@ class GetClusterTopologyTest extends RemoteTestBase
              * TODO Check the AssertUtils todo comments implement responseType to respect compliances
             */
             $result = $command->getResult();
-            dd($result->last_node_id);
-
-            /*AssertUtils::assertThat($result)::isNotNull();
-            AssertUtils::assertThat($result->getLeader())::isNotEmpty();
+            AssertUtils::assertThat($result)::isNotNull();
+            /*AssertUtils::assertThat($result->getLeader())::isNotEmpty();
             AssertUtils::assertThat($result->getNodeTag())::isNotEmpty();
 
             $topology = $result->getTopology();
