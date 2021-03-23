@@ -42,9 +42,10 @@ class ObjectMapper
     /**
      * @param string $response
      * @param object $targetClass
+     * @return mixed
      * @throws Exception
      */
-   public function genericMapper(string $response, object $targetClass){
+   public function genericMapper(string $response, object $targetClass):object{
         if(!is_object($targetClass)){
             throw new Exception('Please provide a target class');
         }
