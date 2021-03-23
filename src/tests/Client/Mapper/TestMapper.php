@@ -10,6 +10,8 @@ use RavenDB\Client\Serverwide\Mapper\CaseStudy\OrderLine;
 use RavenDB\Client\Serverwide\Mapper\ObjectMapper;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use RavenDB\Client\Util\AssertUtils;
+use RavenDB\Client\Util\StringUtils;
 use ReflectionClass;
 
 class TestMapper extends TestCase
@@ -24,5 +26,6 @@ class TestMapper extends TestCase
         $property = $reflectionClass->getProperty('myProperty');
         $reader = new AnnotationReader();
         $myAnnotation = $reader->getPropertyAnnotation($property, MyAnnotation::class);
+        AssertUtils::assertThat($myAnnotation->myProperty)::isNotEmpty();
     }
 }
