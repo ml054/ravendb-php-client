@@ -7,11 +7,11 @@ use DateTime;
 class NodeStatus
 {
     private bool $connected;
-    private string $errorDetails; // TODO : SNAKE
-    private DateTime $lastSend; // TODO : DateTimeInterface
-    private DateTime $lastReply; // TODO : DateTimeInterface SNAKE
-    private string $lastSentMessage;
-    private string $lastMatchingIndex; // TODO LONG IN JAVA
+    private string $error_details; // TODO : SNAKE
+    private DateTime $last_send; // TODO : DateTimeInterface
+    private DateTime $last_reply; // TODO : DateTimeInterface SNAKE
+    private string $last_sent_message;
+    private string $last_matching_index; // TODO LONG IN JAVA
 
     public function isConnected(): bool
     {
@@ -25,52 +25,52 @@ class NodeStatus
 
     public function getErrorDetails(): string
     {
-        return $this->errorDetails;
+        return $this->error_details;
     }
 
-    public function setErrorDetails(string $errorDetails): void
+    public function setErrorDetails(string $error_details): void
     {
-        $this->errorDetails = $errorDetails;
+        $this->error_details = $error_details;
     }
 
     public function getLastSend(): DateTime
     {
-        return $this->lastSend;
+        return $this->last_send;
     }
 
-    public function setLastSend(DateTime $lastSend): void
+    public function setLastSend(DateTime $last_send): void
     {
-        $this->lastSend = $lastSend;
+        $this->last_send = $last_send;
     }
 
     public function getLastReply(): DateTime
     {
-        return $this->lastReply;
+        return $this->last_reply;
     }
 
-    public function setLastReply(DateTime $lastReply): void
+    public function setLastReply(DateTime $last_reply): void
     {
-        $this->lastReply = $lastReply;
+        $this->last_reply = $last_reply;
     }
 
     public function getLastSentMessage(): string
     {
-        return $this->lastSentMessage;
+        return $this->last_sent_message;
     }
 
-    public function setLastSentMessage(string $lastSentMessage): void
+    public function setLastSentMessage(string $last_sent_message): void
     {
-        $this->lastSentMessage = $lastSentMessage;
+        $this->last_sent_message = $last_sent_message;
     }
 
     public function getLastMatchingIndex(): string
     {
-        return $this->lastMatchingIndex;
+        return $this->last_matching_index;
     }
 
-    public function setLastMatchingIndex(string $lastMatchingIndex): void
+    public function setLastMatchingIndex(string $last_matching_index): void
     {
-        $this->lastMatchingIndex = $lastMatchingIndex;
+        $this->last_matching_index = $last_matching_index;
     }
 }
 /* PHP-MIGRATION-STATUS : EMPTY SOURCE CLASS BODY - MEANS ALL RESOURCES ARE IMPORTED. TO CLEAN ONCE VALIDATED
