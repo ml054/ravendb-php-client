@@ -20,6 +20,7 @@ class ObjectMapper
      */
    public function topology($response):ClusterTopology{
 
+       // TODO REMOVE MAX
        $maxDepthHandler = function ($innerObject, $outerObject, string $attributeName, string $format = null, array $context = []) {};
        $defaultContext = [
            AbstractObjectNormalizer::MAX_DEPTH_HANDLER => $maxDepthHandler,
@@ -36,5 +37,38 @@ class ObjectMapper
        $topology = new ClusterTopology();
        $topology->mapOptions($result);
        return $topology;
+   }
+
+    /**
+     * @param string $response
+     * @param object $targetClass
+     * @throws Exception
+     */
+   public function genericMapper(string $response, object $targetClass){
+        if(!is_object($targetClass)){
+            throw new Exception('Please provide a target class');
+        }
+
+        if(null === $response){
+            throw new Exception('Please provide a valid response');
+        }
+
+       // TODO REMOVE MAX
+       $maxDepthHandler = function ($innerObject, $outerObject, string $attributeName, string $format = null, array $context = []) {};
+       $defaultContext = [
+           AbstractObjectNormalizer::MAX_DEPTH_HANDLER => $maxDepthHandler,
+       ];
+       $data = json_decode($response);
+       $normalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter(), null, null, null, null, $defaultContext);
+       $serializer = new Serializer([$normalizer]);
+       $result = $serializer->normalize($data, null, [ AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true ]);
+
+       // TODO IMPLEMENT THE CLUSTER TOPOLOGY RESPONSE OBJECT AND NOT ClusterTopology (compliance)
+       $target = new $targetClass();
+       if(!method_exists($targetClass,'mapOtions')){
+           throw new Exception('You need to implement the mapOptions method on the target class');
+       }
+       $target->mapOptions($result);
+       return $target;
    }
 }
