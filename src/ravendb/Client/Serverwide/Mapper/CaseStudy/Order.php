@@ -8,7 +8,7 @@ class Order {
     public DateTimeInterface $orderDate;
     public int $id;
     public string $name;
-    /**
+    /** TODO : VALIDATE
      * @MyAnnotation(mapObject="RavenDB\Client\Serverwide\Mapper\CaseStudy\OrderLine")
      */
     private string $map;
