@@ -24,6 +24,5 @@ class TestMapper extends TestCase
         $property = $reflectionClass->getProperty('myProperty');
         $reader = new AnnotationReader();
         $myAnnotation = $reader->getPropertyAnnotation($property, MyAnnotation::class);
-        dd($myAnnotation->myProperty);
     }
 }
