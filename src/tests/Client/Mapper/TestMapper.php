@@ -4,6 +4,7 @@ namespace RavenDB\Tests\Client\Mapper;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use RavenDB\Client\Serverwide\Mapper\CaseStudy\Order;
+use RavenDB\Client\Util\AssertUtils;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -53,7 +54,6 @@ TAG;
         $encoder = new JsonEncoder();
         $serializer = new Serializer([$dateNormalizer, new ArrayDenormalizer(), $normalizer], [$encoder]);
         $result = $serializer->deserialize($json, Order::class, "json");
-        //dd($result);
-        /// TODO WRITE TESTS
+        AssertUtils::assertThat($result->getSingleItem())::isInstanceOf(Order::class); // TODO in progress
     }
 }
