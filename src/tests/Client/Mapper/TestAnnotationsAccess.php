@@ -13,6 +13,8 @@ class TestAnnotationsAccess extends TestCase
 {
     public function testAnnotations(){
         $reflectionClass = new \ReflectionClass(Order::class);
+        // Annotations are mapped to class property (in this case). In Order Entity, mapObject is assigned to the map property via annotations
+        // and can be retrieved
         $property = $reflectionClass->getProperty('map');
         $reader = new AnnotationReader();
         $annotation = $reader->getPropertyAnnotation($property, MyAnnotation::class); // Output : collection of dependencies as array. Subject to validation
