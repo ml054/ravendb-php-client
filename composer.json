@@ -10,8 +10,7 @@
     "analog/analog": "dev-master",
     "ramsey/uuid": "4.x-dev",
     "symfony/serializer": "5.x-dev",
-    "symfony/property-access": "5.x-dev",
-    "jms/serializer": "3.12.x-dev"
+    "symfony/property-access": "5.x-dev"
   },
   "autoload": {
     "psr-4": {
