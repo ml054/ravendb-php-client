@@ -19,7 +19,7 @@ class Order {
      */
     private ?Collection $orderLines;
 
-    public string $name;
+    public string $Name;
     /** TODO : VALIDATE
      * @MyAnnotation(mapObject={
      *     "RavenDB\Client\Serverwide\Mapper\CaseStudy\OrderLine"
