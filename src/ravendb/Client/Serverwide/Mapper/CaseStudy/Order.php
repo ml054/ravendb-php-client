@@ -38,7 +38,7 @@ class Order {
      */
     public function getOrderLines(): Collection|OrderLine
     {
-        return json_decode($this->orderLines->getValues());
+        return $this->orderLines->getValues();
     }
 
     public function addOderLine(OrderLine $orderLine):self
