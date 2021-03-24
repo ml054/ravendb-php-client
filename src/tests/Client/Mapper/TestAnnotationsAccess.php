@@ -15,7 +15,7 @@ class TestAnnotationsAccess extends TestCase
         $reflectionClass = new \ReflectionClass(Order::class);
         $property = $reflectionClass->getProperty('map');
         $reader = new AnnotationReader();
-        $annotation = $reader->getPropertyAnnotation($property, MyAnnotation::class); // Output : class as a string
+        $annotation = $reader->getPropertyAnnotation($property, MyAnnotation::class); // Output : collection of dependencies as array. Subject to validation
         AssertUtils::assertThat($annotation->mapObject)::isNotEmpty();
         // TODO CHECK WITH MARCIN RETURNING ARRAY BECAUSE COLLECTING ALL DEPENDENCIES TO INSTANTIATE
         AssertUtils::assertThat($annotation->mapObject)::isArray();
