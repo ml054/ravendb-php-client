@@ -8,7 +8,7 @@ use RavenDB\Client\Serverwide\Mapper\Annotations\MyAnnotation;
 use RavenDB\Client\Serverwide\Mapper\CaseStudy\Order;
 use RavenDB\Client\Util\AssertUtils;
 
-// TODO : GOAL ACCESS ANNOTATION OF A MAIN CLASS AND RETRIEVE DEPENDENCIES OBJECT / OR DO DATA FORMATING
+// TODO : GOAL ACCESS ANNOTATION OF A MAIN CLASS AND RETRIEVE DEPENDENCY OBJECTS / OR DO DATA FORMATING
 class TestAnnotationsAccess extends TestCase
 {
     public function testAnnotations(){
