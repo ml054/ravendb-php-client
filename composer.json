@@ -6,10 +6,12 @@
     "php": "^8.0",
     "ext-curl": "*",
     "ext-json": "*",
-    "ext-http": "*",
     "symfony/http-client": "^5.2.3",
     "analog/analog": "dev-master",
-    "ramsey/uuid": "4.x-dev"
+    "ramsey/uuid": "4.x-dev",
+    "symfony/serializer": "5.x-dev",
+    "symfony/property-access": "5.x-dev",
+    "jms/serializer": "3.12.x-dev"
   },
   "autoload": {
     "psr-4": {
@@ -22,7 +24,7 @@
     }
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.5",
+    "phpunit/phpunit": "^9",
     "symfony/var-dumper": "5.x-dev"
   },
   "license": "MIT",
