@@ -1,62 +1,113 @@
 <?php
 
 namespace RavenDB\Client\Serverwide\Mapper\CaseStudy;
-use DateTimeInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use RavenDB\Client\Serverwide\Mapper\Annotations\MyAnnotation;
-use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
-/**
- * @ORM\Entity
- */
 class Order {
-
-    public DateTimeInterface $orderDate;
+    /*public DateTimeInterface $orderDate;
     public int $id;
+    public string $name;
+    public OrderLine $singleItem;
+    public array $itemsArray;
+    public array $itemsAsMap;*/
+    //public DateTimeInterface $orderDate;
     /**
-     * @ORM\OneToMany(targetEntity=OrderLine::class, mappedBy="order")
+     * @SerializedName("CustomId")
      */
-    private ?Collection $orderLines;
-
-    public string $Name;
-    /** TODO : VALIDATE
-     * @MyAnnotation(mapObject={
-     *     "RavenDB\Client\Serverwide\Mapper\CaseStudy\OrderLine"
-     *  }
-     * )
+    private int $id;
+    private string $name;
+    public \DateTimeInterface $orderDate;
+    #[SerializedName("SingleItem")]
+    private OrderLine $singleItem;
+    /**
+     * @SerializedName("ItemsArray")
+     * @var OrderLine[]
      */
-    private string $map;
+    private array $itemsArray;
+    /**
+     * @SerializedName("ItemsAsMap")
+     * @var array<string,OrderLine>
+     */
+    private array $itemsAsMap;
 
-    public function __construct()
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
-        $this->orderLines = new ArrayCollection();
+        return $this->id;
     }
 
     /**
-     * @return Collection|OrderLine[]
+     * @param int $id
      */
-    public function getOrderLines(): Collection|OrderLine
+    public function setId(int $id): void
     {
-        return $this->orderLines->getValues();
-    }
-
-    public function addOderLine(OrderLine $orderLine):self
-    {
-        if (!$this->orderLines->contains($orderLine)) {
-            $this->orderLines[] = $orderLine;
-            $collection = new ArrayCollection($this->orderLines->toArray());
-            $this->setOrderLines($collection);
-        }
-        return $this;
+        $this->id = $id;
     }
 
     /**
-     * @param ArrayCollection|Collection|null $orderLines
+     * @return string
      */
-    public function setOrderLines(ArrayCollection|Collection|null $orderLines): void
+    public function getName(): string
     {
-        $this->orderLines = $orderLines;
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return OrderLine
+     */
+    public function getSingleItem(): OrderLine
+    {
+        return $this->singleItem;
+    }
+
+    /**
+     * @param OrderLine $singleItem
+     */
+    public function setSingleItem(OrderLine $singleItem): void
+    {
+        $this->singleItem = $singleItem;
+    }
+
+    /**
+     * @return OrderLine[]
+     */
+    public function getItemsArray(): array
+    {
+        return $this->itemsArray;
+    }
+
+    /**
+     * @param OrderLine[] $itemsArray
+     */
+    public function setItemsArray(array $itemsArray): void
+    {
+        $this->itemsArray = $itemsArray;
+    }
+
+    /**
+     * @return OrderLine[]
+     */
+    public function getItemsAsMap(): array
+    {
+        return $this->itemsAsMap;
+    }
+
+    /**
+     * @param OrderLine[] $itemsAsMap
+     */
+    public function setItemsAsMap(array $itemsAsMap): void
+    {
+        $this->itemsAsMap = $itemsAsMap;
     }
 
 }
