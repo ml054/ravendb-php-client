@@ -30,4 +30,14 @@ final class StringUtils
     public static function isArray($string){
         return is_array($string) && count($string) > 0;
     }
+
+    public static function stripEnd($string,$char){
+        return rtrim($string, $char);
+    }
+
+    public static function startWith($string, $needle): bool
+    {
+        return str_starts_with($string,$needle);
+    }
+
 }

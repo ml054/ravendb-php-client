@@ -35,6 +35,11 @@ class AssertUtils
         TestCase::assertIsArray(static::$elements);
     }
 
+    public static function isString()
+    {
+        TestCase::assertIsString(static::$elements);
+    }
+
     public static function hasSize(int $size)
     {
         $param = is_object(static::$elements) ? (array) static::$elements : static::$elements;

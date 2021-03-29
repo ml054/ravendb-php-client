@@ -4,6 +4,7 @@
 namespace RavenDB\Client\Serverwide\Operations;
 
 
+use Exception;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Http\IRaftCommand;
 use RavenDB\Client\Http\RavenCommand;
@@ -19,11 +20,11 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
     private ?string $databaseName=null;
 
     public function __construct(DocumentConventions $conventions,DatabaseRecord $databaseRecord,int $replicationFactor){
-        /* TODO: IMPORT
-       * */
         $this->conventions = $conventions;
         $this->databaseRecord = $databaseRecord;
         $this->replicationFactor = $replicationFactor;
+        // HARD CODING DATABASE NAME
+        $this->databaseName="dbname_create_1";
     }
 
     public function getRaftUniqueRequestId(): string
@@ -38,24 +39,11 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
 
     public function createRequest(ServerNode $node):array
     {
-         $url = $node->getUrl()."/admin/databases?name".$this->databaseName;
+        $url = $node->getUrl()."/admin/databases?name=".$this->databaseName;
         $url .= "&replicationFactor=".$this->replicationFactor;
-        return [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true
-        ];
-    }
-}
-/*
-
-        TODO:
-        @Override
-        public HttpRequestBase createRequest(ServerNode node, Reference<String> url) {
-            url.value = node.getUrl() + "/admin/databases?name=" + databaseName;
-
-            url.value += "&replicationFactor=" + replicationFactor;
-
-            try {
+        // TODO : mapper
+        /*
+         *  try {
                 String databaseDocument = mapper.writeValueAsString(databaseRecord);
                 HttpPut request = new HttpPut();
                 request.setEntity(new StringEntity(databaseDocument, ContentType.APPLICATION_JSON));
@@ -70,20 +58,19 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
                 throw ExceptionsUtils.unwrapException(e);
             }
         }
-
-        @Override
-        public void setResponse(String response, boolean fromCache) throws IOException {
-            if (response == null) {
-                throwInvalidResponse();
-            }
-
-            result = mapper.readValue(response, DatabasePutResult.class);
-        }
-
-        @Override
-        public String getRaftUniqueRequestId() {
-            return RaftIdGenerator.newId();
-        }
+         * */
+        return [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true
+        ];
     }
 
- * */
+    public function setResponse(array|string $response, bool $fromCache)
+    {
+       if(null === $response){
+           throw new Exception("Response is invalid");
+       }
+
+       dd($response);
+    }
+}

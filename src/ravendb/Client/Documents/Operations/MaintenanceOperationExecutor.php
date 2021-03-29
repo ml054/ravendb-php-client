@@ -2,24 +2,32 @@
 
 namespace RavenDB\Client\Documents\Operations;
 
+use InvalidArgumentException;
 use RavenDB\Client\Documents\DocumentStore;
-use RavenDB\Client\Http\ClusterRequestExecutor;
 use RavenDB\Client\Http\RequestExecutor;
+use RavenDB\Client\Util\ObjectUtils;
+use RavenDB\Client\Util\StringUtils;
 
 class MaintenanceOperationExecutor
 {
     private DocumentStore $store;
     private ?string $databaseName=null;
-    private ?ClusterRequestExecutor $requestExecutor=null;
+    private ?RequestExecutor $requestExecutor=null;
     private ?ServerOperationExecutor $serverOperationExecutor=null;
 
     public function __construct(DocumentStore $store, ?string $databaseName=null)
     {
         $this->store = $store;
-        /*
-         * TODO : this.databaseName = ObjectUtils.firstNonNull(databaseName, store.getDatabase());
-         * */
-        $this->databaseName = $this->store->getDatabase();
+        $this->databaseName = ObjectUtils::firstNonNull($databaseName, [$this->store->getDatabase()]);
+    }
+
+    private function getRequestExecutor(): RequestExecutor
+    {
+        if ($this->requestExecutor !== null) {
+            return $this->requestExecutor;
+        }
+        $this->requestExecutor = $this->databaseName !== null ? $this->store->getRequestExecutor($this->databaseName) : null;
+        return $this->requestExecutor;
     }
 
     public function server(): ServerOperationExecutor
@@ -32,36 +40,24 @@ class MaintenanceOperationExecutor
         }
     }
 
-    private function getRequestExecutor(): RequestExecutor
+    public function forDatabase(string $databaseName){
+        if(StringUtils::equalsIgnoreCase($this->databaseName,$databaseName)){
+            return $this;
+        }
+        return new $this($this->store,$databaseName);
+    }
+
+    public function send(IMaintenanceOperation $operation): object|array|string|null
     {
-        if ($this->requestExecutor !== null) {
-            return $this->requestExecutor;
+        $this->assertDatabaseNameSet();
+        $command = $operation->getCommand($this->getRequestExecutor()->getConventions());
+        $this->getRequestExecutor()->execute($command);
+        return $command->getResult();
+    }
+
+    private function  assertDatabaseNameSet():void {
+        if ($this->databaseName == null) {
+            throw new InvalidArgumentException("Cannot use maintenance without a database defined, did you forget to call forDatabase?");
         }
-        $this->requestExecutor = $this->databaseName !== null ? $this->store->getRequestExecutor($this->databaseName) : null;
-        return $this->requestExecutor;
     }
 }
-/*
-public class MaintenanceOperationExecutor {
-
-
-    public MaintenanceOperationExecutor forDatabase(String databaseName) {
-        if (StringUtils.equalsIgnoreCase(this.databaseName, databaseName)) {
-            return this;
-        }
-
-        return new MaintenanceOperationExecutor(store, databaseName);
-    }
-
-    public Operation sendAsync(IMaintenanceOperation<OperationIdResult> operation) {
-        assertDatabaseNameSet();
-        RavenCommand<OperationIdResult> command = operation.getCommand(getRequestExecutor().getConventions());
-
-        getRequestExecutor().execute(command);
-        return new Operation(getRequestExecutor(),
-                () -> store.changes(), getRequestExecutor().getConventions(),
-                command.getResult().getOperationId(),
-                ObjectUtils.firstNonNull(command.getSelectedNodeTag(), command.getResult().getOperationNodeTag()));
-    }
-}
- * */

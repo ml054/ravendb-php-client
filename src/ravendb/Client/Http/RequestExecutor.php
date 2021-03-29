@@ -3,6 +3,7 @@
 namespace RavenDB\Client\Http;
 
 use DateTime;
+use Exception;
 use InvalidArgumentException;
 use PharIo\Manifest\InvalidUrlException;
 use RavenDB\Client\Auth\AuthOptions; // TODO CLASS DESIGNED TO MIGRATE KeyStore, keyPassword, KeyStore FROM JAVA EXECUTOR
@@ -11,6 +12,7 @@ use RavenDB\Client\Documents\Operations\DatabaseHealthCheckOperation;
 use RavenDB\Client\Documents\Session\SessionInfo;
 use RavenDB\Client\Http\Logger\Log;
 use RavenDB\Client\Primitives\Closable;
+use RavenDB\Client\Util\ValidatorUtils;
 
 // TODO REMINDER : createRequest method should NEVER send request to server. Request to server should NEVER be closed. Internal process in place
 class RequestExecutor implements Closable
@@ -94,29 +96,7 @@ class RequestExecutor implements Closable
         // final String[] initialUrls = validateUrls(new String[]{url}, certificate); TODO
 
     }
-    /**
-     *  public static RequestExecutor createForSingleNodeWithoutConfigurationUpdates(String url, String databaseName, KeyStore certificate, char[] keyPassword, KeyStore trustStore, ExecutorService executorService, DocumentConventions conventions) {
-    final String[] initialUrls = validateUrls(new String[]{url}, certificate);
 
-    RequestExecutor executor = new RequestExecutor(databaseName, certificate, keyPassword, trustStore, conventions, executorService, initialUrls);
-
-    Topology topology = new Topology();
-    topology.setEtag(-1L);
-
-    ServerNode serverNode = new ServerNode();
-    serverNode.setDatabase(databaseName);
-    serverNode.setUrl(initialUrls[0]);
-    topology.setNodes(Collections.singletonList(serverNode));
-
-    executor._nodeSelector = new NodeSelector(topology, executorService);
-    executor.topologyEtag = INITIAL_TOPOLOGY_ETAG;
-    executor._disableTopologyUpdates = true;
-    executor._disableClientConfigurationUpdates = true;
-
-    return executor;
-    }
-
-     */
 
     public function getSecondBroadcastAttemptTimeout(): int
     {
@@ -126,114 +106,6 @@ class RequestExecutor implements Closable
     public function setSecondBroadcastAttemptTimeout(int $secondBroadcastAttemptTimeout): int
     {
         $this->_secondBroadcastAttemptTimeout = $secondBroadcastAttemptTimeout;
-    }
-
-    // TODO : TASK ASSIGNED AFTER THE CURRENT TEST (GetClusterTopologyTest) SUCCESS -> IMPLEMENT REQUEST TO SERVER
-    public function internalExecute()
-    {
-        /*
-         *     public <TResult> void execute(ServerNode chosenNode, Integer nodeIndex, RavenCommand<TResult> command, boolean shouldRetry, SessionInfo sessionInfo, Reference<HttpRequestBase> requestRef) {
-        if (command.failoverTopologyEtag == INITIAL_TOPOLOGY_ETAG) {
-            command.failoverTopologyEtag = INITIAL_TOPOLOGY_ETAG;
-            if (_nodeSelector != null && _nodeSelector.getTopology() != null) {
-                Topology topology = _nodeSelector.getTopology();
-                if (topology.getEtag() != null) {
-                    command.failoverTopologyEtag = topology.getEtag();
-                }
-            }
-        }
-
-        Reference<String> urlRef = new Reference<>();
-        HttpRequestBase request = createRequest(chosenNode, command, urlRef);
-
-        if (request == null) {
-            return;
-        }
-
-        if (requestRef != null) {
-            requestRef.value = request;
-        }
-
-        //noinspection SimplifiableConditionalExpression
-        boolean noCaching = sessionInfo != null ? sessionInfo.isNoCaching() : false;
-
-        Reference<String> cachedChangeVectorRef = new Reference<>();
-        Reference<String> cachedValue = new Reference<>();
-
-        try (HttpCache.ReleaseCacheItem cachedItem = getFromCache(command, !noCaching, urlRef.value, cachedChangeVectorRef, cachedValue)) {
-            if (cachedChangeVectorRef.value != null) {
-                if (tryGetFromCache(command, cachedItem, cachedValue.value)) {
-                    return;
-                }
-            }
-
-            setRequestHeaders(sessionInfo, cachedChangeVectorRef.value, request);
-
-            command.numberOfAttempts = command.numberOfAttempts + 1;
-            int attemptNum = command.numberOfAttempts;
-            EventHelper.invoke(_onBeforeRequest, this, new BeforeRequestEventArgs(_databaseName, urlRef.value, request, attemptNum));
-
-            CloseableHttpResponse response = sendRequestToServer(chosenNode, nodeIndex, command, shouldRetry, sessionInfo, request, urlRef.value);
-
-            if (response == null) {
-                return;
-            }
-
-            CompletableFuture<Void> refreshTask = refreshIfNeeded(chosenNode, response);
-
-            command.statusCode = response.getStatusLine().getStatusCode();
-
-            ResponseDisposeHandling responseDispose = ResponseDisposeHandling.AUTOMATIC;
-
-            try {
-                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
-                    EventHelper.invoke(_onSucceedRequest, this, new SucceedRequestEventArgs(_databaseName, urlRef.value, response, request, attemptNum));
-
-                    cachedItem.notModified();
-
-                    try {
-                        if (command.getResponseType() == RavenCommandResponseType.OBJECT) {
-                            command.setResponse(cachedValue.value, true);
-                        }
-                    } catch (IOException e) {
-                        throw ExceptionsUtils.unwrapException(e);
-                    }
-
-                    return;
-                }
-
-                if (response.getStatusLine().getStatusCode() >= 400) {
-                    if (!handleUnsuccessfulResponse(chosenNode, nodeIndex, command, request, response, urlRef.value, sessionInfo, shouldRetry)) {
-                        Header dbMissingHeader = response.getFirstHeader("Database-Missing");
-                        if (dbMissingHeader != null && dbMissingHeader.getValue() != null) {
-                            throw new DatabaseDoesNotExistException(dbMissingHeader.getValue());
-                        }
-
-                        throwFailedToContactAllNodes(command, request);
-                    }
-                    return; // we either handled this already in the unsuccessful response or we are throwing
-                }
-
-                EventHelper.invoke(_onSucceedRequest, this, new SucceedRequestEventArgs(_databaseName, urlRef.value, response, request, attemptNum));
-
-                responseDispose = command.processResponse(cache, response, urlRef.value);
-                _lastReturnedResponse = new Date();
-            } finally {
-                if (responseDispose == ResponseDisposeHandling.AUTOMATIC) {
-                    IOUtils.closeQuietly(response, null);
-                }
-
-                try {
-                    refreshTask.get();
-                } catch (Exception e) {
-                    //noinspection ThrowFromFinallyBlock
-                    throw ExceptionsUtils.unwrapException(e);
-                }
-            }
-        }
-    }
-
-         * */
     }
 
     /*
@@ -250,22 +122,7 @@ class RequestExecutor implements Closable
             if ($request === null) {
                 return null;
             }
-            /* TODO :
-             * if (RequestExecutor.requestPostProcessor) {
-                RequestExecutor.requestPostProcessor(req);
-            }
 
-            if (command["getRaftUniqueRequestId"]) {
-                const raftCommand = command as unknown as IRaftCommand;
-
-                const raftRequestString = "raft-request-id=" + raftCommand.getRaftUniqueRequestId();
-
-                builder = new URL(builder.search ? builder.toString() + "&" + raftRequestString : builder.toString() + "?" + raftRequestString);
-            }
-            if (this._shouldBroadcast(command)) {
-                command.timeout = command.timeout ?? this.firstBroadcastAttemptTimeout;
-            }
-            req.uri = builder.toString();*/
             return $request;
         } catch (InvalidUrlException $e) {
             throw new InvalidArgumentException('Unable to parse URL');
@@ -296,213 +153,23 @@ class RequestExecutor implements Closable
 
        $this->_sendRequestToServer($node,0,$command,false,$request,null);
     }
-    /* TODO :
-     * private async _executeOnSpecificNode<TResult>( // this method is called `execute` in c# and java code
-        command: RavenCommand<TResult>,
-        sessionInfo: SessionInfo = null,
-        options: ExecuteOptions<TResult> = null): Promise<void> {
 
-        if (command.failoverTopologyEtag === RequestExecutor.INITIAL_TOPOLOGY_ETAG) {
-            command.failoverTopologyEtag = RequestExecutor.INITIAL_TOPOLOGY_ETAG;
-
-            if (this._nodeSelector && this._nodeSelector.getTopology()) {
-                const topology = this._nodeSelector.getTopology();
-                if (topology.etag) {
-                    command.failoverTopologyEtag = topology.etag;
-                }
-            }
-        }
-
-        const { chosenNode, nodeIndex, shouldRetry } = options;
-
-        this._log.info(`Actual execute ${command.constructor.name} on ${chosenNode.url}`
-            + ` ${ shouldRetry ? "with" : "without" } retry.`);
-
-        let url: string;
-        const req = this._createRequest(chosenNode, command, u => url = u);
-
-        if (!req) {
-            return null;
-        }
-
-        const controller = new AbortController();
-
-        if (options?.abortRef) {
-            options.abortRef(controller);
-        }
-
-        req.signal = controller.signal;
-
-        const noCaching = sessionInfo ? sessionInfo.noCaching : false;
-
-        let cachedChangeVector: string;
-        let cachedValue: string;
-        const cachedItem = this._getFromCache(
-            command, !noCaching, req.uri.toString(), (cachedItemMetadata) => {
-                cachedChangeVector = cachedItemMetadata.changeVector;
-                cachedValue = cachedItemMetadata.response;
-            });
-
-        if (cachedChangeVector) {
-            if (await this._tryGetFromCache(command, cachedItem, cachedValue)) {
-                return;
-            }
-        }
-
-        this._setRequestHeaders(sessionInfo, cachedChangeVector, req);
-
-        command.numberOfAttempts++;
-        const attemptNum = command.numberOfAttempts;
-        this._emitter.emit("beforeRequest", new BeforeRequestEventArgs(this._databaseName, url, req, attemptNum));
-
-        let bodyStream: stream.Readable;
-
-        const responseAndStream = await this._sendRequestToServer(chosenNode, nodeIndex, command, shouldRetry, sessionInfo, req, url, controller);
-
-        if (!responseAndStream) {
-            return;
-        }
-
-
-        const response = responseAndStream.response;
-        bodyStream = responseAndStream.bodyStream;
-        const refreshTask = this._refreshIfNeeded(chosenNode, response);
-
-        command.statusCode = response.status;
-
-        let responseDispose: ResponseDisposeHandling = "Automatic";
-
-        try {
-
-            if (response.status === StatusCodes.NotModified) {
-                this._emitter.emit("succeedRequest", new SucceedRequestEventArgs(this._databaseName, url, response, req, attemptNum));
-
-                cachedItem.notModified();
-
-                if (command.responseType === "Object") {
-                    await command.setResponseFromCache(cachedValue);
-                }
-
-                return;
-            }
-
-            if (response.status >= 400) {
-                const unsuccessfulResponseHandled = await this._handleUnsuccessfulResponse(
-                    chosenNode,
-                    nodeIndex,
-                    command,
-                    req,
-                    response,
-                    bodyStream,
-                    req.uri as string,
-                    sessionInfo,
-                    shouldRetry);
-
-                if (!unsuccessfulResponseHandled) {
-
-                    const dbMissingHeader = response.headers.get(HEADERS.DATABASE_MISSING);
-                    if (dbMissingHeader) {
-                        throwError("DatabaseDoesNotExistException", dbMissingHeader as string);
-                    }
-
-                    this._throwFailedToContactAllNodes(command, req);
-                }
-
-                return; // we either handled this already in the unsuccessful response or we are throwing
-            }
-
-            this._emitter.emit("succeedRequest", new SucceedRequestEventArgs(this._databaseName, url, response, req, attemptNum));
-
-            responseDispose = await command.processResponse(this._cache, response, bodyStream, req.uri as string);
-            this._lastReturnedResponse = new Date();
-        } finally {
-            if (responseDispose === "Automatic") {
-                closeHttpResponse(response);
-            }
-
-            await refreshTask;
-        }
-    }
-
-     * */
     // TODO : Mandatory : DO NOT CLOSE THE CONNECTION ATTRIBUTES IMPORTED FROM NODEJS. TO CONFIRM IF ALL NEEDED
     private function _sendRequestToServer(ServerNode $node,int $nodeIndex,RavenCommand $command,bool $shouldRetry,
                                           array $request,?SessionInfo $sessionInfo=null, ?string $url=null,?string $abortController=null):void
     {
         $curlUrl = curl_init();
         curl_setopt_array($curlUrl, (array)$request);
-        // TODO VALIDATE THE APPROACH WITH MARCIN : INJECTING CURL RESPONSE AS RESULT
         try {
             $this->numberOfServerRequests++;
            // $timeout = $command->getTimeout() || $this->getDefaultTimeout();
 
             // TODO COMPLETE THE IMPLEMENTATION OF _sendRequestToServer
             $command->setResponse(curl_exec($curlUrl), false);
-        } catch (\Exception $e) {
-        }
-    }
-    /* TODO : SEND REQUEST TO SERVER
-     * private async _sendRequestToServer<TResult>(chosenNode: ServerNode,
-                                                nodeIndex: number,
-                                                command: RavenCommand<TResult>,
-                                                shouldRetry: boolean,
-                                                sessionInfo: SessionInfo,
-                                                request: HttpRequestParameters,
-                                                url: string,
-                                                abortController: AbortController) {
-        try {
-            this.numberOfServerRequests++;
-
-            const timeout = command.timeout || this._defaultTimeout;
-
-            if (!TypeUtil.isNullOrUndefined(timeout)) {
-
-                const cancelTask = setTimeout(() => abortController.abort(), timeout);
-
-                try {
-                    const response = await this._send(chosenNode, command, sessionInfo, request);
-                    clearTimeout(cancelTask);
-                    return response;
-                } catch (error) {
-                    if (error.name === "AbortError") {
-                        const timeoutException = getError("TimeoutException", "The request for " + request.uri + " failed with timeout after " + TimeUtil.millisToTimeSpan(timeout), error);
-                        if (!shouldRetry) {
-                            if (!command.failedNodes) {
-                                command.failedNodes = new Map<ServerNode, Error>();
-                            }
-
-                            command.failedNodes.set(chosenNode, timeoutException);
-                            throw timeoutException;
-                        }
-
-                        if (!await this._handleServerDown(url, chosenNode, nodeIndex, command, request, null,  "", timeoutException, sessionInfo, shouldRetry)) {
-                            this._throwFailedToContactAllNodes(command, request);
-                        }
-                        return null;
-                    }
-                    throw error;
-                }
-            } else {
-                return await this._send(chosenNode, command, sessionInfo, request);
-            }
-        } catch (e) {
-            if (e.name === "AllTopologyNodesDownException") {
-                throw e;
-            }
-
-            if (!shouldRetry) {
-                throw e;
-            }
-
-            if (!await this._handleServerDown(url, chosenNode, nodeIndex, command, request, null, "", e, sessionInfo, shouldRetry)) {
-                this._throwFailedToContactAllNodes(command, request);
-            }
-
-            return null;
+        } catch (Exception $e) {
         }
     }
 
-     * */
     public function close()
     {
         //TODO:  no instructions yet to setup a content here
@@ -542,168 +209,15 @@ class RequestExecutor implements Closable
     {
         return $this->conventions;
     }
+
+    /**
+     * @param array $initialUrls
+     * @param string|null $certificate
+     * @return array
+     * @throws Exception
+     */
+    public static function validateUrls(array $initialUrls, string $certificate=null): array
+    {
+        return ValidatorUtils::validateUrl($initialUrls,$certificate);
+    }
 }
-
-
-/* TODO : EXECUTOR REMAIN TASKS ========== ANTYTHING LISTED BELOW IS DESIGNED TO BE IMPORTED IF NOT ADVISE OTHERWISE
- * private <TResult> CloseableHttpResponse send(ServerNode chosenNode, RavenCommand<TResult> command, SessionInfo sessionInfo, HttpRequestBase request) throws IOException {
-        CloseableHttpResponse response = null;
-
-        if (shouldExecuteOnAll(chosenNode, command)) {
-            response = executeOnAllToFigureOutTheFastest(chosenNode, command);
-        } else {
-            response = command.send(getHttpClient(), request);
-        }
-
-        String serverVersion = tryGetServerVersion(response);
-        if (serverVersion != null) {
-            lastServerVersion = serverVersion;
-        }
-
-        if (sessionInfo != null && sessionInfo.getLastClusterTransactionIndex() != null) {
-            // if we reach here it means that sometime a cluster transaction has occurred against this database.
-            // Since the current executed command can be dependent on that, we have to wait for the cluster transaction.
-            // But we can't do that if the server is an old one.
-
-            Header version = response.getFirstHeader(Constants.Headers.SERVER_VERSION);
-            if (version != null && "4.1".compareToIgnoreCase(version.getValue()) > 0) {
-                throw new ClientVersionMismatchException("The server on " + chosenNode.getUrl() + " has an old version and can't perform " +
-                        "the command since this command dependent on a cluster transaction which this node doesn't support.");
-            }
-        }
-
-        return response;
-    }
-*/
-/*
- private async _executeOnSpecificNode<TResult>( // this method is called `execute` in c# and java code
-        command: RavenCommand<TResult>,
-        sessionInfo: SessionInfo = null,
-        options: ExecuteOptions<TResult> = null): Promise<void> {
-
-        if (command.failoverTopologyEtag === RequestExecutor.INITIAL_TOPOLOGY_ETAG) {
-            command.failoverTopologyEtag = RequestExecutor.INITIAL_TOPOLOGY_ETAG;
-
-            if (this._nodeSelector && this._nodeSelector.getTopology()) {
-                const topology = this._nodeSelector.getTopology();
-                if (topology.etag) {
-                    command.failoverTopologyEtag = topology.etag;
-                }
-            }
-        }
-
-        const { chosenNode, nodeIndex, shouldRetry } = options;
-
-        this._log.info(`Actual execute ${command.constructor.name} on ${chosenNode.url}`
-            + ` ${ shouldRetry ? "with" : "without" } retry.`);
-
-        let url: string;
-        const req = this._createRequest(chosenNode, command, u => url = u);
-
-        if (!req) {
-            return null;
-        }
-
-        // TODO : check with Marcin on AbortController
-        const controller = new AbortController();
-
-        if (options?.abortRef) {
-            options.abortRef(controller);
-        }
-
-        req.signal = controller.signal;
-
-        const noCaching = sessionInfo ? sessionInfo.noCaching : false;
-
-        let cachedChangeVector: string;
-        let cachedValue: string;
-        const cachedItem = this._getFromCache(
-            command, !noCaching, req.uri.toString(), (cachedItemMetadata) => {
-                cachedChangeVector = cachedItemMetadata.changeVector;
-                cachedValue = cachedItemMetadata.response;
-            });
-
-        if (cachedChangeVector) {
-            if (await this._tryGetFromCache(command, cachedItem, cachedValue)) {
-                return;
-            }
-        }
-
-        this._setRequestHeaders(sessionInfo, cachedChangeVector, req);
-
-        command.numberOfAttempts++;
-        const attemptNum = command.numberOfAttempts;
-        this._emitter.emit("beforeRequest", new BeforeRequestEventArgs(this._databaseName, url, req, attemptNum));
-
-        let bodyStream: stream.Readable;
-
-        const responseAndStream = await this._sendRequestToServer(chosenNode, nodeIndex, command, shouldRetry, sessionInfo, req, url, controller);
-
-        if (!responseAndStream) {
-            return;
-        }
-
-
-        const response = responseAndStream.response;
-        bodyStream = responseAndStream.bodyStream;
-        const refreshTask = this._refreshIfNeeded(chosenNode, response);
-
-        command.statusCode = response.status;
-
-        let responseDispose: ResponseDisposeHandling = "Automatic";
-
-        try {
-
-            if (response.status === StatusCodes.NotModified) {
-                this._emitter.emit("succeedRequest", new SucceedRequestEventArgs(this._databaseName, url, response, req, attemptNum));
-
-                cachedItem.notModified();
-
-                if (command.responseType === "Object") {
-                    await command.setResponseFromCache(cachedValue);
-                }
-
-                return;
-            }
-
-            if (response.status >= 400) {
-                const unsuccessfulResponseHandled = await this._handleUnsuccessfulResponse(
-                    chosenNode,
-                    nodeIndex,
-                    command,
-                    req,
-                    response,
-                    bodyStream,
-                    req.uri as string,
-                    sessionInfo,
-                    shouldRetry);
-
-                if (!unsuccessfulResponseHandled) {
-
-                    const dbMissingHeader = response.headers.get(HEADERS.DATABASE_MISSING);
-                    if (dbMissingHeader) {
-                        throwError("DatabaseDoesNotExistException", dbMissingHeader as string);
-                    }
-
-                    this._throwFailedToContactAllNodes(command, req);
-                }
-
-                return; // we either handled this already in the unsuccessful response or we are throwing
-            }
-
-            this._emitter.emit("succeedRequest", new SucceedRequestEventArgs(this._databaseName, url, response, req, attemptNum));
-
-            responseDispose = await command.processResponse(this._cache, response, bodyStream, req.uri as string);
-            this._lastReturnedResponse = new Date();
-        } finally {
-            if (responseDispose === "Automatic") {
-                closeHttpResponse(response);
-            }
-
-            await refreshTask;
-        }
-    }
-
-
-
-*/

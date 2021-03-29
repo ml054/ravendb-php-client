@@ -2,6 +2,7 @@
 
 namespace RavenDB\Client\Documents\Conventions;
 
+use Closure;
 use RavenDB\Client\Documents\Operations\Configuration\ClientConfiguration;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Http\LoadBalanceBehavior;
@@ -24,9 +25,9 @@ class DocumentConventions
     private ?int $_secondBroadcastAttemptTimeout = null;
     private ?LoadBalanceBehavior $_loadBalanceBehavior = null;
     private ?ReadBalanceBehavior $_readBalanceBehavior = null;
-    private ObjectMapper $_entityMapper; /*TODO : IMPORT THE CLASS*/
+    //private ObjectMapper $_entityMapper; /*TODO : IMPORT THE CLASS*/
     private ?bool $_useCompression=null;
-
+    private ?Closure $_documentIdGenerator=null;
     public function getMaxHttpCacheSize(): ?int
     {
         return $this->_maxHttpCacheSize;
@@ -110,5 +111,26 @@ class DocumentConventions
         } catch (IllegalStateException $e) {
         }
         $this->_firstBroadcastAttemptTimeout = $firstBroadcastAttemptTimeout;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDocumentIdGenerator(): ?Closure
+    {
+        return $this->_documentIdGenerator;
+    }
+
+    /**
+     * @param string|null $stringArg
+     * @param object|null $objectArg
+     * @return Closure|null Possible Php approach of BiFunction<String, Object, String>
+     * Possible Php approach of BiFunction<String, Object, String>
+     */
+    public function setDocumentIdGenerator(?string $stringArg=null, ?object $objectArg=null): ?Closure
+    {
+        return $this->_documentIdGenerator = function($documentIdGenerator) use($stringArg,$objectArg){
+                // todo call the $documentIdGenerator->generateID($stringArg,$objectArg) to test
+        };
     }
 }

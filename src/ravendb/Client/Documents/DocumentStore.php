@@ -2,6 +2,7 @@
 
 namespace RavenDB\Client\Documents;
 
+use Exception;
 use InvalidArgumentException;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\Identity\MultiDatabaseHiLoIdGenerator;
@@ -13,22 +14,25 @@ use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
 use RavenDB\Client\Documents\TimeSeries\TimeSeriesOperations;
 use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Http\RequestExecutor;
-use RavenDB\Client\Util\EventHandler;
 use RavenDB\Client\Util\StringUtils;
 use Ramsey\Uuid\Uuid;
+use RuntimeException;
 
+// MH : openSession | initialize | maintenaince
 class DocumentStore extends DocumentStoreBase
 {
-    private MultiDatabaseHiLoIdGenerator $_multiDbHiLo;
     private ?MaintenanceOperationExecutor $maintenanceOperationExecutor = null;
     private OperationExecutor $operationExecutor;
     private DatabaseSmuggler $_smuggler;
+    private MultiDatabaseHiLoIdGenerator $_multiDbHiLo;
     private ?string $identifier;
 
     public function __construct(string|array $url = null, ?string $database = null)
     {
         if (StringUtils::isString($url)) {
             $this->setUrls([$url]);
+        }else{
+            $this->setUrls($url);
         }
 
         $this->setDatabase($database);
@@ -77,26 +81,19 @@ class DocumentStore extends DocumentStoreBase
             return $this;
         }
         $this->assertValidConfiguration();
-
-        /*
-         * TODO:
-        RequestExecutor.validateUrls(urls, getCertificate());
-
-        try {
-            if (getConventions().getDocumentIdGenerator() == null) { // don't overwrite what the user is doing
-                MultiDatabaseHiLoIdGenerator generator = new MultiDatabaseHiLoIdGenerator(this);
-                _multiDbHiLo = generator;
-
-                getConventions().setDocumentIdGenerator(generator::generateDocumentId);
+        RequestExecutor::validateUrls($this->urls,null);
+        try{
+            if(null === $this->getConventions()->getDocumentIdGenerator()){ // don't overwrite what the user is doing
+                $generator = new MultiDatabaseHiLoIdGenerator($this);
+                $this->_multiDbHiLo = $generator;
+                $this->getConventions()->getDocumentIdGenerator();
             }
-
-            getConventions().freeze();
-            initialized = true;
-        } catch (Exception e) {
-            close();
-            throw ExceptionsUtils.unwrapException(e);
+            $this->getConventions()->freeze();
+            $this->initialized = true;
+        }catch (Exception $e){
+            $this->close();
+            throw new RuntimeException();
         }
-         * */
         return $this;
     }
 
@@ -107,35 +104,11 @@ class DocumentStore extends DocumentStoreBase
         }
     }
 
-    public function addAfterCloseListener(EventHandler $event): void
-    {
-        // TODO: Implement addAfterCloseListener() method.
-    }
-
-    public function removeAfterCloseListener(EventHandler $event)
-    {
-        // TODO: Implement removeAfterCloseListener() method.
-    }
-
-    function executeIndex(IAbstractIndexCreationTask $task, string $database): void
-    {
-        // TODO: Implement executeIndex() method.
-    }
-
-    function executeIndexes(IAbstractIndexCreationTask $tasks): void
-    {
-        // TODO: Implement executeIndexes() method.
-    }
-
     public function getConventions(): DocumentConventions
     {   /*TODO: JUST FOR TESTING*/
         return new DocumentConventions();
     }
 
-    public function bulkInsert(string $database): BulkInsertOperation
-    {
-        // TODO: Implement bulkInsert() method.
-    }
 
     public function getRequestExecutor(?string $database=null): RequestExecutor
     {
@@ -149,16 +122,11 @@ class DocumentStore extends DocumentStoreBase
             return RequestExecutor::create(null,$databaseName,null,$conventions);
     }
 
-    public function timeSeries(): TimeSeriesOperations
-    {
-        // TODO: Implement timeSeries() method. Check with Marcin. Imported from Interface
-    }
-
     public function maintenance(): MaintenanceOperationExecutor
     {
         try {
             $this->assertInitialized();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
         }
         if (null === $this->maintenanceOperationExecutor) {
             $this->maintenanceOperationExecutor = new MaintenanceOperationExecutor($this, $this->getDatabase());
@@ -174,20 +142,43 @@ class DocumentStore extends DocumentStoreBase
         return $this->operationExecutor;
     }
 
+    public function addAfterCloseListener(EventHandler|\RavenDB\Client\Util\EventHandler $event): void
+    {
+        // TODO: Implement addAfterCloseListener() method.
+    }
+
+    public function removeAfterCloseListener(EventHandler|\RavenDB\Client\Util\EventHandler $event)
+    {
+        // TODO: Implement removeAfterCloseListener() method.
+    }
+
+    function executeIndex(IAbstractIndexCreationTask $task, string $database): void
+    {
+        // TODO: Implement executeIndex() method.
+    }
+
+    function executeIndexes(IAbstractIndexCreationTask $tasks): void
+    {
+        // TODO: Implement executeIndexes() method.
+    }
+
+    public function bulkInsert(string $database): BulkInsertOperation
+    {
+        // TODO: Implement bulkInsert() method.
+    }
+
+    public function timeSeries(): TimeSeriesOperations
+    {
+        // TODO: Implement timeSeries() method.
+    }
+
     public function smuggler(): DatabaseSmuggler
     {
-        if (null === $this->_smuggler) {
-            $this->_smuggler = new DatabaseSmuggler($this);
-        }
-        return $this->_smuggler;
+        // TODO: Implement smuggler() method.
     }
 
-    public function setRequestTimeout(int $timeout, ?string $database = null): Closable
+    public function setRequestTimeout(int $timeout, ?string $database): Closable
     {
-        return $this->setRequestTimeout($timeout, null);
+        // TODO: Implement setRequestTimeout() method.
     }
 }
-
-/*
-
-  */
