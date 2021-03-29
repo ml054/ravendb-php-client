@@ -5,7 +5,7 @@ namespace RavenDB\Client\Http;
 class Topology
 {
     private string $etag;
-    private ServerNode $nodes;
+    private ServerNode|array $nodes;
 
     public function getEtag(): string
     {

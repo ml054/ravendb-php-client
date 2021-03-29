@@ -4,13 +4,7 @@ namespace RavenDB\Client\Serverwide\Mapper\CaseStudy;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 class Order {
-    /*public DateTimeInterface $orderDate;
-    public int $id;
-    public string $name;
-    public OrderLine $singleItem;
-    public array $itemsArray;
-    public array $itemsAsMap;*/
-    //public DateTimeInterface $orderDate;
+
     /**
      * @SerializedName("CustomId")
      */

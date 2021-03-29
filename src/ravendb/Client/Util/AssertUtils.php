@@ -3,15 +3,14 @@
 namespace RavenDB\Client\Util;
 
 use PHPUnit\Framework\TestCase;
-// TODO: remove static approach for assertThat. Map it in a controller and call assertThat with invocation of AssertUtils class constructor
-// to acces $this methods
+
 class AssertUtils
 {
     static private array|string|object $elements;
 
     public static function assertThat(array|string|object $element): self
     {
-        $encode = is_object($element) ? array($element) : $element;
+        $encode = is_object($element) ? (array) $element : $element;
         self::$elements = $encode;
         return new self;
     }
@@ -31,13 +30,19 @@ class AssertUtils
         TestCase::assertNotEmpty(static::$elements);
     }
 
-    public static function hasSize(int $size)
+    public static function isArray()
     {
-        TestCase::assertCount($size, static::$elements);
+        TestCase::assertIsArray(static::$elements);
     }
 
-    public static function classExists()
+    public static function hasSize(int $size)
     {
-       // TestCase::assertInstanceOf(static::$elements); TODO WRITE THE TEST
+        $param = is_object(static::$elements) ? (array) static::$elements : static::$elements;
+        TestCase::assertCount($size, $param);
+    }
+
+    public static function isInstanceOf(string $object)
+    {
+        TestCase::assertInstanceOf($object,static::$elements);
     }
 }

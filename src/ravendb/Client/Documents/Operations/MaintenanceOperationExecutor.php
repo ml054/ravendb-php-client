@@ -27,7 +27,6 @@ class MaintenanceOperationExecutor
         if ($this->serverOperationExecutor !== null) {
             return $this->serverOperationExecutor;
         } else {
-            // TODO: CHECK WITH MARCIN FOR THE EXECUTOR BIND TO THE STORE
             $this->serverOperationExecutor = new ServerOperationExecutor($this->store,$this->store->getRequestExecutor($this->store->getDatabase()));
             return $this->serverOperationExecutor;
         }

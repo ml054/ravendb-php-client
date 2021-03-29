@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Serializer;
 class TestMapper extends TestCase
 {
     public function testDeserialization() {
-        $json = <<<'TAG'
+$json = <<<TAG
 {
             "OrderDate": "2021-03-19T16:17:52.4486295Z",
             "CustomId": 7,
@@ -54,6 +54,7 @@ TAG;
         $encoder = new JsonEncoder();
         $serializer = new Serializer([$dateNormalizer, new ArrayDenormalizer(), $normalizer], [$encoder]);
         $result = $serializer->deserialize($json, Order::class, "json");
+        dd($result);
         AssertUtils::assertThat($result->getSingleItem())::isInstanceOf(Order::class); // TODO in progress
     }
 }
