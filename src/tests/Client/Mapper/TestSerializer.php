@@ -53,17 +53,19 @@ EOD;
         } catch (\Exception $e) {
             dd($e->getMessage());
         }
+
         /**
          * @var Cart $result
         */
         AssertUtils::assertThat($result)::isNotNull();
         AssertUtils::assertThat($result)::isInstanceOf(Cart::class);
+        AssertUtils::assertThat($result->getOrderedAt())::isNotNull();
+        AssertUtils::assertThat($result->getOrderedAt())::isInstanceOf(\DateTime::class);
         AssertUtils::assertThat($result->getCardItems())::isObject();
         AssertUtils::assertThat($result->getCardItems())::isInstanceOf(CartItems::class);
         AssertUtils::assertThat($result->getItemsCollection())::isArray();
         AssertUtils::assertThat($result->getItemsCollection())::hasSize(2);
         AssertUtils::assertThat($result->getItemsCollection())::isArray();
         AssertUtils::assertThat($result->getItemsCollection())::hasSize(2);
-
     }
 }
