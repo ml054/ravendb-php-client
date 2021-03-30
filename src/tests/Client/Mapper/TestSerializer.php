@@ -51,7 +51,6 @@ EOD;
         try {
             $result = RavenJsonSerializer::deserializeData($json, Cart::class);
         } catch (\Exception $e) {
-            dd($e->getMessage());
         }
 
         /**
