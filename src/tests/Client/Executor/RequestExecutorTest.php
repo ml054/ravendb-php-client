@@ -33,22 +33,10 @@ class RequestExecutorTest extends RemoteTestBase
     }
 
     public function testCanCreateDatabase(){
-        $databaseRecord = new DatabaseRecord();
-        $conventions = new DocumentConventions();
-        $store = $this->getDocumentStore();
+
         try {
-            $executor = RequestExecutor::create($store->getUrls(), $store->getDatabase(), null, $conventions);
-            try {
-                $conventions->setDocumentIdGenerator();
-                $operation = new CreateDatabaseOperation($databaseRecord, 0);
-                $command = $operation->getCommand($conventions);
-                $executor->execute($command);
-                $result = $command->getResult();
-                // TODO : COMPLETE THE EXECUTE METHOD
-                dd($result);
-            } finally {
-                $executor->close();
-            }
+            $store = $this->getDocumentStoreMaintenance();
+
         } finally {
             $store->close();
         }

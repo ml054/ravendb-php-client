@@ -36,7 +36,6 @@ class RemoteTestBase extends RavenTestDriver implements Closable
 
     private static function getGlobalServer(bool $secured): ?IDocumentStore
     {
-        // TODO: return $secured ? self::$globalSecuredServer : self::$globalServer;
         $documentStore = new DocumentStore('http://devtool.infra:9095/', 'initdb_5');
         $documentStore->initialize();
         return $documentStore;
@@ -91,17 +90,17 @@ class RemoteTestBase extends RavenTestDriver implements Closable
     {
         return self::getGlobalServer(false);
     }
-    /*TODO SEE COMMENTS BELOW THE METHOD AND CHECK WITH MARCIN*/
-    public function _getDocumentStore(?string $database = null, bool $secured = false, ?int $waitForIndexingTimeout = null): DocumentStore
+    /*TODO */
+    public function getDocumentStoreMaintenance(?string $database = null, bool $secured = false, ?int $waitForIndexingTimeout = null): DocumentStore
     {
-        $name = $database . "initdb_" . ++self::$_index;
+        $name = $database . "new_db_" . ++self::$_index;
         self::reportInfo("getDocumentStore for db " . $database . ".");
         $documentStore = self::getGlobalServer($secured);
         $databaseRecord = new DatabaseRecord();
         $databaseRecord->setDatabaseName($name);
         $this->customizeDbRecord($databaseRecord);
 
-        $createDatabaseOperation = new CreateDatabaseOperation($databaseRecord, 1);
+        $createDatabaseOperation = new CreateDatabaseOperation($databaseRecord, 0);
         $documentStore->maintenance()->server()->send($createDatabaseOperation);
 
         $store = new DocumentStore();
@@ -110,12 +109,6 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         $this->customizeStore($store);
         $store->initialize();
         $this->setupDatabase($store);
-        /* TODO :
-         *  if ($waitForIndexingTimeout !== null) {
-             waitForIndexing($store, $name, $waitForIndexingTimeout);
-         }
-        $documentStore->add($store);
-        */
         return $store;
     }
     /*TODO CONFIRM WITH MARCIN IF THIS 3rd METHODS IS ONLY FOR CreateDatabaseOperation*/
