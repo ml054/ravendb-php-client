@@ -3,6 +3,7 @@ namespace RavenDB\Client\Serverwide\Commands;
 use RavenDB\Client\Http\ClusterTopologyResponse;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
+use RavenDB\Tests\Client\Lab\Components\Serializer\RavenJsonSerializer;
 
 class GetClusterTopologyCommand extends RavenCommand
 {
@@ -25,9 +26,8 @@ class GetClusterTopologyCommand extends RavenCommand
     }
     public function setResponse(string|array $response, bool $fromCache): ClusterTopologyResponse
     {
-        $jsonResponse = json_decode($response);
-        $topologyResponse = new ClusterTopologyResponse($jsonResponse);
-        return $this->result = $topologyResponse->response();
+        /// TODO : IMPLEMENT NEW RESPONSE TYPE
+        $this->result = RavenJsonSerializer::deserializeData($response,ClusterTopologyResponse::class);
     }
 
 
