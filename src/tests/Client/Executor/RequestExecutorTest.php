@@ -31,12 +31,14 @@ class RequestExecutorTest extends RemoteTestBase
             $store->close();
         }
     }
-
+    // TODO : COMPLETE THE TEST DatabaseRecord is providing the base configuration for new db
     public function testCanCreateDatabase(){
-
+        $store = $this->getDocumentStore();
         try {
-            $store = $this->getDocumentStoreMaintenance();
-
+            $databaseRecord = new DatabaseRecord();
+            $databaseRecord->setDatabaseName("dbnew_1");
+            $createDatabaseOperation = new CreateDatabaseOperation($databaseRecord, 0);
+            $store->maintenance()->server()->send($createDatabaseOperation);
         } finally {
             $store->close();
         }
