@@ -24,9 +24,8 @@ $json = <<<TAG
             "Name": "test",
             "SingleItem": {
                "Id": "aaa",
-               "comment": {
-                  "text": "Is it working?"
-               }
+               "comment": "Is it working?"
+               
             }, 
             "itemsArray": [
                 {
@@ -34,6 +33,9 @@ $json = <<<TAG
                 },
                 {
                    "Id": "ccc"
+                },
+                {
+                   "Id": "dddd"
                 }
             ],
             "ItemsAsMap": {

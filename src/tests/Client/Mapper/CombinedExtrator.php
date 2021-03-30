@@ -5,9 +5,14 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 
+/**
+ * Class CombinedExtrator
+ * @package RavenDB\Tests\Client\Mapper
+ * Combined with php extractor to access the phpDocumentor "collection" annotation type
+ * (e.g. @var SomeClass<DateTime>, @var SomeClass<integer,string>, @var Doctrine\Common\Collections\Collection<App\Entity\SomeEntity>, etc.)
+ */
 class CombinedExtrator implements PropertyTypeExtractorInterface
 {
-
     private ReflectionExtractor $reflectionExtractor;
     private PhpDocExtractor $phpDocExtractor;
     /**

@@ -18,6 +18,7 @@ class ClusterTopologyResponse
         $this->jsonObject = $json;
     }
 
+    // TODO DEVELOP A MAPPER TO MAP DATA TO AN OBJECT "TEMPLATE" INCLUDING DEPENDENCIES
     public function response(){
         $nameConverter = new CamelCaseToSnakeCaseNameConverter();
         $clusterTopology = new ClusterTopology();
@@ -35,7 +36,7 @@ class ClusterTopologyResponse
         $this->setEtag($this->jsonObject->Etag);
         $this->setTopology($clusterTopology);
         /*if(null !== (array)count($this->jsonObject->status)){
-            // TODO GENERA THE STATUS DATA FROM NON EMPTY OBJECT
+
         }*/
         return $this;
     }

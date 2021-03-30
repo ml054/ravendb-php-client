@@ -10,8 +10,7 @@ class AssertUtils
 
     public static function assertThat(array|string|object $element): self
     {
-        $encode = is_object($element) ? (array) $element : $element;
-        self::$elements = $encode;
+        self::$elements = $element;
         return new self;
     }
 
@@ -44,6 +43,11 @@ class AssertUtils
     {
         $param = is_object(static::$elements) ? (array) static::$elements : static::$elements;
         TestCase::assertCount($size, $param);
+    }
+
+    public static function isObject()
+    {
+        TestCase::assertIsObject(static::$elements);
     }
 
     public static function isInstanceOf(string $object)
