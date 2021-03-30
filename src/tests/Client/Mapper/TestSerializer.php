@@ -18,7 +18,7 @@ use Webmozart\Assert\Assert;
 class TestSerializer extends RemoteTestBase
 {
     public function testSerializerMapping(){
-        $jsonCard = <<<CARD
+        $jsonCard = <<<EOD
         {
             "CardName":"MyCard",
             "DateOrder":"2021-03-19T16:17:52.4486295Z",
@@ -47,7 +47,7 @@ class TestSerializer extends RemoteTestBase
                 }
             }
         }
-CARD;
+EOD;
         try {
             $result = RavenJsonSerializer::deserializeData($jsonCard, Cart::class);
         } catch (\Exception $e) {
