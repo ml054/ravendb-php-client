@@ -24,7 +24,6 @@ class GetClusterTopologyCommand extends RavenCommand
         ];
     }
 
-    /// TODO MAP THE PROPERTIES AND ADJUST THE RELATED CLASSES. NOT DONE YET
     public function setResponse(string|array $response, bool $fromCache): ClusterTopologyResponse
     {
         return $this->result = $this->mapper()::readValue($response,ClusterTopologyResponse::class);
