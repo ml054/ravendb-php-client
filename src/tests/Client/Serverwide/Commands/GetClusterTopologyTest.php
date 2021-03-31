@@ -5,7 +5,6 @@ use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Http\ClusterTopologyResponse;
 use RavenDB\Client\Serverwide\Commands\GetClusterTopologyCommand;
 use RavenDB\Client\Util\AssertUtils;
-use RavenDB\Tests\Client\Lab\Models\Cart;
 use RavenDB\Tests\Client\RemoteTestBase;
 
 class GetClusterTopologyTest extends RemoteTestBase
