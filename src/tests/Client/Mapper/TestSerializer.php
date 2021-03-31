@@ -49,7 +49,6 @@ EOD;
             $result = JsonExtensions::readValue($json, Cart::class);
         } catch (\Exception $e) {
         }
-
         /**
          * @var Cart $result
         */
