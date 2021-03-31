@@ -8,6 +8,7 @@ use http\Exception\RuntimeException;
 use HttpResponse;
 use InvalidArgumentException;
 use RavenDB\Client\Exceptions\IllegalStateException;
+use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\StringUtils;
 use CurlHandle;
 abstract class RavenCommand
@@ -32,6 +33,11 @@ abstract class RavenCommand
     public function setTimeout(int $timeout): void
     {
         $this->timeout = $timeout;
+    }
+
+    protected function mapper(): JsonExtensions
+    {
+        return JsonExtensions::getDefaultMapper();
     }
 
     public function getStatusCode(): int

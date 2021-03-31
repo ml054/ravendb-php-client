@@ -1,8 +1,9 @@
 <?php
-namespace RavenDB\Tests\Client\Lab\Components\Serializer;
+
+namespace RavenDB\Client\Extensions;
+
 use Doctrine\Common\Annotations\AnnotationReader;
 use Exception;
-use RavenDB\Tests\Client\Mapper\CombinedExtrator;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -11,14 +12,14 @@ use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-/**
- * Class JsonSerializerEncoder
- * @package RavenDB\Tests\Client\Lab\Components\Serializer
- * @see https://symfony.com/doc/current/components/serializer.html
- * @see https://symfony.com/doc/current/components/property_info.html#phpdocextractor
- */
-class RavenJsonSerializer extends JsonEncoder
+// TODO NO NEED TO EXTEND EXTERNALS
+class JsonExtensions
 {
+    /// TODO IMPROVE
+    public static function getDefaultMapper():self{
+        return new self;
+    }
+
     /**
      * @return Serializer
      * using 2 merged class and property types for reverse reflection
@@ -27,9 +28,11 @@ class RavenJsonSerializer extends JsonEncoder
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $metadataAwareNameConverter = new MetadataAwareNameConverter($classMetadataFactory);
-        $normalizer = new ObjectNormalizer($classMetadataFactory, $metadataAwareNameConverter, null, new CombinedExtrator());
-        $encoder = new JsonEncoder();
-        return new Serializer([new ArrayDenormalizer(), $normalizer], [$encoder]);
+        $typeExtractors = new CombinedExtrator();
+        $normalizer = new ObjectNormalizer($classMetadataFactory, $metadataAwareNameConverter, null, $typeExtractors);
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ArrayDenormalizer(), $normalizer];
+        return new Serializer($normalizers,$encoders);
     }
 
     /**
@@ -38,13 +41,22 @@ class RavenJsonSerializer extends JsonEncoder
      * @return mixed
      * @throws Exception
      */
-    public static function deserializeData(string $data,string $type){
-
+    public static function readValue(string $data,string $type): mixed
+    {
         if(!is_string($data)){
             throw new Exception('Data source must be a valid string');
         }
+        return self::serializer()->deserialize($data, $type, "json");
+    }
 
-        $serializer = self::serializer();
-        return $serializer->deserialize($data, $type, "json");
+    public static function writeValueAsString(object $object): object
+    {
+        try {
+            $extractor = ClassInfoExtractor::propertyExtractors();
+        } catch (Exception $e) {
+        }
+        $className = $object::class;
+
+        dd($extractor->getProperties($className));
     }
 }

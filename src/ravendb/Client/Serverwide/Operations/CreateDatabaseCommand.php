@@ -5,11 +5,15 @@ namespace RavenDB\Client\Serverwide\Operations;
 
 
 use Exception;
+use RavenDB\Client\Constants;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
+use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Http\IRaftCommand;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Serverwide\DatabaseRecord;
+use RavenDB\Client\Util\RaftIdGenerator;
+use RavenDB\Client\Util\RouteUtils;
 
 class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
 {
@@ -17,19 +21,24 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
     private DatabaseRecord $databaseRecord;
     private ?int $replicationFactor=null;
     private ?string $etag=null;
-    private ?string $databaseName=null;
+    private string $databaseName;
 
+    /**
+     * DatabaseRecord is providing the database name to be created as injected in the test call
+     * @param DocumentConventions $conventions
+     * @param DatabaseRecord $databaseRecord
+     * @param int $replicationFactor
+     */
     public function __construct(DocumentConventions $conventions,DatabaseRecord $databaseRecord,int $replicationFactor){
         $this->conventions = $conventions;
         $this->databaseRecord = $databaseRecord;
         $this->replicationFactor = $replicationFactor;
-        // HARD CODING DATABASE NAME
-        $this->databaseName="dbname_create_1";
+        $this->databaseName = $databaseRecord->getDatabaseName();
     }
 
     public function getRaftUniqueRequestId(): string
     {
-        // TODO: Implement getRaftUniqueRequestId() method.
+        return RaftIdGenerator::newId();
     }
 
     public function isReadRequest(): bool
@@ -37,11 +46,26 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
         return false;
     }
 
+    /**
+     * @param ServerNode $node
+     * @return array
+     * @throws Exception
+     */
     public function createRequest(ServerNode $node):array
     {
-        $url = $node->getUrl()."/admin/databases?name=".$this->databaseName;
-        $url .= "&replicationFactor=".$this->replicationFactor;
-        // TODO : mapper 
+        $url = RouteUtils::node($node,Constants::ROUTE_ADMIN_DATABASE."?", [
+                "name"=>$this->databaseName,
+                "replicationFactor"=>$this->replicationFactor
+        ]);
+
+        try{
+            // TODO GENERATE JSON STRING WITH RESPECT TO THE CASING AS PER NODE CONFIGURATION : PascalCase output
+            $databaseDocument = $this->mapper()::writeValueAsString($this->databaseRecord);
+            dd($databaseDocument);
+        }catch (Exception $e){
+            throw new Exception();
+        }
+        // TODO : mapper
         /*
          *  try {
                 String databaseDocument = mapper.writeValueAsString(databaseRecord);
@@ -59,10 +83,14 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
             }
         }
          * */
-        return [
+        // TODO TRYING THE MANUAL CREATION BASE IMPLEMENTING. INJECTING HEADER
+        $headerEtag = "etag";
+        $query = [
             CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
         ];
+
+         return $query;
     }
 
     public function setResponse(array|string $response, bool $fromCache)
@@ -70,7 +98,6 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
        if(null === $response){
            throw new Exception("Response is invalid");
        }
-
-       dd($response);
+       $this->result = $response;
     }
 }

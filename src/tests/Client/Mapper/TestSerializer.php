@@ -1,19 +1,16 @@
 <?php
 namespace RavenDB\Tests\Client\Mapper;
+use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\AssertUtils;
-use RavenDB\Tests\Client\Lab\Components\Serializer\RavenJsonSerializer;
 use RavenDB\Tests\Client\Lab\Models\Cart;
 use RavenDB\Tests\Client\Lab\Models\CartItems;
 use RavenDB\Tests\Client\RemoteTestBase;
-use Webmozart\Assert\Assert;
-
 
 /**
  * Class TestSerializer
  * @package RavenDB\Tests\Client\Lab
  * Purpose of the test is to create a generic serializer that takes json reponse and map it to an Object with reflection types.
  * output to match with object property. Using native php anotation style
- * TODO : IMPLEMENT PHP NATIVE ANNOTATION. IMPLEMENT THE SERIALIZER IN THE TOPOLOGYRESPONSE - RELOCATE RAVENJSONSERIALIZER FOR GLOBAL USE
  */
 class TestSerializer extends RemoteTestBase
 {
@@ -49,7 +46,7 @@ class TestSerializer extends RemoteTestBase
         }
 EOD;
         try {
-            $result = RavenJsonSerializer::deserializeData($json, Cart::class);
+            $result = JsonExtensions::readValue($json, Cart::class);
         } catch (\Exception $e) {
         }
 

@@ -42,24 +42,15 @@ class GetDatabaseNamesCommand extends RavenCommand
             self::throwInvalidResponse(null);
             return;
         }
-        /*
-         * TODO : CHECK WITH MARCIN IF UTILS IS NEEDED HERE
-         * JsonNode names = mapper.readTree(response);
-            if (!names.has("Databases")) {
-                throwInvalidResponse();
-            }
-         * */
+
         $jsonObject = json_decode($response);
         if(!property_exists($jsonObject,'Databases')){
             self::throwInvalidResponse(null);
         }
-
         $databases = $jsonObject->Databases;
         if(!is_array($databases)){
             self::throwInvalidResponse();
         }
-
-        // TODO CHECK WITH MARCIN IF THIS LOOP IS TO IMPLEMENT
 
         $databaseNames = [] ;
         $dbNames = $databases;
@@ -67,7 +58,5 @@ class GetDatabaseNamesCommand extends RavenCommand
             $databaseNames[$i] = $dbNames[$i];
         }
         $this->result = $databaseNames;
-
-
     }
 }

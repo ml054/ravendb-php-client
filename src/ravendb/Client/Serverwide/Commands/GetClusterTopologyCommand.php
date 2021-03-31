@@ -1,9 +1,9 @@
 <?php
 namespace RavenDB\Client\Serverwide\Commands;
+use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Http\ClusterTopologyResponse;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
-use RavenDB\Tests\Client\Lab\Components\Serializer\RavenJsonSerializer;
 
 class GetClusterTopologyCommand extends RavenCommand
 {
@@ -16,7 +16,6 @@ class GetClusterTopologyCommand extends RavenCommand
 
     public function createRequest(ServerNode $node): array
     {
-
         $url = $node->getUrl() . "/cluster/topology";
         if ($this->_debugTag !== null) $url .= "?" . $this->_debugTag;
         return [
@@ -24,12 +23,12 @@ class GetClusterTopologyCommand extends RavenCommand
             CURLOPT_RETURNTRANSFER => true
         ];
     }
+
+    /// TODO MAP THE PROPERTIES AND ADJUST THE RELATED CLASSES. NOT DONE YET
     public function setResponse(string|array $response, bool $fromCache): ClusterTopologyResponse
     {
-        /// TODO : IMPLEMENT NEW RESPONSE TYPE
-        $this->result = RavenJsonSerializer::deserializeData($response,ClusterTopologyResponse::class);
+        $this->result = $this->mapper()::readValue($response,ClusterTopologyResponse::class);
     }
-
 
     public function isReadRequest(): bool
     {

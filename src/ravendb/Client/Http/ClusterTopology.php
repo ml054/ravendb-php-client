@@ -1,8 +1,7 @@
 <?php
 
 namespace RavenDB\Client\Http;
-// TODO : REMOVE ALL JAVA Map approach -> php Assoc Array //
-// SUGGEST : IF POSSIBLE TO SET AN INTERFACE
+// TODO : IMPLEMENT THE FIRST DRAFT OF THE MAPPER
 
 class ClusterTopology
 {

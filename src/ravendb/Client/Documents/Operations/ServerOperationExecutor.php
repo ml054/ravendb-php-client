@@ -24,11 +24,11 @@ class ServerOperationExecutor implements Closable
         $this->_requestExecutor = $requestExecutor;
     }
 
-    public function send(IServerOperation $operation)
+    public function send(IServerOperation $operation): object|null|array|string
     {
-        // TODO: CHECK WITH MARCIN IF INTERFACE SHOULD BE CHECKED
-        $command = $operation->getCommand($this->_requestExecutor->getConventions());
-        $this->_requestExecutor->execute($command);
+      $command = $operation->getCommand($this->_requestExecutor->getConventions());
+      $this->_requestExecutor->execute($command);
+      return $command->getResult();
     }
 
     public function close()

@@ -54,4 +54,15 @@ class AssertUtils
     {
         TestCase::assertInstanceOf($object,static::$elements);
     }
+
+
+    public static function databaseNotFoundError(){
+        $jsonMessage = json_decode(static::$elements);
+        // non case sensitive comparaison
+        $assert = $jsonMessage->Type == "Error"
+            && str_starts_with($jsonMessage->Message,'Database')
+            && str_ends_with($jsonMessage->Message,'found')
+        ;
+        TestCase::assertTrue($assert,"The database does not exist");
+    }
 }

@@ -13,7 +13,7 @@ use RavenDB\Client\Documents\Session\SessionInfo;
 use RavenDB\Client\Http\Logger\Log;
 use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Util\ValidatorUtils;
-
+use Ramsey\Uuid;
 // TODO REMINDER : createRequest method should NEVER send request to server. Request to server should NEVER be closed. Internal process in place
 class RequestExecutor implements Closable
 {
@@ -25,7 +25,6 @@ class RequestExecutor implements Closable
     private ?int $_secondBroadcastAttemptTimeout = null;
     private ?int $_firstBroadcastAttemptTimeout = null;
     private ?int $numberOfServerRequests=null;
-    /// how to access
     private static DatabaseHealthCheckOperation $failureCheckOperation;
     public static string $requestPostProcessor;
     public static string $CLIENT_VERSION = "5.0.0";

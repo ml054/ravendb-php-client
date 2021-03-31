@@ -1,45 +1,19 @@
 <?php
 namespace RavenDB\Client\Http;
 // TODO INJECT THE CLASS RESPONSE
-
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 class ClusterTopologyResponse
 {
+    #[SerializedName("Leader")]
     public string $leader;
+    #[SerializedName("Leader")]
     public string $nodeTag;
-    public ClusterTopology $topology;
+
+    public ClusterTopology $topolgy;
     public string $etag;
     private NodeStatus $status;
-    private object $jsonObject;
 
-    public function __construct(object $json)
-    {
-        $this->jsonObject = $json;
-    }
-
-    // TODO DEVELOP A MAPPER TO MAP DATA TO AN OBJECT "TEMPLATE" INCLUDING DEPENDENCIES
-    public function response(){
-        $nameConverter = new CamelCaseToSnakeCaseNameConverter();
-        $clusterTopology = new ClusterTopology();
-        /// GENERATING THE CLUSTER TOPOLOGY SETTERS
-        foreach( $this->jsonObject->Topology as $property => $value ){
-            /// CAMEL CASING
-            $normalize = $nameConverter->denormalize($property);
-            $methods = 'set'.ucfirst($normalize);
-            if(property_exists($clusterTopology,$normalize)){
-                $clusterTopology->$methods($value);
-            }
-        }
-        $this->setNodeTag($this->jsonObject->NodeTag);
-        $this->setLeader($this->jsonObject->Leader);
-        $this->setEtag($this->jsonObject->Etag);
-        $this->setTopology($clusterTopology);
-        /*if(null !== (array)count($this->jsonObject->status)){
-
-        }*/
-        return $this;
-    }
     /**
      * @return string
      */

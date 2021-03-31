@@ -37,4 +37,7 @@ class Constants
     public const HEADERS_TRANSFER_ENCODING = "Transfer-Encoding";
     public const HEADERS_CONTENT_ENCODING = "Content-Encoding";
     public const HEADERS_CONTENT_LENGTH = "Content-Length";
+
+    // RAVENDB ROUTES
+    public const ROUTE_ADMIN_DATABASE = "/admin/databases";
 }

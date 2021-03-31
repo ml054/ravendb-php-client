@@ -1,6 +1,6 @@
 <?php
 
-namespace RavenDB\Tests\Client\Mapper;
+namespace RavenDB\Client\Extensions;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;

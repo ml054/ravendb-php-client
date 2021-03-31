@@ -99,7 +99,6 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         $databaseRecord = new DatabaseRecord();
         $databaseRecord->setDatabaseName($name);
         $this->customizeDbRecord($databaseRecord);
-
         $createDatabaseOperation = new CreateDatabaseOperation($databaseRecord, 0);
         $documentStore->maintenance()->server()->send($createDatabaseOperation);
 
