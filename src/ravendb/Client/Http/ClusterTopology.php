@@ -7,7 +7,7 @@ class ClusterTopology
 {
     public string $lastNodeId;
     public ?string $topologyId;
-    public string $etag;
+    public string|int $etag;
     public array|object $members;
     public array|object $promotables;
     public array|object $watchers;
@@ -46,17 +46,17 @@ class ClusterTopology
     }
 
     /**
-     * @return string
+     * @return string|int
      */
-    public function getEtag(): string
+    public function getEtag(): string|int
     {
         return $this->etag;
     }
 
     /**
-     * @param string $etag
+     * @param string|int $etag
      */
-    public function setEtag(string $etag): void
+    public function setEtag(string|int $etag): void
     {
         $this->etag = $etag;
     }

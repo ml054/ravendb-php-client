@@ -56,7 +56,7 @@ class AssertUtils
     }
 
 
-    public static function databaseNotFoundError(){
+    public static function notFoundDatabase(){
         $jsonMessage = json_decode(static::$elements);
         // non case sensitive comparaison
         $assert = $jsonMessage->Type == "Error"

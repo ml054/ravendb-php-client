@@ -47,6 +47,7 @@ class TestSerializer extends RemoteTestBase
 EOD;
         try {
             $result = JsonExtensions::readValue($json, Cart::class);
+
         } catch (\Exception $e) {
         }
         /**

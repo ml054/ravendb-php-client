@@ -5,13 +5,11 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 
 class ClusterTopologyResponse
 {
-    #[SerializedName("Leader")]
     public string $leader;
-    #[SerializedName("Leader")]
     public string $nodeTag;
 
-    public ClusterTopology $topolgy;
-    public string $etag;
+    public ClusterTopology $topology;
+    public string|int $etag;
     private NodeStatus $status;
 
     /**
@@ -63,17 +61,17 @@ class ClusterTopologyResponse
     }
 
     /**
-     * @return string
+     * @return string|int
      */
-    public function getEtag(): string
+    public function getEtag(): string|int
     {
         return $this->etag;
     }
 
     /**
-     * @param string $etag
+     * @param string|int $etag
      */
-    public function setEtag(string $etag): void
+    public function setEtag(string|int $etag): void
     {
         $this->etag = $etag;
     }
