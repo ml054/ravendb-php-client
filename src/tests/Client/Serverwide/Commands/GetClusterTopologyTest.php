@@ -20,7 +20,7 @@ class GetClusterTopologyTest extends RemoteTestBase
              * @var ClusterTopologyResponse $result
             */
             $result = $command->getResult();
-            dd($result);
+
             AssertUtils::assertThat($result)::isNotNull();
             AssertUtils::assertThat($result->getLeader())::isNotEmpty();
             AssertUtils::assertThat($result->getNodeTag())::isNotEmpty();
@@ -86,11 +86,12 @@ class GetClusterTopologyTest extends RemoteTestBase
 }        
 EOD;
         // TODO COMPLETE THE VALIDATION : ADJUST THE TYPING
-        $result=null;
         try {
             $result = JsonExtensions::readValue($json, ClusterTopologyResponse::class);
         } catch (\Exception $e) {
+            dd($e->getMessage());
         }
-        dd($result);
+        AssertUtils::assertThat($result)::isNotNull();
+        AssertUtils::assertThat($result)::isInstanceOf(ClusterTopologyResponse::class);
     }
 }
