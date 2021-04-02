@@ -9,44 +9,51 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-// TODO NO NEED TO EXTEND EXTERNALS
+/**
+ * Class JsonExtensions
+ * @package RavenDB\Client\Extensions
+ * @see https://symfony.com/doc/current/serializer.html
+ * "Always make sure to load the DateTimeNormalizer when serializing the DateTime or
+ * DateTimeImmutable classes to avoid excessive memory usage and exposing internal details."
+ */
 class JsonExtensions
 {
-    /// TODO IMPROVE
     public static function getDefaultMapper():self{
         return new self;
     }
 
     /**
      * @return Serializer
-     * using 2 merged class and property types for reverse reflection
+     * GetSetMethodNormalizer consumes less than ObjectNormalizer in this specific scenario
      */
     public static function serializer(): Serializer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $metadataAwareNameConverter = new MetadataAwareNameConverter($classMetadataFactory);
         $typeExtractors = new CombinedExtrator();
-        $normalizer = new ObjectNormalizer($classMetadataFactory, $metadataAwareNameConverter, null, $typeExtractors);
+        $normalizer = new GetSetMethodNormalizer($classMetadataFactory,$metadataAwareNameConverter,$typeExtractors); // consume less then ObjectNormalizer
         $encoders = [new JsonEncoder()];
-        $normalizers = [new ArrayDenormalizer(), $normalizer];
+        $normalizers = [$normalizer,new DateTimeNormalizer()];
         return new Serializer($normalizers,$encoders);
     }
 
     /**
      * @param string $data
-     * @param string $type
+     * @param string $className
      * @return mixed
      * @throws Exception
      */
-    public static function readValue(string $data,string $type): mixed
+    public static function readValue(string $data,string $className): mixed
     {
         if(!is_string($data)){
-            throw new Exception('Data source must be a valid string');
+            throw new Exception('Data source must be a valid json string');
         }
-        return self::serializer()->deserialize($data, $type, "json");
+        return self::serializer()->deserialize($data, $className, "json");
     }
 
     public static function writeValueAsString(object $object): object
