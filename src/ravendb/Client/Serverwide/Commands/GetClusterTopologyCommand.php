@@ -10,7 +10,7 @@ class GetClusterTopologyCommand extends RavenCommand
 
     public function __construct(?string $debugTag = null)
     {
-        $this->_debugTag = $debugTag === null ? null : $debugTag;
+        $this->_debugTag = $debugTag !== null ? $debugTag : null;
     }
 
     public function createRequest(ServerNode $node): array

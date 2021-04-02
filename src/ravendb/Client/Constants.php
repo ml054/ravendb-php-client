@@ -40,4 +40,7 @@ class Constants
 
     // RAVENDB ROUTES
     public const ROUTE_ADMIN_DATABASE = "/admin/databases";
+
+    // THE CLIENT
+    public const CLIENT_VERSION="5.0.0";
 }

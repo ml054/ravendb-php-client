@@ -36,7 +36,7 @@ class JsonExtensions
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $metadataAwareNameConverter = new MetadataAwareNameConverter($classMetadataFactory);
         $typeExtractors = new CombinedExtrator();
-        $normalizer = new GetSetMethodNormalizer($classMetadataFactory,$metadataAwareNameConverter,$typeExtractors); // consume less then ObjectNormalizer
+        $normalizer = new GetSetMethodNormalizer($classMetadataFactory,$metadataAwareNameConverter,$typeExtractors);
         $encoders = [new JsonEncoder()];
         $normalizers = [$normalizer,new DateTimeNormalizer()];
         return new Serializer($normalizers,$encoders);

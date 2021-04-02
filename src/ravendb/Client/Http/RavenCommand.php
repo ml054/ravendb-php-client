@@ -1,26 +1,20 @@
 <?php
-
 namespace RavenDB\Client\Http;
-
 use Exception;
-use http\Env\Response;
-use http\Exception\RuntimeException;
-use HttpResponse;
 use InvalidArgumentException;
+use RavenDB\Client\Constants;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\StringUtils;
-use CurlHandle;
 abstract class RavenCommand
 {
     protected object $resultClass;
     protected int $statusCode;
     protected ?int $timeout=null;
     protected bool $canCache;
-    /*    protected bool $canCacheAggressively;*/
     protected string $selectedNodeTag;
     protected int $numberOfAttempts;
-    public const CLIENT_VERSION = "5.0.0";
+    public const CLIENT_VERSION = Constants::CLIENT_VERSION;
     protected null|string|array|object $result=null;
     public int $failoverTopologyEtag = -2;
     protected RavenCommandResponseType|string $responseType;
@@ -35,6 +29,9 @@ abstract class RavenCommand
         $this->timeout = $timeout;
     }
 
+    /**
+     * Instantiating the default mapper as method. It cannot be instantiated as property in php (java model)
+    */
     protected function mapper(): JsonExtensions
     {
         return JsonExtensions::getDefaultMapper();
@@ -122,8 +119,6 @@ abstract class RavenCommand
     {
         $this->resultClass = $resultClass;
         $this->responseType = RavenCommandResponseType::OBJECT;
-        // $this->canCache = true; TODO : not yet in php scope
-        // $canCacheAggressively = true;
     }
 
     protected function urlEncode(string $value): string
