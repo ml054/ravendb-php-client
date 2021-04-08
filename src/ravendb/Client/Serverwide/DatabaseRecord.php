@@ -16,30 +16,45 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
  * @package RavenDB\Client\Serverwide
  * DatabaseRecord is a collection of database configurations.
  * @see https://ravendb.net/docs/article-page/4.2/java/client-api/operations/server-wide/create-database
- * Note : Object default value is null
+ * Note : Object default value is null if not instantiated
  */
 class DatabaseRecord
 {
-    public const DATABASE_STATUS_NORMAL = "NORMAL";
-    public const DATABASE_STATUS_RESTORE_IN_PROGRESS = "RESTORE_IN_PROGRESS";
+    // DATABASE_STATE prefixes are matching java's private DatabaseState $databaseState property;
+    // no enum yet in php (may be in version 8.1) pending on vote
+    public const DATABASE_STATE_NORMAL = "NORMAL";
+    public const DATABASE_STATE_RESTORE_IN_PROGRESS = "RESTORE_IN_PROGRESS";
     #[SerializedName("DatabaseName")]
     private string $databaseName;
     private bool $disabled;
     private bool $encrypted;
     private string $etagForBackup;
+    private array $deletionInProgress;
+    private DatabaseTopology $topology;
     private ConflictSolver $conflictSolverConfig;
+    private DocumentsCompressionConfiguration $documentsCompression;
+    private array $sorters;
+    private array $indexes;
+    private array $indexesHistory;
+    private array $autoIndexes;
+    private array $settings;
     private RevisionsConfiguration $revisions;
     private TimeSeriesConfiguration $timeSeries;
     private RevisionsCollectionConfiguration $revisionsForConflicts;
     private ExpirationConfiguration $expiration;
     private RefreshConfiguration $refresh;
+    private array $periodicBackups;
+    private array $externalReplications;
+    private array $sinkPullReplications;
+    private array $hubPullReplications;
+    private array $ravenConnectionStrings;
+    private array $sqlConnectionStrings;
+    private array $ravenEtls;
+    private array $sqlEtls;
     private ClientConfiguration $client;
     private StudioConfiguration $studio;
-    private string $truncatedClusterTransactionCommandsCount;
-    private array $deletionInProgress;
-    private string $databaseState;
-    private DatabaseTopology $topology;
-    private DocumentsCompressionConfiguration $documentsCompression;
+    private float $truncatedClusterTransactionCommandsCount;
+    private array $unusedDatabaseIds;
     /**
      * @return mixed
      */
@@ -93,7 +108,7 @@ class DatabaseRecord
      */
     public function getDatabaseState(): string
     {
-        return $this->databaseState ?? self::DATABASE_STATUS_NORMAL;
+        return $this->databaseState ?? self::DATABASE_STATE_NORMAL;
     }
 
     /**
@@ -103,8 +118,6 @@ class DatabaseRecord
     {
         $this->databaseState = $databaseState;
     }
-
-
 
     /**
      * @return array
@@ -124,7 +137,6 @@ class DatabaseRecord
 
     /**
      * @return DatabaseTopology|null
-     * IF OBJECT NULL IF NOT SET
      */
     public function getTopology(): ?DatabaseTopology
     {
@@ -267,5 +279,260 @@ class DatabaseRecord
         $this->studio = $studio;
     }
 
+    /**
+     * @return DocumentsCompressionConfiguration|null
+     */
+    public function getDocumentsCompression(): ?DocumentsCompressionConfiguration
+    {
+        return $this->documentsCompression ?? null;
+    }
+
+    /**
+     * @param DocumentsCompressionConfiguration $documentsCompression
+     */
+    public function setDocumentsCompression(DocumentsCompressionConfiguration $documentsCompression): void
+    {
+        $this->documentsCompression = $documentsCompression;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getSorters(): ?array
+    {
+        return $this->sorters ?? null;
+    }
+
+    /**
+     * @param array $sorters
+     */
+    public function setSorters(array $sorters): void
+    {
+        $this->sorters = $sorters;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getIndexes(): ?array
+    {
+        return $this->indexes ?? null;
+    }
+
+    /**
+     * @param array $indexes
+     */
+    public function setIndexes(array $indexes): void
+    {
+        $this->indexes = $indexes;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getIndexesHistory(): ?array
+    {
+        return $this->indexesHistory ?? null;
+    }
+
+    /**
+     * @param array $indexesHistory
+     */
+    public function setIndexesHistory(array $indexesHistory): void
+    {
+        $this->indexesHistory = $indexesHistory;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getAutoIndexes(): ?array
+    {
+        return $this->autoIndexes ?? null;
+    }
+
+    /**
+     * @param array $autoIndexes
+     */
+    public function setAutoIndexes(array $autoIndexes): void
+    {
+        $this->autoIndexes = $autoIndexes;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getSettings(): ?array
+    {
+        return $this->settings ?? null;
+    }
+
+    /**
+     * @param array $settings
+     */
+    public function setSettings(array $settings): void
+    {
+        $this->settings = $settings;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getPeriodicBackups(): ?array
+    {
+        return $this->periodicBackups ?? null;
+    }
+
+    /**
+     * @param array $periodicBackups
+     */
+    public function setPeriodicBackups(array $periodicBackups): void
+    {
+        $this->periodicBackups = $periodicBackups;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getExternalReplications(): ?array
+    {
+        return $this->externalReplications ?? null;
+    }
+
+    /**
+     * @param array $externalReplications
+     */
+    public function setExternalReplications(array $externalReplications): void
+    {
+        $this->externalReplications = $externalReplications;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getSinkPullReplications(): ?array
+    {
+        return $this->sinkPullReplications ?? null;
+    }
+
+    /**
+     * @param array $sinkPullReplications
+     */
+    public function setSinkPullReplications(array $sinkPullReplications): void
+    {
+        $this->sinkPullReplications = $sinkPullReplications;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getHubPullReplications(): ?array
+    {
+        return $this->hubPullReplications ?? null;
+    }
+
+    /**
+     * @param array $hubPullReplications
+     */
+    public function setHubPullReplications(array $hubPullReplications): void
+    {
+        $this->hubPullReplications = $hubPullReplications;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getRavenConnectionStrings(): ?array
+    {
+        return $this->ravenConnectionStrings ?? null;
+    }
+
+    /**
+     * @param array $ravenConnectionStrings
+     */
+    public function setRavenConnectionStrings(array $ravenConnectionStrings): void
+    {
+        $this->ravenConnectionStrings = $ravenConnectionStrings;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getSqlConnectionStrings(): ?array
+    {
+        return $this->sqlConnectionStrings ?? null;
+    }
+
+    /**
+     * @param array $sqlConnectionStrings
+     */
+    public function setSqlConnectionStrings(array $sqlConnectionStrings): void
+    {
+        $this->sqlConnectionStrings = $sqlConnectionStrings;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getRavenEtls(): ?array
+    {
+        return $this->ravenEtls ?? null;
+    }
+
+    /**
+     * @param array $ravenEtls
+     */
+    public function setRavenEtls(array $ravenEtls): void
+    {
+        $this->ravenEtls = $ravenEtls;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getSqlEtls(): ?array
+    {
+        return $this->sqlEtls ?? null;
+    }
+
+    /**
+     * @param array $sqlEtls
+     */
+    public function setSqlEtls(array $sqlEtls): void
+    {
+        $this->sqlEtls = $sqlEtls;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getTruncatedClusterTransactionCommandsCount(): ?float
+    {
+        return $this->truncatedClusterTransactionCommandsCount ?? null;
+    }
+
+    /**
+     * @param float $truncatedClusterTransactionCommandsCount
+     */
+    public function setTruncatedClusterTransactionCommandsCount(float $truncatedClusterTransactionCommandsCount): void
+    {
+        $this->truncatedClusterTransactionCommandsCount = $truncatedClusterTransactionCommandsCount;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getUnusedDatabaseIds(): ?array
+    {
+        return $this->unusedDatabaseIds ?? null;
+    }
+
+    /**
+     * @param array $unusedDatabaseIds
+     */
+    public function setUnusedDatabaseIds(array $unusedDatabaseIds): void
+    {
+        $this->unusedDatabaseIds = $unusedDatabaseIds;
+    }
 
 }
