@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
  */
 class DatabaseRecord
 {
-    // DATABASE_STATE prefixes are matching java's private DatabaseState $databaseState property;
+    // DATABASE_STATE prefixes are matching java's private DatabaseState $databaseState property in reference to RDBC-447;
     // no enum yet in php (may be in version 8.1) pending on vote
     public const DATABASE_STATE_NORMAL = "NORMAL";
     public const DATABASE_STATE_RESTORE_IN_PROGRESS = "RESTORE_IN_PROGRESS";
