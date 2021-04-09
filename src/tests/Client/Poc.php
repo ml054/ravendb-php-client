@@ -7,8 +7,8 @@ use RavenDB\Client\Infrastructure\Entities\User;
 class Poc
 {
     private string $name;
-    private User $obj;
-
+    private ?User $obj;
+    private string|int $id;
     /**
      * @return string
      */
@@ -26,18 +26,19 @@ class Poc
     }
 
     /**
-     * @return \RavenDB\Client\Infrastructure\Entities\User
+     * @return \RavenDB\Client\Infrastructure\Entities\User|null
      */
-    public function getObj(): User
+    public function getObj(): ?User
     {
         return $this->obj;
     }
 
     /**
-     * @param \RavenDB\Client\Infrastructure\Entities\User $obj
+     * @param \RavenDB\Client\Infrastructure\Entities\User|null $obj
      */
-    public function setObj(User $obj): void
+    public function setObj(?User $obj): void
     {
         $this->obj = $obj;
     }
+
 }
