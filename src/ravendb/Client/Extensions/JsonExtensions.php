@@ -58,6 +58,7 @@ class JsonExtensions
 
     public static function writeValueAsString(object $object): object
     {
+        $extractor = null;
         try {
             $extractor = ClassInfoExtractor::propertyExtractors();
         } catch (Exception $e) {

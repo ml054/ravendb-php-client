@@ -25,8 +25,8 @@ class SessionInfo
         if(null === $session){
             throw new InvalidArgumentException("Session cannot be null");
         }
-
         $this->_session = $session;
-
     }
+
+
 }

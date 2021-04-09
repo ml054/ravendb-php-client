@@ -26,6 +26,7 @@ class DatabaseRecord
     public const DATABASE_STATE_RESTORE_IN_PROGRESS = "RESTORE_IN_PROGRESS";
     #[SerializedName("DatabaseName")]
     private string $databaseName;
+    #[SerializedName("Disabled")]
     private bool $disabled;
     private bool $encrypted;
     private string $etagForBackup;

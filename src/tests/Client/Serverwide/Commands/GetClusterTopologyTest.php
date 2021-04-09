@@ -140,10 +140,9 @@ EOD;
 	]
 }
 EOD;
-        $q = new Jsonq($json);
+        $q = new Jsonq($json); // TODO : NO DIRECT QUERY TO SERVER ONLY THE QUERY AS STRING - REPONSE FROM SERVER : SERILIAZE
         $jsonres = $q->from('products')
-            ->where('cat', '=', 2)
-            ->get()->count();
+            ->where('cat', '=', 2)->get();
         dd($jsonres);
     }
 
@@ -163,10 +162,10 @@ EOD;
 
         try {
             $normalize = $serializer->normalize($record);
-           // $normalize = $serializer->serialize($record,'json');
+        //    $normalize = $serializer->serialize($record,'json');
         } catch (ExceptionInterface $e) {
             dd($e->getMessage());
         }
-
+        dd($normalize);
     }
 }
