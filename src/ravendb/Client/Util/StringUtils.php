@@ -39,5 +39,8 @@ final class StringUtils
     {
         return str_starts_with($string,$needle);
     }
-
+    public static function pascalize($string): string
+    {
+       return "nothing";
+    }
 }
