@@ -4,10 +4,13 @@ namespace RavenDB\Client\Extensions;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Exception;
+use RavenDB\Client\Util\StringUtils;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -56,15 +59,23 @@ class JsonExtensions
         return self::serializer()->deserialize($data, $className, "json");
     }
 
-    public static function writeValueAsString(object $object): object
+    /**
+     * @param object $object
+     * @return string
+     * @throws \Exception
+     */
+    public static function writeValueAsString(object $object): string
     {
-        $extractor = null;
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $metadataAwareNameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $normalizer = new GetSetMethodNormalizer($classMetadataFactory,$metadataAwareNameConverter,null);
+        $serializer = new Serializer([$normalizer],[new JsonEncoder()]);
+        $record = new $object();
         try {
-            $extractor = ClassInfoExtractor::propertyExtractors();
-        } catch (Exception $e) {
+            $normalize = StringUtils::pascalize($serializer->normalize($record));
+        } catch (ExceptionInterface $e) {
+            dd($e->getMessage());
         }
-        $className = $object::class;
-
-        dd($extractor->getProperties($className));
+        return $serializer->encode($normalize,'json');
     }
 }
