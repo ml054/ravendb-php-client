@@ -26,7 +26,7 @@ class Poc
     }
 
     /**
-     * @return \RavenDB\Client\Infrastructure\Entities\User|null
+     * @return User|null
      */
     public function getObj(): ?User
     {
@@ -34,7 +34,7 @@ class Poc
     }
 
     /**
-     * @param \RavenDB\Client\Infrastructure\Entities\User|null $obj
+     * @param ?User $obj
      */
     public function setObj(?User $obj): void
     {
