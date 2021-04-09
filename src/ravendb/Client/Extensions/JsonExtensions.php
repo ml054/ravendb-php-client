@@ -60,6 +60,7 @@ class JsonExtensions
     }
 
     /**
+     * Convert class properties in PascalCase and assign default values from the object if nothing submitted
      * @param object $object
      * @return string
      * @throws \Exception
