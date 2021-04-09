@@ -4,6 +4,7 @@ namespace RavenDB\Tests\Client;
 use RavenDB\Client\Data\Driver\RavenDB;
 use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\AssertUtils;
+use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\StringUtils;
 class CrudTest extends RemoteTestBase
 {
@@ -29,7 +30,8 @@ class CrudTest extends RemoteTestBase
             $putAttempt = new RavenDB($store,'db1');
             $putAttempt->put("45454545415",$body);
 
-            $mapResult = JsonExtensions::getDefaultMapper()::readValue($body,Poc::class);
+            // TODO relocate the mapper
+            $mapResult = ObjectMapper::mapper()::readValue($body,Poc::class);
             AssertUtils::assertThat($mapResult)::isInstanceOf(Poc::class);
         } catch (\Exception $e) {
             dd($e->getMessage());
