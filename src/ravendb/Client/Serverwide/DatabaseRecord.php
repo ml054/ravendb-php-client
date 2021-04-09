@@ -10,6 +10,8 @@ use RavenDB\Client\Documents\Operations\Revisions\RevisionsCollectionConfigurati
 use RavenDB\Client\Documents\Operations\Revisions\RevisionsConfiguration;
 use RavenDB\Client\Documents\Operations\TimeSeries\TimeSeriesConfiguration;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+Use RavenDB\Client\Documents\Naming as CaseConverter;
+use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 /**
  * Class DatabaseRecord
@@ -17,6 +19,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
  * DatabaseRecord is a collection of database configurations.
  * @see https://ravendb.net/docs/article-page/4.2/java/client-api/operations/server-wide/create-database
  * Note : Object default value is null if not instantiated
+ * @Annotation
  */
 class DatabaseRecord
 {
@@ -24,9 +27,7 @@ class DatabaseRecord
     // no enum yet in php (may be in version 8.1) pending on vote. No migration to php 8.1 will be applied until Customer requires for
     public const DATABASE_STATE_NORMAL = "NORMAL";
     public const DATABASE_STATE_RESTORE_IN_PROGRESS = "RESTORE_IN_PROGRESS";
-    #[SerializedName("DatabaseName")]
     private string $databaseName;
-    #[SerializedName("Disabled")]
     private bool $disabled;
     private bool $encrypted;
     private string $etagForBackup;
@@ -56,12 +57,13 @@ class DatabaseRecord
     private StudioConfiguration $studio;
     private float $truncatedClusterTransactionCommandsCount;
     private array $unusedDatabaseIds;
+
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getDatabaseName(): string
+    public function getDatabaseName(): ?string
     {
-        return $this->databaseName;
+        return $this->databaseName ?? null;
     }
 
 

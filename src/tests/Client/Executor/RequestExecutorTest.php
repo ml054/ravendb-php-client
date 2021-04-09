@@ -39,6 +39,7 @@ class RequestExecutorTest extends RemoteTestBase
             $databaseRecord->setDatabaseName("dbnew_1");
             $operation = new CreateDatabaseOperation($databaseRecord, 0);
             $result = $store->maintenance()->server()->send($operation);
+
             // TODO WRITE MORE ASSERTIONS
             AssertUtils::assertThat($result)::notFoundDatabase(); // should pass the test if db not found : Test OK
         } finally {

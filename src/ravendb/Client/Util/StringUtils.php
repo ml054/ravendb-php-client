@@ -39,8 +39,17 @@ final class StringUtils
     {
         return str_starts_with($string,$needle);
     }
-    public static function pascalize($string): string
+
+    /**
+     * @throws \Exception
+     */
+    public static function pascalize($content): array
     {
-       return "nothing";
+        if(!is_array($content) ||(is_array($content) && count($content) === 0)) throw new \Exception('Only Array is supported for now');
+        $format = [];
+        foreach($content as $key=>$data){
+            $format[ucfirst($key)] = $data;
+        }
+        return $format;
     }
 }

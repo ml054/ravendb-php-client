@@ -50,6 +50,12 @@ class AssertUtils
         TestCase::assertIsObject(static::$elements);
     }
 
+    public static function isJson($return_data = false) {
+        $data = json_decode(static::$elements);
+        $validate = (json_last_error() == JSON_ERROR_NONE) ?? false;
+        TestCase::assertTrue($validate);
+    }
+
     public static function isInstanceOf(string $object)
     {
         TestCase::assertInstanceOf($object,static::$elements);

@@ -12,6 +12,7 @@ class SessionDispatcherTest extends RemoteTestBase
     public function testCanBeforeStoreEventArgs(){
         $object = new SessionObject();
         $object->setName("TestName");
+
         $event = new BeforeStoreEventArgs($object);
         $dispatcher = SessionDispatcher::dispatcher();
         $dispatcher->dispatch($event,BeforeStoreEventArgs::NAME);

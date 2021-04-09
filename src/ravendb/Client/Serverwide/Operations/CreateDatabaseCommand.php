@@ -57,39 +57,18 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
                 "name"=>$this->databaseName,
                 "replicationFactor"=>$this->replicationFactor
         ]);
-
         try{
-            // TODO GENERATE JSON STRING WITH RESPECT TO THE CASING AS PER NODE CONFIGURATION : PascalCase output
             $databaseDocument = $this->mapper()::writeValueAsString($this->databaseRecord);
-            dd($databaseDocument);
         }catch (Exception $e){
-            throw new Exception();
+            throw new Exception($e->getMessage());
         }
-        // TODO : mapper
-        /*
-         *  try {
-                String databaseDocument = mapper.writeValueAsString(databaseRecord);
-                HttpPut request = new HttpPut();
-                request.setEntity(new StringEntity(databaseDocument, ContentType.APPLICATION_JSON));
-
-
-                if (etag != null) {
-                    request.addHeader(Constants.Headers.ETAG,"\"" + etag + "\"");
-                }
-
-                return request;
-            } catch (JsonProcessingException e) {
-                throw ExceptionsUtils.unwrapException(e);
-            }
-        }
-         * */
-        // TODO TRYING THE MANUAL CREATION BASE IMPLEMENTING. INJECTING HEADER
-        $headerEtag = "etag";
+        dd($databaseDocument);
++
+     //   $headerEtag = "etag";
         $query = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
         ];
-
          return $query;
     }
 
