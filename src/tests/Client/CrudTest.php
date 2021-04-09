@@ -9,8 +9,8 @@ class CrudTest extends RemoteTestBase
 {
     // TODO SUBJECT TO IMPROVMENT BUT THE TEST IS PASSING. To mirror with java model via saveChanges
     /**
-     * The challenge address :
-     * 1. create and object
+     * The challenge addressed :
+     * 1. create an object
      * 2. send with put method
      * 3. property recorded are PascalCase
      * 4. When the object is mapped to the class it loads the properties as per the class definition and return an object (easy to serialize)
