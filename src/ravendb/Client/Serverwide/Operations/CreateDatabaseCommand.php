@@ -6,17 +6,20 @@ namespace RavenDB\Client\Serverwide\Operations;
 
 use CurlHandle;
 use Exception;
-use RavenDB\Client\Constants;
 use RavenDB\Client\Data\Driver\RavenDB;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
-use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Http\IRaftCommand;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Serverwide\DatabaseRecord;
+use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\RaftIdGenerator;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
+/**
+ * Class CreateDatabaseCommand
+ * @package RavenDB\Client\Serverwide\Operations
+ * TODO : Pending on revision with tech. Test working OK
+ */
 class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
 {
     private DocumentConventions $conventions;
@@ -50,8 +53,8 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
 
     /**
      * @param \RavenDB\Client\Http\ServerNode $node
-     * @return array|string
-     * Goal create a request with
+     * @return array|string|\CurlHandle Goal create a request with curl options. Curl options depends on the scenario of the request
+     * Goal create a request with curl options. Curl options depends on the scenario of the request
      */
     public function createRequest(ServerNode $node): array|string|CurlHandle
     {
@@ -66,9 +69,9 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
                 CURLOPT_SSL_VERIFYHOST=>"2",
                 CURLOPT_SSL_VERIFYPEER=>"1",
                 CURLOPT_CUSTOMREQUEST=>"PUT",
-                CURLOPT_HTTPHEADER=>["Content-Type:application/json"]
+                CURLOPT_POSTFIELDS=>$databaseDocument
             ];
-            $request = $httpClient->createCurlRequest($url,$databaseDocument,$curlotp);
+            $request = $httpClient->createCurlRequest($url,$curlotp);
         }catch (Exception $e){
         }
         return $request;
@@ -76,9 +79,9 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
 
     public function setResponse(array|string $response, bool $fromCache)
     {
-       if(null === $response){
-           throw new Exception("Response is invalid");
-       }
-       $this->result = $this->mapper()::readValue($response,DatabaseRecord::class);
+        if(null === $response){
+            throw new Exception("Response is invalid");
+        }
+        $this->result = $this->mapper()::readValue($response,DatabaseRecord::class);
     }
 }

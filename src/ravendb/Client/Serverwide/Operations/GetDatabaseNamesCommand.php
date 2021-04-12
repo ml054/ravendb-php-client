@@ -2,7 +2,9 @@
 
 namespace RavenDB\Client\Serverwide\Operations;
 
+use CurlHandle;
 use Exception;
+use RavenDB\Client\Data\Driver\RavenDB;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
 
@@ -22,13 +24,18 @@ class GetDatabaseNamesCommand extends RavenCommand
         return true;
     }
 
-    public function createRequest(ServerNode $node): array|string
+    /**
+     * @throws \Exception
+     */
+    public function createRequest(ServerNode $node): array|string|CurlHandle
     {
         $url = $node->getUrl() ."/databases?start=".$this->_start."&pageSize=".$this->_pageSize."&namesOnly=true";
-        return [
+        $curlotp = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true
         ];
+        $httpClient = new RavenDB();
+        return $httpClient->createCurlRequest($url,$curlotp);
     }
 
     /**
@@ -42,7 +49,6 @@ class GetDatabaseNamesCommand extends RavenCommand
             self::throwInvalidResponse(null);
             return;
         }
-
         $jsonObject = json_decode($response);
         if(!property_exists($jsonObject,'Databases')){
             self::throwInvalidResponse(null);
@@ -51,7 +57,6 @@ class GetDatabaseNamesCommand extends RavenCommand
         if(!is_array($databases)){
             self::throwInvalidResponse();
         }
-
         $databaseNames = [] ;
         $dbNames = $databases;
         for( $i=0; $i< count($databases); $i++){

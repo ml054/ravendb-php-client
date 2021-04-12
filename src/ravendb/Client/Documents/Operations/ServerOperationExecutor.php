@@ -35,7 +35,6 @@ class ServerOperationExecutor implements Closable
 
     public function close()
     {
-        // TODO: Implement close() method.
     }
 
 }

@@ -27,14 +27,13 @@ class DocumentStore extends DocumentStoreBase
     private MultiDatabaseHiLoIdGenerator $_multiDbHiLo;
     private ?string $identifier;
 
-    public function __construct(string|array $url = null, ?string $database = null)
+    public function __construct(string|array $url, ?string $database = null)
     {
         if (StringUtils::isString($url)) {
             $this->setUrls([$url]);
         }else{
             $this->setUrls($url);
         }
-
         $this->setDatabase($database);
     }
 

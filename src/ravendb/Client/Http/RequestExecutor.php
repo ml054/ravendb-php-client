@@ -301,15 +301,19 @@ class RequestExecutor implements Closable
         $this->_sendRequestToServer($node,0,$command,false,$request,null);
     }
 
-    // TODO : Mandatory : DO NOT CLOSE THE CONNECTION ATTRIBUTES IMPORTED FROM NODEJS. TO CONFIRM IF ALL NEEDED
-    private function _sendRequestToServer(ServerNode $node, int $nodeIndex, RavenCommand $command, bool $shouldRetry,
-                                          array|CurlHandle $request, ?SessionInfo $sessionInfo=null, ?string $url=null, ?string $abortController=null):void
+    private function _sendRequestToServer(
+        ServerNode $node, int $nodeIndex,
+        RavenCommand $command, bool $shouldRetry,
+        array|CurlHandle $request,
+        ?SessionInfo $sessionInfo=null,
+        ?string $url=null,
+        ?string $abortController=null):void
     {
-
         try {
             $this->numberOfServerRequests++;
             $httpClient = new RavenDB();
-            $httpClient->execute();
+            $httpClient->execute($request);
+            $command->setResponse($httpClient->getResponse(), false);
         } catch (\Exception $e) {
         }
     }
