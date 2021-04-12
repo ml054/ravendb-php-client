@@ -2,23 +2,23 @@
 
 namespace RavenDB\Client\Documents;
 
-use Exception;
-use InvalidArgumentException;
+use Ramsey\Uuid\Uuid;
+use RavenDB\Client\Documents\BulkInsertOperation;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\Identity\MultiDatabaseHiLoIdGenerator;
+use RavenDB\Client\Documents\IDocumentStore;
 use RavenDB\Client\Documents\Indexes\IAbstractIndexCreationTask;
 use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
 use RavenDB\Client\Documents\Operations\OperationExecutor;
+use RavenDB\Client\Documents\Session\DocumentSession;
 use RavenDB\Client\Documents\Session\SessionOptions;
 use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
 use RavenDB\Client\Documents\TimeSeries\TimeSeriesOperations;
-use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Http\RequestExecutor;
+use RavenDB\Client\Primitives\Closable;
+use RavenDB\Client\Primitives\VoidArgs;
 use RavenDB\Client\Util\StringUtils;
-use Ramsey\Uuid\Uuid;
-use RuntimeException;
 
-// MH : openSession | initialize | maintenaince
 class DocumentStore extends DocumentStoreBase
 {
     private ?MaintenanceOperationExecutor $maintenanceOperationExecutor = null;
@@ -38,77 +38,68 @@ class DocumentStore extends DocumentStoreBase
         $this->setDatabase($database);
     }
 
+
+
+    public function addAfterCloseListener(VoidArgs $event): void
+    {
+        $this->add($event);
+    }
+
+    public function removeAfterCloseListener(VoidArgs $event):void
+    {
+        $this->remove($event);
+    }
+
     public function getIdentifier(): string
     {
-        if (null !== $this->identifier) {
-            return $this->identifier;
-        }
-
-        if (null === $this->urls) {
-            return false;
-        }
-
-        if (null !== $this->database) {
-            return implode(',', $this->urls) . " (DB: " . $this->database . ")";
-        }
+        if (null !== $this->identifier) { return $this->identifier;}
+        if (null === $this->urls) { return false;}
+        if (null !== $this->database) { return implode(',', $this->urls) . " (DB: " . $this->database . ")";}
         return implode(',', $this->urls);
     }
 
-    public function setIdentifier(?string $identifier = null): void
+    public function setIdentifier(string $identifier): void
     {
         $this->identifier = $identifier;
     }
 
-    public function openSession(string|SessionOptions $database = null, ?SessionOptions $options = null): IDocumentStore
-    {
-
-        if (null !== $database && null === $options) {
-            $sessionOptions = new SessionOptions();
-            $sessionOptions->setDatabase($database);
-        }
-
-        if (null === $database && null !== $options) {
-            $this->assertInitialized();
-            $this->ensureNotClosed();
-            $sessionId = Uuid::uuid4()->toString(); // TODO: uncompleted method
-            //TODO: $newSession = new DocumentSession($this, '');
-        }
+    protected function assertValidConfiguration(){
+        if(null === $this->urls || count($this->urls) ===0 ) throw new \InvalidArgumentException("Document store URLs cannot be empty");
     }
 
+    /**
+     * @throws \Exception
+     */
     public function initialize(): IDocumentStore
     {
-        if ($this->initialized) {
+        if($this->initialized){
             return $this;
         }
         $this->assertValidConfiguration();
-        RequestExecutor::validateUrls($this->urls,null);
-        try{
+        RequestExecutor::validateUrls($this->urls);
+        try {
             if(null === $this->getConventions()->getDocumentIdGenerator()){ // don't overwrite what the user is doing
                 $generator = new MultiDatabaseHiLoIdGenerator($this);
                 $this->_multiDbHiLo = $generator;
-                $this->getConventions()->getDocumentIdGenerator();
+                //   $this->getConventions()->setDocumentIdGenerator($generator->generateDocumentId());
             }
             $this->getConventions()->freeze();
             $this->initialized = true;
-        }catch (Exception $e){
+        } catch(\Exception $e){
             $this->close();
-            throw new RuntimeException();
+            throw new \Exception($e);
         }
         return $this;
     }
 
-    protected function assertValidConfiguration(): void
+    public function openSession(SessionOptions $sessionOptions): IDocumentStore
     {
-        if (StringUtils::isNull($this->urls) || StringUtils::isBlank($this->urls)) {
-            throw new InvalidArgumentException("Document store URLs cannot be empty");
-        }
-    }
+        $this->assertInitialized();
+        $this->ensureNotClosed();
+        $sessionID = Uuid::uuid4()->toString();
+       dd($sessionID);
 
-    public function getConventions(): DocumentConventions
-    {   /*TODO: JUST FOR TESTING*/
-        return new DocumentConventions();
     }
-
 
     public function getRequestExecutor(?string $database=null): RequestExecutor
     {
@@ -118,15 +109,15 @@ class DocumentStore extends DocumentStoreBase
 
     private function internalGetRequestExecutor($databaseName):RequestExecutor
     {
-            $conventions = new DocumentConventions();
-            return RequestExecutor::create(null,$databaseName,null,$conventions);
+        $conventions = new DocumentConventions();
+        return RequestExecutor::create(null,$databaseName,null,$conventions);
     }
 
     public function maintenance(): MaintenanceOperationExecutor
     {
         try {
             $this->assertInitialized();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
         }
         if (null === $this->maintenanceOperationExecutor) {
             $this->maintenanceOperationExecutor = new MaintenanceOperationExecutor($this, $this->getDatabase());
@@ -140,16 +131,6 @@ class DocumentStore extends DocumentStoreBase
             $this->operationExecutor = new OperationExecutor($this);
         }
         return $this->operationExecutor;
-    }
-
-    public function addAfterCloseListener(EventHandler|\RavenDB\Client\Util\EventHandler $event): void
-    {
-        // TODO: Implement addAfterCloseListener() method.
-    }
-
-    public function removeAfterCloseListener(EventHandler|\RavenDB\Client\Util\EventHandler $event)
-    {
-        // TODO: Implement removeAfterCloseListener() method.
     }
 
     function executeIndex(IAbstractIndexCreationTask $task, string $database): void
@@ -167,10 +148,12 @@ class DocumentStore extends DocumentStoreBase
         // TODO: Implement bulkInsert() method.
     }
 
+
     public function timeSeries(): TimeSeriesOperations
     {
         // TODO: Implement timeSeries() method.
     }
+
 
     public function smuggler(): DatabaseSmuggler
     {
@@ -180,5 +163,15 @@ class DocumentStore extends DocumentStoreBase
     public function setRequestTimeout(int $timeout, ?string $database): Closable
     {
         // TODO: Implement setRequestTimeout() method.
+    }
+
+    public function addBeforeCloseListener(VoidArgs $event): void
+    {
+        // TODO: Implement addBeforeCloseListener() method.
+    }
+
+    public function removeBeforeCloseListener(VoidArgs $event): void
+    {
+        // TODO: Implement removeBeforeCloseListener() method.
     }
 }

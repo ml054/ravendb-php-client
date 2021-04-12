@@ -3,7 +3,6 @@
 
 namespace RavenDB\Client\Documents\Session;
 
-
 use RavenDB\Client\Http\RequestExecutor;
 
 class SessionOptions

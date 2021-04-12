@@ -14,10 +14,20 @@ class RouteUtils
 
     /**
      * @throws \Exception
+     * TODO IMPROVE
      */
-    public static function store(DocumentStore $store, string $route, array $params):string{
+    public static function store(DocumentStore|ServerNode $store, string $route, array $params):string{
+        $url = null;
+        if($store instanceof DocumentStore){
+            $url = $store->getUrls()[0];
+        }elseif($store instanceof ServerNode){
+            $url = $store->getUrl();
+        }
+        return $url.$route.http_build_query($params);
+    }
+
+    public static function request(string $url, string $route, array $params):string{
         // TODO MANAGE THE ARRAY PARAMETER
-        if(is_array($store->getUrls()) && count($store->getUrls()) > 1) throw new \Exception('Array processing is not yet in place');
-        return $store->getUrls()[0].$route.http_build_query($params);
+        return $url.$route.http_build_query($params);
     }
 }

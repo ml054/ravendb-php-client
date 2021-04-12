@@ -3,19 +3,21 @@
 namespace RavenDB\Client\Documents\Operations;
 
 use InvalidArgumentException;
+use MongoDB\Driver\Server;
 use RavenDB\Client\Documents\DocumentStore;
 use RavenDB\Client\Http\RequestExecutor;
+use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Serverwide\Operations\IServerOperation;
 
 class ServerOperationExecutor implements Closable
 {
     private ?string $_nodeTag=null;
-    private DocumentStore $_store;
-    private ?RequestExecutor $_requestExecutor=null; // replaced from ClusterRequestExecutor
+    private DocumentStore|ServerNode $_store;
+    private ?RequestExecutor $_requestExecutor=null;
     private ?RequestExecutor $_initialRequestExecutor;
 
-    public function __construct(?DocumentStore $store,RequestExecutor $requestExecutor)
+    public function __construct(DocumentStore|ServerNode $store,RequestExecutor $requestExecutor)
     {
         if (null === $store) {
             throw new InvalidArgumentException("Store cannot be null");

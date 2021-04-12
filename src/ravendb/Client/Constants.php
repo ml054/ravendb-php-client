@@ -41,7 +41,13 @@ class Constants
     // RAVENDB ROUTES
     public const ROUTE_ADMIN_DATABASE = "/admin/databases";
     public const ROUTE_DOCS = "/docs";
+    public const ROUTE_DATABASES="/databases/";
 
     // THE CLIENT
     public const CLIENT_VERSION="5.0.0";
+
+    // EVENT DISPATCHERS CONSTANTS
+    public const EVENT_DISPATCHER_KEY="event.request.dispatcher";
+    public const EVENT_INMEMO_KEY="event.in.memory.dispatcher";
+
 }

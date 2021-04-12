@@ -22,7 +22,7 @@ class GetDatabaseNamesCommand extends RavenCommand
         return true;
     }
 
-    public function createRequest(ServerNode $node): array
+    public function createRequest(ServerNode $node): array|string
     {
         $url = $node->getUrl() ."/databases?start=".$this->_start."&pageSize=".$this->_pageSize."&namesOnly=true";
         return [

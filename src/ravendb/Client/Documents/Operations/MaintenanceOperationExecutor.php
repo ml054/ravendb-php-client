@@ -32,12 +32,10 @@ class MaintenanceOperationExecutor
 
     public function server(): ServerOperationExecutor
     {
-        if ($this->serverOperationExecutor !== null) {
-            return $this->serverOperationExecutor;
-        } else {
-            $this->serverOperationExecutor = new ServerOperationExecutor($this->store,$this->store->getRequestExecutor($this->store->getDatabase()));
-            return $this->serverOperationExecutor;
+        if ($this->serverOperationExecutor === null) {
+            $this->serverOperationExecutor = new ServerOperationExecutor($this->store, $this->store->getRequestExecutor($this->store->getDatabase()));
         }
+        return $this->serverOperationExecutor;
     }
 
     public function forDatabase(string $databaseName){

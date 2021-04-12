@@ -14,7 +14,7 @@ class CreateDatabaseOperation implements IServerOperation
     private string $etag;
     private string $databaseName;
 
-    public function __construct(DatabaseRecord $databaseRecord,int $replicationFactor)
+    public function __construct(DatabaseRecord $databaseRecord,int $replicationFactor = 1)
     {
       $this->databaseRecord = $databaseRecord;
       $this->replicationFactor = $replicationFactor;

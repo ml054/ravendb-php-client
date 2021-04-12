@@ -70,12 +70,3 @@ class ServerNode
         }
     }
 }
-/* TODO:
-    @
-    public int hashCode() {
-        int result = url != null ? url.hashCode() : 0;
-        result = 31 * result + (database != null ? database.hashCode() : 0);
-        return result;
-    }
-}
- * */

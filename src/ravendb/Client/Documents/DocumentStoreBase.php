@@ -2,20 +2,23 @@
 
 namespace RavenDB\Client\Documents;
 
-use Exception;
-use InvalidArgumentException;
-use phpDocumentor\Reflection\Types\This;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
+use RavenDB\Client\Documents\Indexes\IAbstractIndexCreationTask;
+use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
+use RavenDB\Client\Documents\Operations\OperationExecutor;
+use RavenDB\Client\Documents\Session\EventDispatcher\Dispatcher;
+use RavenDB\Client\Documents\Session\SessionOptions;
+use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
+use RavenDB\Client\Documents\TimeSeries\TimeSeriesOperations;
+use RavenDB\Client\Exceptions\IllegalStateException;
+use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Primitives\Closable;
+use RavenDB\Client\Primitives\VoidArgs;
 use RavenDB\Client\Util\StringUtils;
 
-/**
- * Class DocumentStoreBase
- * @package RavenDB\Client\Documents
- */
 abstract class DocumentStoreBase implements IDocumentStore
 {
-
+    use Dispatcher;
     private array $onBeforeStore; // <EventHandler<BeforeStoreEventArgs>>
     private array $onAfterSaveChanges; // <EventHandler<AfterSaveChangesEventArgs>>
     private array $onBeforeDelete; // <EventHandler<BeforeDeleteEventArgs>>
@@ -29,36 +32,80 @@ abstract class DocumentStoreBase implements IDocumentStore
     private array $onSucceedRequest ;// <EventHandler<SucceedRequestEventArgs>>
     private array $onFailedRequest ;// <EventHandler<FailedRequestEventArgs>>
     private array $onTopologyUpdated ;// <EventHandler<TopologyUpdatedEventArgs>>
-    private DocumentConventions $conventions;
+    protected array|null $urls;
+    protected ?string $database;
+    protected bool $initialized=false;
+    private ?DocumentConventions $conventions=null;
 
-    /**
-     * @var bool
-     */
+
+    public abstract function addBeforeCloseListener(VoidArgs $event): void;
+    public abstract function removeBeforeCloseListener(VoidArgs $event): void;
+    public abstract function addAfterCloseListener(VoidArgs $event): void;
+    public abstract function removeAfterCloseListener(VoidArgs $event):void;
+
     protected bool $disposed;
-    /**
-     * @var bool
-     */
-    protected bool $initialized = false;
-    /**
-     * @var string|array
-     */
-    protected string|array $urls;
-    /**
-     * @var string|null
-     */
-    protected ?string $database = null;
+    public function isDisposed(): bool { return $this->disposed; }
 
-    /**
-     * @return bool
-     */
-    public function isDisposed(): bool
+    public function getEffectiveDatabase(string $database): string
     {
-        return $this->disposed;
+        return self::effectiveDatabase($database);
     }
 
-    public function close():void
+    public static function effectiveDatabase(string $database, ?IDocumentStore $store = null): string
     {
-        // TODO: THIS METHOD IS INVOKING AGGRESSIVE CACHING AND EXECUTOR SERVICE SO FAR OUT OF PHP MIGRATION FOR NOW. TO CONFIRM
+        if (null === $database) {
+            $database = $store->getDatabase();
+        }
+        if (StringUtils::isNotBlank($database)) {
+            return $database;
+        }
+        throw new \InvalidArgumentException("Cannot determine database to operate on. " .
+            "Please either specify 'database' directly as an action parameter " .
+            "or set the default database to operate on using 'DocumentStore.setDatabase' method. " .
+            "Did you forget to pass 'database' parameter? ");
+    }
+    /**
+     * Set the database instance
+     * @param string|null $database
+     * @return string|null
+     */
+    public function setDatabase(?string $database = null): ?string
+    {
+        return $this->database = $database;
+    }
+    public function close()
+    {
+        // TODO: Implement close() method.
+    }
+
+    public function getIdentifier(): string
+    {
+        // TODO: Implement getIdentifier() method.
+    }
+
+    public function setIdentifier(string $identifier): void
+    {
+        // TODO: Implement setIdentifier() method.
+    }
+
+    public function initialize(): IDocumentStore
+    {
+        // TODO: Implement initialize() method.
+    }
+
+    public function openSession(SessionOptions $sessionOptions): IDocumentStore
+    {
+        // TODO: Implement openSession() method.
+    }
+
+    function executeIndex(IAbstractIndexCreationTask $task, string $database): void
+    {
+        // TODO: Implement executeIndex() method.
+    }
+
+    function executeIndexes(IAbstractIndexCreationTask $tasks): void
+    {
+        // TODO: Implement executeIndexes() method.
     }
 
     public function getConventions(): DocumentConventions
@@ -72,30 +119,73 @@ abstract class DocumentStoreBase implements IDocumentStore
     public function setConvention(DocumentConventions $conventions){
         try {
             $this->assertNotInitialized('conventions');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
         }
         $this->conventions = $conventions;
     }
-
-    /**
-     * @throws Exception
-     */
-    public function assertInitialized(): void
+    public function getUrls(): array|string
     {
-        if (!$this->initialized) {
-            throw new Exception("You cannot open a session or access the database commands
-            before initializing the document store. Did you forget calling initialize()?");
-        }
+        return $this->urls;
+    }
+
+    public function bulkInsert(string $database): BulkInsertOperation
+    {
+        // TODO: Implement bulkInsert() method.
     }
 
     /**
-     * @param string $property
-     * @throws Exception
+     * @return string|null
      */
-    private function assertNotInitialized(string $property): void
+    public function getDatabase(): ?string
     {
+        return $this->database;
+    }
+
+    public function getRequestExecutor(?string $databaseName = null): RequestExecutor
+    {
+        // TODO: Implement getRequestExecutor() method.
+    }
+
+    public function timeSeries(): TimeSeriesOperations
+    {
+        // TODO: Implement timeSeries() method.
+    }
+
+    public function maintenance(): MaintenanceOperationExecutor
+    {
+        // TODO: Implement maintenance() method.
+    }
+
+    public function operations(): OperationExecutor
+    {
+        // TODO: Implement operations() method.
+    }
+
+    public function smuggler(): DatabaseSmuggler
+    {
+        // TODO: Implement smuggler() method.
+    }
+
+    public function setRequestTimeout(int $timeout, ?string $database): Closable
+    {
+        // TODO: Implement setRequestTimeout() method.
+    }
+
+    protected function ensureNotClosed():void {
+        if ($this->disposed) {
+            throw new IllegalStateException("The document store has already been disposed and cannot be used");
+        }
+    }
+
+    public function assertInitialized():void {
+        if (!$this->initialized) {
+            throw new IllegalStateException("You cannot open a session or access the database commands before initializing the document store. Did you forget calling initialize()?");
+        }
+    }
+
+    private function assertNotInitialized(string $property):void {
         if ($this->initialized) {
-            throw new Exception("You cannot set $property after the document store has been initialized.");
+            throw new IllegalStateException("You cannot set '".$property."' after the document store has been initialized.");
         }
     }
 
@@ -106,7 +196,7 @@ abstract class DocumentStoreBase implements IDocumentStore
      */
     public function setUrls(string|array $values): void
     {
-        if (null === $values) throw new InvalidArgumentException("value cannot be null");
+        if (null === $values) throw new \InvalidArgumentException("value cannot be null");
 
         $collect = $values;
 
@@ -115,10 +205,10 @@ abstract class DocumentStoreBase implements IDocumentStore
             $collect = [];
             for ($i = 0; $i < count($values); $i++) {
 
-                $values[$i] ?: throw new InvalidArgumentException("value cannot be null");
+                $values[$i] ?: throw new \InvalidArgumentException("value cannot be null");
                 // TODO: check URL to migrate to an Utils (UrlUtils::checkUrl()). based on occurrences
                 if (false === filter_var($values[$i], FILTER_VALIDATE_URL)) {
-                    throw new InvalidArgumentException("The url " . $values[$i] . " is not valid");
+                    throw new \InvalidArgumentException("The url " . $values[$i] . " is not valid");
                 }
                 // TODO rtrim to StringUtils
                 $collect[$i] = rtrim($values[$i], "/");
@@ -127,79 +217,4 @@ abstract class DocumentStoreBase implements IDocumentStore
 
         $this->urls = $collect;
     }
-
-    /**
-     * @return array|string
-     */
-    public function getUrls(): array|string
-    {
-        return $this->urls;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDatabase(): ?string
-    {
-        return $this->database;
-    }
-
-    /**
-     * Set the database instance
-     * @param string|null $database
-     * @return string|null
-     */
-    public function setDatabase(?string $database = null): ?string
-    {
-        return $this->database = $database;
-    }
-
-    /**
-     * Ensure the resource is not closed
-     * @return void
-     * @throws Exception
-     */
-    protected function ensureNotClosed(): void
-    {
-        if ($this->disposed) {
-            throw new Exception('The document store has already been disposed and cannot be used');
-        }
-    }
-
-    /**
-     * @param string $database
-     * @param bool|null $secured
-     * @param int|null $waitIndexingTimeout
-     */
-    public function getDocumentStore(string $database, ?bool $secured, ?int $waitIndexingTimeout)
-    {
-    }
-
-    public function getEffectiveDatabase(string $database): string
-    {
-              return self::effectiveDatabase($database);
-    }
-
-    public static function effectiveDatabase(string $database, ?IDocumentStore $store = null): string
-    {
-        if (null === $database) {
-            $database = $store->getDatabase();
-        }
-        /* TODO: CHECK improvement*/
-        if (StringUtils::isNotBlank($database)) {
-            return $database;
-        }
-
-        throw new InvalidArgumentException("Cannot determine database to operate on. " .
-            "Please either specify 'database' directly as an action parameter " .
-            "or set the default database to operate on using 'DocumentStore.setDatabase' method. " .
-            "Did you forget to pass 'database' parameter? ");
-    }
-
-    private function runServer(bool $secured)
-    {
-        // TODO
-    }
-
-
 }

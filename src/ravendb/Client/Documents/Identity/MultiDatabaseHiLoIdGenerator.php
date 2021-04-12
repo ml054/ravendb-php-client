@@ -14,10 +14,10 @@ class MultiDatabaseHiLoIdGenerator
         $this->store = $store;
     }
 
-    public function generateDocumentId(?string $database=null, ?object $entity=null): ?string
+    public function generateDocumentId(string $database, ?object $entity=null): string
     {
         // TODO: To complete
-        $database = $this->store->getEffectiveDatabase($database);
+        $this->store->getEffectiveDatabase($database);
 
     }
 

@@ -10,10 +10,10 @@ class GetStatisticsOperation implements IMaintenanceOperation
     private ?string $_debugTag;
     private ?string $_nodeTag;
 
-    public function __construct(?string $debugTag, ?string $nodeTag)
+    public function __construct(?string $debugTag=null, ?string $nodeTag=null)
     {
-        $this->_debugTag = null;
-        $this->_nodeTag = null;
+        $this->_debugTag = $debugTag;
+        $this->_nodeTag = $nodeTag;
     }
 
     public function getCommand(DocumentConventions $conventions): RavenCommand

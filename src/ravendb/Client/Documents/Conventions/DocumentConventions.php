@@ -7,6 +7,7 @@ use RavenDB\Client\Documents\Operations\Configuration\ClientConfiguration;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Http\LoadBalanceBehavior;
 use RavenDB\Client\Http\ReadBalanceBehavior;
+use RavenDB\Client\Util\Duration;
 
 class DocumentConventions
 {
@@ -20,9 +21,9 @@ class DocumentConventions
     private ?bool $_useOptimisticConcurrency = null;
     private ?bool $_throwIfQueryPageSizeIsNotSet = null;
     private ?int $_maxNumberOfRequestsPerSession = null;
-    private ?int $_requestTimeout = null;
-    private ?int $_firstBroadcastAttemptTimeout = null;
-    private ?int $_secondBroadcastAttemptTimeout = null;
+    private ?Duration $_requestTimeout = null;
+    private ?Duration $_firstBroadcastAttemptTimeout = null;
+    private ?Duration $_secondBroadcastAttemptTimeout = null;
     private ?LoadBalanceBehavior $_loadBalanceBehavior = null;
     private ?ReadBalanceBehavior $_readBalanceBehavior = null;
     //private ObjectMapper $_entityMapper; /*TODO : IMPORT THE CLASS*/
@@ -33,7 +34,7 @@ class DocumentConventions
         return $this->_maxHttpCacheSize;
     }
 
-    public function getRequestTimeout(): ?int
+    public function getRequestTimeout(): ?Duration
     {
         return $this->_requestTimeout;
     }

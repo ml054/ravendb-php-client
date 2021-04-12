@@ -10,8 +10,10 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
 /**
@@ -36,9 +38,9 @@ class JsonExtensions
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $metadataAwareNameConverter = new MetadataAwareNameConverter($classMetadataFactory);
         $typeExtractors = new CombinedExtrator();
-        $normalizer = new GetSetMethodNormalizer($classMetadataFactory,$metadataAwareNameConverter,$typeExtractors);
+        $getsetNormalizer = new GetSetMethodNormalizer($classMetadataFactory,$metadataAwareNameConverter,$typeExtractors);
         $encoders = [new JsonEncoder()];
-        $normalizers = [$normalizer,new DateTimeNormalizer()];
+        $normalizers = [$getsetNormalizer,new DateTimeNormalizer(),new ObjectNormalizer()];
         return new Serializer($normalizers,$encoders);
     }
 
@@ -62,13 +64,10 @@ class JsonExtensions
      * @return string
      * @throws \Exception
      */
-    public static function writeValueAsString(object $object): string
+    public static function writeValueAsString(object $object,?string $argument): string
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $metadataAwareNameConverter = new MetadataAwareNameConverter($classMetadataFactory);
-        $normalizer = new GetSetMethodNormalizer($classMetadataFactory,$metadataAwareNameConverter,null);
-        $serializer = new Serializer([$normalizer],[new JsonEncoder()]);
-        $record = new $object();
+        $serializer = static::serializer();
+        $record = new $object($argument);
         try {
             $normalize = StringUtils::pascalize($serializer->normalize($record));
         } catch (ExceptionInterface $e) {

@@ -9,9 +9,6 @@ use RavenDB\Client\Documents\Operations\Refresh\RefreshConfiguration;
 use RavenDB\Client\Documents\Operations\Revisions\RevisionsCollectionConfiguration;
 use RavenDB\Client\Documents\Operations\Revisions\RevisionsConfiguration;
 use RavenDB\Client\Documents\Operations\TimeSeries\TimeSeriesConfiguration;
-use Symfony\Component\Serializer\Annotation\SerializedName;
-Use RavenDB\Client\Documents\Naming as CaseConverter;
-use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 /**
  * Class DatabaseRecord
@@ -25,7 +22,7 @@ class DatabaseRecord
 {
     // DATABASE_STATE prefixes are matching java's private DatabaseState $databaseState property in reference to RDBC-447;
     // no enum yet in php (may be in version 8.1) pending on vote. No migration to php 8.1 will be applied until Customer requires for
-    public const DATABASE_STATE_NORMAL = "NORMAL";
+    public const DATABASE_STATE_NORMAL = "Normal";
     public const DATABASE_STATE_RESTORE_IN_PROGRESS = "RESTORE_IN_PROGRESS";
     private string $databaseName;
     private bool $disabled;
@@ -58,8 +55,13 @@ class DatabaseRecord
     private float $truncatedClusterTransactionCommandsCount;
     private array $unusedDatabaseIds;
 
+    public function __construct(string $databaseName)
+    {
+        $this->databaseName = $databaseName;
+    }
+
     /**
-     * @return string|null
+     * @return string
      */
     public function getDatabaseName(): ?string
     {

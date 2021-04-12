@@ -6,14 +6,18 @@ use DateTime;
 
 class NodeSelector
 {
-   // private ExecutorService $executorService; // TODO : EXECUTOR SERVICE OUT OF PHP SCOPE FOR NOW
     private DateTime $_updateFastestNodeTimer;
     private NodeSelectorState $_state;
 
     public function getTopology()
     {
-        return "";
+        return new Topology();
     }
+
+    public function getPreferredNode():CurrentIndexAndNode{
+
+    }
+
 }
 /*  TODO: SOURCE CODE REFERENCE(S) ( [] NODEJS | [x] JAVA )
 class NodeSelector {
@@ -22,10 +26,6 @@ class NodeSelector {
         return _state.topology;
     }
 
-    public NodeSelector(Topology topology, ExecutorService executorService) {
-        _state = new NodeSelectorState(topology);
-        this.executorService = executorService;
-    }
 
     public void onFailedRequest(int nodeIndex) {
         NodeSelectorState state = _state;

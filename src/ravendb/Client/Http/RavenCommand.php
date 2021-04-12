@@ -22,7 +22,7 @@ abstract class RavenCommand
 
     public abstract function isReadRequest(): bool;
 
-    public abstract function createRequest(ServerNode $node): array;
+    public abstract function createRequest(ServerNode $node): array|string|object;
 
     public function setTimeout(int $timeout): void
     {

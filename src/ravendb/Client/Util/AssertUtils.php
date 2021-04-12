@@ -61,6 +61,10 @@ class AssertUtils
         TestCase::assertInstanceOf($object,static::$elements);
     }
 
+    public static function isCount(int $int)
+    {
+        TestCase::assertEquals($int,static::$elements);
+    }
 
     public static function notFoundDatabase(){
         $jsonMessage = json_decode(static::$elements);

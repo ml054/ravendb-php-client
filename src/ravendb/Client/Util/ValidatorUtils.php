@@ -19,7 +19,7 @@ class ValidatorUtils
     public static function validateUrl(array|string $initialUrls, string $certificate = null): array
     {
         if(is_string($initialUrls)){
-            throw new Exception('URL as as string is not yet supported');
+            throw new Exception('URL as a string is not yet supported');
         }
 
         $requireHttps = null !== $certificate ?? false;
