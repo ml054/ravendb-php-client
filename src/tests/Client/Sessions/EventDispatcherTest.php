@@ -112,7 +112,7 @@ class EventDispatcherTest extends RemoteTestBase
         AssertUtils::assertThat($event)::isInstanceOf(Event::class);
         AssertUtils::assertThat($event->getObject())::isInstanceOf(BeforeStoreEventArgs::class);
         AssertUtils::assertThat($event->getObject()->getDocumentId())::isNotNull();
-        AssertUtils::assertThat($event->getObject()->getSession())::isNotNull();
+        AssertUtils::assertThat($event->getObject()->getSession())::isNull();
         AssertUtils::assertThat($event->getObject()->getDocumentId())::isIdenticalTo('eESd4');
     }
 }

@@ -24,6 +24,11 @@ class AssertUtils
         TestCase::assertNotNull(static::$elements);
     }
 
+    public static function isNull()
+    {
+        TestCase::assertNull(static::$elements);
+    }
+
     public static function isNotEmpty()
     {
         TestCase::assertNotEmpty(static::$elements);
