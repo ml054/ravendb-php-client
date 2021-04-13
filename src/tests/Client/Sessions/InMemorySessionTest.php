@@ -9,9 +9,7 @@ use RavenDB\Client\Util\AssertUtils;
 use RavenDB\Tests\Client\RemoteTestBase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\EventDispatcher\Event;
-/**
- * IN A SCENARIO OF EVENT MANAGEMENT THE EVENT
-*/
+
 class InMemorySessionTest extends RemoteTestBase
 {
     public function testCanOnBeforeConversionToDocumentAddingListener(){
