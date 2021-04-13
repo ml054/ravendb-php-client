@@ -63,7 +63,7 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
         try{
             $databaseDocument = $this->mapper()::writeValueAsString($this->databaseRecord,$this->databaseName);
             $httpClient = new RavenDB();
-            $curlotp = [
+            $curlopt = [
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_SSL_VERIFYHOST=>"2",
@@ -71,7 +71,9 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
                 CURLOPT_CUSTOMREQUEST=>"PUT",
                 CURLOPT_POSTFIELDS=>$databaseDocument
             ];
-            $request = $httpClient->createCurlRequest($url,$curlotp);
+
+            $request = $httpClient->createCurlRequest($url,$curlopt);
+
         }catch (Exception $e){
         }
         return $request;

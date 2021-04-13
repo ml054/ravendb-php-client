@@ -5,7 +5,7 @@ use Exception;
 class RavenDB
 {
     private string|object $response;
-    // Generally 20x code are successfull status. array subject to change
+
     private $http_codes = [
         200=>200,
         201=>201,

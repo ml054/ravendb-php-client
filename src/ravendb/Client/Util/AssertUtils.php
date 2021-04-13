@@ -50,7 +50,7 @@ class AssertUtils
         TestCase::assertIsObject(static::$elements);
     }
 
-    public static function isJson($return_data = false) {
+    public static function isJson() {
         $data = json_decode(static::$elements);
         $validate = (json_last_error() == JSON_ERROR_NONE) ?? false;
         TestCase::assertTrue($validate);
@@ -61,18 +61,15 @@ class AssertUtils
         TestCase::assertInstanceOf($object,static::$elements);
     }
 
-    public static function isCount(int $int)
+    public static function isEqualTo(int $int)
     {
         TestCase::assertEquals($int,static::$elements);
     }
 
-    public static function notFoundDatabase(){
-        $jsonMessage = json_decode(static::$elements);
-        // non case sensitive comparaison
-        $assert = $jsonMessage->Type == "Error"
-            && str_starts_with($jsonMessage->Message,'Database')
-            && str_ends_with($jsonMessage->Message,'found')
-        ;
-        TestCase::assertTrue($assert,"The database does not exist");
+    public static function isIdenticalTo(string $indenticalTo)
+    {
+        $validate = $indenticalTo === static::$elements;
+        TestCase::assertTrue($validate);
     }
+
 }

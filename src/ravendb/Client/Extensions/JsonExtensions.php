@@ -63,11 +63,24 @@ class JsonExtensions
      * @param object $object
      * @return string
      * @throws \Exception
+     * Bug identified and corrected. Instantiation of the objet was wrong approach. Fixed
      */
-    public static function writeValueAsString(object $object,?string $argument): string
+    public static function writeValueAsString(object $object): string
+    {
+        $serializer = static::serializer();
+        try {
+            $normalize = StringUtils::pascalize($serializer->normalize($object));
+        } catch (ExceptionInterface $e) {
+            dd($e->getMessage());
+        }
+        return $serializer->encode($normalize,'json');
+    }
+
+    public static function writeValueAsString_previous(object $object,null|string $argument): string
     {
         $serializer = static::serializer();
         $record = new $object($argument);
+        dd($object);
         try {
             $normalize = StringUtils::pascalize($serializer->normalize($record));
         } catch (ExceptionInterface $e) {

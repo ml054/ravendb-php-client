@@ -9,17 +9,19 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  * @package RavenDB\Client\Documents\Session\EventDispatcher
  *
  */
-trait Dispatcher
+trait InMemorySessionDispatcher
 {
     /**
      * @throws \Exception
      */
-    public function add($handler){
+    public function add(object $handler,string $trigger,$dispatch=true){
         $dispatcher = new EventDispatcher();
-        $subscriber = new EventHandlerSubscriber();
-        $event = new EventHandlerDispatcher($handler);
+        $subscriber = new InMemoryDocSessionSubscriber();
+        $event = new InMemoryDocSessionDispatcher($handler);
         $dispatcher->addSubscriber($subscriber);
-        $dispatcher->dispatch($event, EventHandlerDispatcher::NAME);
+        if(true === $dispatch){
+            $dispatcher->dispatch($event, $trigger."add");
+        }
     }
 
     /**
@@ -37,5 +39,5 @@ trait Dispatcher
         }
     }
 
-
+    
 }

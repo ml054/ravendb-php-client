@@ -12,9 +12,6 @@ class TopologyUpdatedEventArgs
         $this->_topology = $topology;
     }
 
-    /**
-     * @return Topology
-     */
     public function getTopology(): Topology
     {
         return $this->_topology;

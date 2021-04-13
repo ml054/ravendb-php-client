@@ -5,23 +5,24 @@ namespace RavenDB\Client\Serverwide\Operations;
 use RavenDB\Client\Util\Duration;
 
 class Parameters {
-        private string $databaseNames;
-        private bool $hardDelete;
-        private array $fromNodes;
-        private Duration $timeToWaitForConfirmation;
+
+        private ?string $databaseNames=null;
+        private bool $hardDelete=true;
+        private ?string $fromNodes=null;
+        private ?int $timeToWaitForConfirmation=null;
 
     /**
-     * @return string
-     */
-    public function getDatabaseNames(): string
-    {
-        return $this->databaseNames;
-    }
+         * @return string|null
+         */
+        public function getDatabaseNames(): ?string
+        {
+            return $this->databaseNames;
+        }
 
     /**
      * @param string $databaseNames
      */
-    public function setDatabaseNames(string|array $databaseNames): void
+    public function setDatabaseNames(string $databaseNames): void
     {
         $this->databaseNames = $databaseNames;
     }
@@ -43,33 +44,33 @@ class Parameters {
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getFromNodes(): array
+    public function getFromNodes(): ?string
     {
         return $this->fromNodes;
     }
 
     /**
-     * @param array $fromNodes
+     * @param string|null $fromNodes
      */
-    public function setFromNodes(array|string $fromNodes): void
+    public function setFromNodes(string|null $fromNodes): void
     {
         $this->fromNodes = $fromNodes;
     }
 
     /**
-     * @return \RavenDB\Client\Util\Duration
+     * @return int
      */
-    public function getTimeToWaitForConfirmation(): Duration
+    public function getTimeToWaitForConfirmation(): ?int
     {
         return $this->timeToWaitForConfirmation;
     }
 
     /**
-     * @param \RavenDB\Client\Util\Duration $timeToWaitForConfirmation
+     * @param int $timeToWaitForConfirmation
      */
-    public function setTimeToWaitForConfirmation(Duration $timeToWaitForConfirmation): void
+    public function setTimeToWaitForConfirmation(int|null $timeToWaitForConfirmation): void
     {
         $this->timeToWaitForConfirmation = $timeToWaitForConfirmation;
     }

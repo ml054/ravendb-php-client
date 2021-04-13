@@ -16,25 +16,16 @@ class BeforeRequestEventArgs implements IEventHandler
         $this->attemptNumber = $attemptNumber;
     }
 
-    /**
-     * @return string
-     */
     public function getDatabase(): string
     {
         return $this->database;
     }
 
-    /**
-     * @return string
-     */
     public function getUrl(): string
     {
         return $this->url;
     }
 
-    /**
-     * @return int
-     */
     public function getAttemptNumber(): int
     {
         return $this->attemptNumber;

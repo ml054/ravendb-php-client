@@ -2,6 +2,7 @@
 
 namespace RavenDB\Client\Documents;
 
+use Ramsey\Uuid\Uuid;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\Indexes\IAbstractIndexCreationTask;
 use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
@@ -95,8 +96,12 @@ abstract class DocumentStoreBase implements IDocumentStore
 
     public function openSession(SessionOptions $sessionOptions): IDocumentStore
     {
-        // TODO: Implement openSession() method.
+        $this->assertInitialized();
+        $this->ensureNotClosed();
+        $sessionID = Uuid::uuid4()->toString();
+        dd($sessionID);
     }
+
 
     function executeIndex(IAbstractIndexCreationTask $task, string $database): void
     {

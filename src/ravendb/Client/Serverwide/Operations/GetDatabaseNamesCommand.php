@@ -30,12 +30,12 @@ class GetDatabaseNamesCommand extends RavenCommand
     public function createRequest(ServerNode $node): array|string|CurlHandle
     {
         $url = $node->getUrl() ."/databases?start=".$this->_start."&pageSize=".$this->_pageSize."&namesOnly=true";
-        $curlotp = [
+        $curlopt = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true
         ];
         $httpClient = new RavenDB();
-        return $httpClient->createCurlRequest($url,$curlotp);
+        return $httpClient->createCurlRequest($url,$curlopt);
     }
 
     /**

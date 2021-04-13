@@ -91,13 +91,13 @@ class DocumentStore extends DocumentStoreBase
         return $this;
     }
 
-    public function openSession(SessionOptions $sessionOptions): IDocumentStore
+    public function openSession(SessionOptions $options): IDocumentStore
     {
         $this->assertInitialized();
         $this->ensureNotClosed();
         $sessionID = Uuid::uuid4()->toString();
-       dd($sessionID);
-
+        $session = new DocumentSession($this,$sessionID,$options);
+        return $session;
     }
 
     public function getRequestExecutor(?string $database=null): RequestExecutor

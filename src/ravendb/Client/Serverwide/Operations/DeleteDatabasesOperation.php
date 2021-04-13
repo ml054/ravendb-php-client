@@ -10,26 +10,28 @@ class DeleteDatabasesOperation implements IServerOperation
 {
     private Parameters $parameters;
 
-    public function __construct(string $databaseName, bool $hardDelete, string $fromNode, Duration $timeToWaitForConfirmation)
+    public function __construct(string $databaseName, bool $hardDelete, string|null $fromNode, int|null $timeToWaitForConfirmation)
     {
         if(null === $databaseName){
             throw new \InvalidArgumentException("Database name cannot be null");
         }
-
         $parameters = new Parameters();
-        $parameters->setDatabaseNames([$databaseName]);
+        $parameters->setDatabaseNames($databaseName);
         $parameters->setHardDelete($hardDelete);
         $parameters->setFromNodes($fromNode);
         $parameters->setTimeToWaitForConfirmation($timeToWaitForConfirmation);
 
         if(null !== $fromNode){
-            $parameters->setFromNodes([$fromNode]);
+            $parameters->setFromNodes($fromNode);
         }
         $this->parameters = $parameters;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function getCommand(DocumentConventions $conventions): RavenCommand
     {
-        // TODO: Implement getCommand() method.
+        return new DeleteDatabaseCommand($conventions,$this->parameters);
     }
 }
