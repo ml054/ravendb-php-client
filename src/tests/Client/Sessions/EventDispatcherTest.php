@@ -38,10 +38,8 @@ class EventDispatcherTest extends RemoteTestBase
     public function testCanSucceedRequestEventArgs(){
         $RequestEventArgs = new SucceedRequestEventArgs('database_name','url',5);
         $dispatcher = new EventDispatcher();
-
         $subscriber = new EventHandlerSubscriber();
         $event = new EventHandlerDispatcher($RequestEventArgs);
-
         $dispatcher->addSubscriber($subscriber);
         $dispatcher->dispatch($event, EventHandlerDispatcher::NAME);
         AssertUtils::assertThat($event->getObject())::isNotNull();
@@ -90,14 +88,13 @@ class EventDispatcherTest extends RemoteTestBase
         $subscriber = new EventHandlerSubscriber();
         $event = new EventHandlerDispatcher($RequestEventArgs);
         $dispatcher->addSubscriber($subscriber);
-        AssertUtils::assertThat($topology->getEtag())::isIdenticalTo("Et57_updating"); // <- before subscriber
+        AssertUtils::assertThat($topology->getEtag())::isIdenticalTo("Et57_updating"); // <- will pass (before event - and fail if called after event)
         $dispatcher->dispatch($event, EventHandlerDispatcher::NAME);
+        AssertUtils::assertThat($event->getObject()->getTopology()->getEtag())::isIdenticalTo("Et58_upgraded"); // <- will pass
         AssertUtils::assertThat($event->getObject())::isNotNull();
         AssertUtils::assertThat($event->getObject()->getTopology())::isNotNull();
         AssertUtils::assertThat($event->getObject()->getTopology())::isInstanceOf(Topology::class);
         AssertUtils::assertThat($event->getObject())::isInstanceOf(TopologyUpdatedEventArgs::class);
-        // Let's say we want save change of Etag from Et57_updating to Et58_upgraded via subscriber and run assertion on the same
-        AssertUtils::assertThat($event->getObject()->getTopology()->getEtag())::isIdenticalTo("Et58_upgraded"); // <- after subscriber
     }
 
     public function testCanAddBeforeStoreListener(){
