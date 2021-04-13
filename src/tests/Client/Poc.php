@@ -8,7 +8,7 @@ class Poc
 {
     private string $name;
     private ?User $obj;
-    private string|int $id;
+    private ?string $id;
     /**
      * @return string
      */

@@ -64,4 +64,6 @@ EOD;
         AssertUtils::assertThat($result->getItemsCollection())::isArray();
         AssertUtils::assertThat($result->getItemsCollection())::hasSize(2);
     }
+    public function testSemaphore(){
+    }
 }

@@ -34,9 +34,12 @@ class RemoteTestBase extends RavenTestDriver implements Closable
     {
     }
 
+    /**
+     * @throws \Exception
+     */
     private static function getGlobalServer(bool $secured): ?IDocumentStore
     {
-        $documentStore = new DocumentStore('http://devtool.infra:9095/', 'initdb_5');
+        $documentStore = new DocumentStore('http://devtool.infra:9095/', 'db1');
         $documentStore->initialize();
         return $documentStore;
     }
@@ -86,24 +89,26 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         RavenTestDriver::killProcess($p);
     }
 
-    public function getDocumentStore(): ?IDocumentStore
+    public function getDocumentStore(): IDocumentStore
     {
         return self::getGlobalServer(false);
     }
     /*TODO */
-    public function getDocumentStoreMaintenance(?string $database = null, bool $secured = false, ?int $waitForIndexingTimeout = null): DocumentStore
+    /**
+     * @throws \Exception
+     */
+    public function getDocumentStoreMaintenance(?string $database = null, bool $secured = false, ?int $waitForIndexingTimeout = null): IDocumentStore
     {
-        $name = $database . "new_db_" . ++self::$_index;
+        $name = $database . "rvdb_".time();
         self::reportInfo("getDocumentStore for db " . $database . ".");
         $documentStore = self::getGlobalServer($secured);
-        $databaseRecord = new DatabaseRecord();
+        $databaseRecord = new DatabaseRecord($name);
         $databaseRecord->setDatabaseName($name);
         $this->customizeDbRecord($databaseRecord);
         $createDatabaseOperation = new CreateDatabaseOperation($databaseRecord, 0);
         $documentStore->maintenance()->server()->send($createDatabaseOperation);
-
-        $store = new DocumentStore();
-        $store->setUrls($documentStore->getUrls());
+        $store = new DocumentStore('http://devtool.infra:9095/',$name);
+        $store->setUrls(["http://devtool.infra:9095/"]);
         $store->setDatabase($name);
         $this->customizeStore($store);
         $store->initialize();
