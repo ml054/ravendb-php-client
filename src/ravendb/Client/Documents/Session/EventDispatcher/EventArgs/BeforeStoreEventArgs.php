@@ -22,7 +22,7 @@ class BeforeStoreEventArgs
     public function getDocumentMetadata(): IMetadataDictionary
     {
         if(null === $this->_documentMetadata){
-            $this->_documentMetadata = $this->session->getMetadataFor($this->entity);
+            $this->_documentMetadata = $this->session->getMetadataFor($this->entity); // TODO
         }
         return $this->_documentMetadata;
     }

@@ -11,14 +11,16 @@ use RavenDB\Client\Util\StringUtils;
 class OperationExecutor
 {
     private IDocumentStore $store;
-    private string $databaseName;
+    private ?string $databaseName;
     private RequestExecutor $requestExecutor;
 
     public function __construct(DocumentStoreBase|IDocumentStore $store, ?string $databaseName = null)
     {
         $this->store = $store;
-        $this->databaseName = $databaseName !== null ? $this->databaseName : $store->getDatabase();
-
+        $this->databaseName = $databaseName;
+        if(null === $this->databaseName){
+            $this->databaseName = $store->getDatabase();
+        }
         if (StringUtils::isNotBlank($this->databaseName)) {
             $this->requestExecutor = $this->store->getRequestExecutor($this->databaseName);
         } else {

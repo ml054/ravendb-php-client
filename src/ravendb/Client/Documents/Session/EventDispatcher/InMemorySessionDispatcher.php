@@ -1,43 +1,33 @@
 <?php
-
 namespace RavenDB\Client\Documents\Session\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-// TODO WORK IN PROGRESS SUBJECT TO CHANGES
 
 /**
  * Trait Dispatcher
  * @package RavenDB\Client\Documents\Session\EventDispatcher
- *
  */
 trait InMemorySessionDispatcher
 {
     /**
      * @throws \Exception
      */
-    public function add(object $handler,string $trigger,$dispatch=true){
+    public function add($handler,string $eventName){
         $dispatcher = new EventDispatcher();
         $subscriber = new InMemoryDocSessionSubscriber();
         $event = new InMemoryDocSessionDispatcher($handler);
         $dispatcher->addSubscriber($subscriber);
-        if(true === $dispatch){
-            $dispatcher->dispatch($event, $trigger."add");
-        }
+        $dispatcher->dispatch($event, $eventName);
     }
 
     /**
      * @throws \Exception
      */
-    public function remove($handler){
+    public function remove($handler,string $eventName){
         $dispatcher = new EventDispatcher();
-        $subscriber = new EventHandlerSubscriber();
-        $event = new EventHandlerDispatcher($handler);
+        $subscriber = new InMemoryDocSessionSubscriber();
+        $event = new InMemoryDocSessionDispatcher($handler);
         $event->stopPropagation();
         $dispatcher->addSubscriber($subscriber);
-        $dispatcher->dispatch($event, EventHandlerDispatcher::NAME);
-        if(!$event->isPropagationStopped()){
-            throw new \Exception('The event should be stopped');
-        }
+        return $dispatcher->dispatch($event, $eventName);
     }
-
-    
 }
