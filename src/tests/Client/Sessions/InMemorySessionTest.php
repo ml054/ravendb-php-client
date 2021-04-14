@@ -1,5 +1,4 @@
 <?php
-
 namespace RavenDB\Tests\Client\Sessions;
 
 use RavenDB\Client\Documents\Session\EventDispatcher\EventArgs\BeforeRequestEventArgs;
@@ -9,9 +8,7 @@ use RavenDB\Client\Documents\Session\EventDispatcher\InMemoryDocSessionSubscribe
 use RavenDB\Client\Util\AssertUtils;
 use RavenDB\Client\Util\EventNameHolder;
 use RavenDB\Tests\Client\RemoteTestBase;
-use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class InMemorySessionTest extends RemoteTestBase
@@ -52,5 +49,8 @@ class InMemorySessionTest extends RemoteTestBase
         $dispatcher->addSubscriber($subscriber);
         $dispatcher->dispatch($event, 'onSequenceBeforeStore');
     }
-    // TODO TRACEABLE DISPATCHER ON GOING BEFORE OPENSESSION
+    // The goal track an object during its changes event
+    public function testTraceableDispatcher(){
+
+    }
 }

@@ -30,21 +30,21 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         $this->securedLocator = new RavenServerLocator();
     }
 
-    protected function customizeDbRecord(DatabaseRecord $dbRecord): void // TODO : JVM API MODEL TO MIGRATE
+    protected function customizeDbRecord(DatabaseRecord $dbRecord): void
     {
     }
 
     /**
      * @throws \Exception
      */
-    private static function getGlobalServer(bool $secured): ?IDocumentStore
+    private static function getGlobalServer(bool $secured): IDocumentStore
     {
         $documentStore = new DocumentStore('http://devtool.infra:9095/', 'db1');
         $documentStore->initialize();
         return $documentStore;
     }
 
-    protected function customizeStore(DocumentStore $store): void // TODO : JVM API MODEL TO MIGRATE
+    protected function customizeStore(DocumentStore $store): void
     {
     }
 
@@ -89,10 +89,14 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         RavenTestDriver::killProcess($p);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function getDocumentStore(): IDocumentStore
     {
         return self::getGlobalServer(false);
     }
+
     /*TODO */
     /**
      * @throws \Exception

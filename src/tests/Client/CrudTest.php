@@ -13,18 +13,19 @@ class CrudTest extends RemoteTestBase
 {
     /**
      * @throws \Exception
-     *
+     * TODO : IMPLEMENTATION OF SAVE CHANGE. OPENSESSION OK
      */
     public function testCrudCanUpdatePropertyFromNullToObject(){
         $store = $this->getDocumentStore();
+        $options = new SessionOptions();
+        $options->setDatabase('new_db_1');
         try {
-            $option = new SessionOptions();
-            $option->setDatabase('db1');
-            $session = $store->openSession($option);
+            $session = $store->openSession($options);
             $poc = new Poc();
             $poc->setName("aviv");
             $poc->setObj(null);
-            dd($session);
+            $session->store($poc,'testeste',"users/1");
+            $session->saveChanges();
         } catch (\Exception $e) {
             dd($e->getMessage());
         } finally {

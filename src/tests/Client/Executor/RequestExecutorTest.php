@@ -40,7 +40,7 @@ class RequestExecutorTest extends RemoteTestBase
         try {
             $executor = RequestExecutor::create($store->getUrls(), $store->getDatabase(), null, $conventions);
             try {
-                        for($i=0;$i < 50; $i++){
+                        for( $i=0; $i < 50; $i++ ){
                             $databaseNamesOperation = new GetDatabaseNamesOperation(0, 20);
                             $command = $databaseNamesOperation->getCommand($conventions);
                             $executor->execute($command);
@@ -79,24 +79,7 @@ class RequestExecutorTest extends RemoteTestBase
         }
         AssertUtils::assertThat($i)::isEqualTo(5);
     }
-    /**
-     * @throws \Exception
-     * TODO : THE DELETATION FLOW HITS THE SERVER BUT RESPONSE IS SIMILAR TO RavenDB-10942 BACK IN THE V.4. TO CHECK WITH TECH
-     * PREVIOUS REFERENCE : https://issues.hibernatingrhinos.com/issue/RavenDB-10942
-     * PREVIOUS FIX : https://github.com/ravendb/ravendb/pull/5936/commits/41f917e8481bb575ec34dada76f4ae69ad276769
-     * ================= Below traces from my local ravendb server when running the testCanDeleteDatabase test (500 Internal Server Error)
-     * {
-        "Url": "/admin/databases",
-        "Type": "System.FormatException",
-        "Message": "Could not convert Sparrow.Json.LazyStringValue ('db3') to Sparrow.Json.BlittableJsonReaderArray",
-        "Error": "System.FormatException: Could not convert Sparrow.Json.LazyStringValue ('db3') to Sparrow.Json.BlittableJsonReaderArray\n --->
-         System.InvalidCastException: Invalid cast from 'System.String' to 'Sparrow.Json.BlittableJsonReaderArray'.\n
-         at System.Convert.DefaultToType(IConvertible value, Type targetType, IFormatProvider provider)\n
-         at System.String.System.IConvertible.ToType(Type type, IFormatProvider provider)\n
-         at Sparrow.Json.BlittableJsonReaderObject.ConvertType[T](Object result, T& obj)
-         in C:\\Builds\\RavenDB-Stable-5.1\\51016\\src\\Sparrow\\Json\\BlittableJsonReaderObject.cs:line 519\
-    }
-     */
+
     public function testCanDeleteDatabase(){
         $store = $this->getDocumentStore();
         try {
