@@ -11,6 +11,7 @@ use RavenDB\Client\Documents\Indexes\IAbstractIndexCreationTask;
 use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
 use RavenDB\Client\Documents\Operations\OperationExecutor;
 use RavenDB\Client\Documents\Session\DocumentSession;
+use RavenDB\Client\Documents\Session\IDocumentSession;
 use RavenDB\Client\Documents\Session\SessionOptions;
 use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
 use RavenDB\Client\Documents\TimeSeries\TimeSeriesOperations;
@@ -35,18 +36,6 @@ class DocumentStore extends DocumentStoreBase
             $this->setUrls($url);
         }
         $this->setDatabase($database);
-    }
-
-
-
-    public function addAfterCloseListener(VoidArgs $event): void
-    {
-        $this->add($event);
-    }
-
-    public function removeAfterCloseListener(VoidArgs $event):void
-    {
-        $this->remove($event);
     }
 
     public function getIdentifier(): string
@@ -80,7 +69,6 @@ class DocumentStore extends DocumentStoreBase
             if(null === $this->getConventions()->getDocumentIdGenerator()){ // don't overwrite what the user is doing
                 $generator = new MultiDatabaseHiLoIdGenerator($this);
                 $this->_multiDbHiLo = $generator;
-                //   $this->getConventions()->setDocumentIdGenerator($generator->generateDocumentId());
             }
             $this->getConventions()->freeze();
             $this->initialized = true;
@@ -89,15 +77,6 @@ class DocumentStore extends DocumentStoreBase
             throw new \Exception($e);
         }
         return $this;
-    }
-
-    public function openSession(SessionOptions $options): IDocumentStore
-    {
-        $this->assertInitialized();
-        $this->ensureNotClosed();
-        $sessionID = Uuid::uuid4()->toString();
-        $session = new DocumentSession($this,$sessionID,$options);
-        return $session;
     }
 
     public function getRequestExecutor(?string $database=null): RequestExecutor
@@ -132,6 +111,13 @@ class DocumentStore extends DocumentStoreBase
         return $this->operationExecutor;
     }
 
+    public function openSession(SessionOptions $sessionOptions): IDocumentSession
+    {
+        $this->assertInitialized();
+        $this->ensureNotClosed();
+        $sessionID = Uuid::uuid4()->toString();
+        return new DocumentSession($this,$sessionID,$sessionOptions);
+    }
     function executeIndex(IAbstractIndexCreationTask $task, string $database): void
     {
         // TODO: Implement executeIndex() method.
@@ -172,5 +158,15 @@ class DocumentStore extends DocumentStoreBase
     public function removeBeforeCloseListener(VoidArgs $event): void
     {
         // TODO: Implement removeBeforeCloseListener() method.
+    }
+
+    public function addAfterCloseListener(VoidArgs $event): void
+    {
+        // TODO: Implement addAfterCloseListener() method.
+    }
+
+    public function removeAfterCloseListener(VoidArgs $event)
+    {
+        // TODO: Implement removeAfterCloseListener() method.
     }
 }

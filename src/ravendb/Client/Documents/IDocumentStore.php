@@ -6,6 +6,7 @@ use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\Indexes\IAbstractIndexCreationTask;
 use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
 use RavenDB\Client\Documents\Operations\OperationExecutor;
+use RavenDB\Client\Documents\Session\IDocumentSession;
 use RavenDB\Client\Documents\Session\SessionOptions;
 use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
 use RavenDB\Client\Documents\TimeSeries\TimeSeriesOperations;
@@ -26,7 +27,7 @@ interface IDocumentStore extends IDisposalNotification
 
     public function initialize(): IDocumentStore;
 
-    public function openSession(SessionOptions $sessionOptions): IDocumentStore;
+    public function openSession(SessionOptions $sessionOptions): IDocumentSession;
 
     function executeIndex(IAbstractIndexCreationTask $task, string $database): void;
 

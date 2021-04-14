@@ -15,6 +15,8 @@ class DeleteDatabasesOperation implements IServerOperation
         if(null === $databaseName){
             throw new \InvalidArgumentException("Database name cannot be null");
         }
+
+        /// DATABASES AND FROMNODES MUST BE AN ARRAY TO HAVE THE TEST PASS
         $parameters = new Parameters();
         $parameters->setDatabaseNames($databaseName);
         $parameters->setHardDelete($hardDelete);

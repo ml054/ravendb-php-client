@@ -19,6 +19,14 @@ abstract class RavenCommand
     public int $failoverTopologyEtag = -2;
     protected RavenCommandResponseType|string $responseType;
     private ServerNode|array $failedNodes;
+    const RESPONSE_TYPE_EMPTY = "EMPTY"; // NO ENUM YET IN PHP
+    const RESPONSE_TYPE_OBJECT = "OBJECT"; // NO ENUM YET IN PHP
+    const RESPONSE_TYPE_RAW = "RAW"; // NO ENUM YET IN PHP
+    public function __construct($resultClass)
+    {
+        $this->resultClass = $resultClass;
+        $this->responseType = self::RESPONSE_TYPE_OBJECT;
+    }
 
     public abstract function isReadRequest(): bool;
 

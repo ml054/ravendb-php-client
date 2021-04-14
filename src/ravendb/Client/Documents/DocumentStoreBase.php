@@ -1,57 +1,32 @@
 <?php
 
 namespace RavenDB\Client\Documents;
-
-use Ramsey\Uuid\Uuid;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\Indexes\IAbstractIndexCreationTask;
 use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
 use RavenDB\Client\Documents\Operations\OperationExecutor;
-use RavenDB\Client\Documents\Session\EventDispatcher\Dispatcher;
+use RavenDB\Client\Documents\Session\IDocumentSession;
 use RavenDB\Client\Documents\Session\SessionOptions;
 use RavenDB\Client\Documents\Smuggler\DatabaseSmuggler;
 use RavenDB\Client\Documents\TimeSeries\TimeSeriesOperations;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Primitives\Closable;
-use RavenDB\Client\Primitives\VoidArgs;
 use RavenDB\Client\Util\StringUtils;
 
 abstract class DocumentStoreBase implements IDocumentStore
 {
-    use Dispatcher;
-    private array $onBeforeStore; // <EventHandler<BeforeStoreEventArgs>>
-    private array $onAfterSaveChanges; // <EventHandler<AfterSaveChangesEventArgs>>
-    private array $onBeforeDelete; // <EventHandler<BeforeDeleteEventArgs>>
-    private array $onBeforeQuery; // <EventHandler<BeforeQueryEventArgs>>
-    private array $onSessionCreated; // <EventHandler<SessionCreatedEventArgs>>
-    private array $onBeforeConversionToDocument; // <EventHandler<BeforeConversionToDocumentEventArgs>>
-    private array $onAfterConversionToDocument; // <EventHandler<AfterConversionToDocumentEventArgs>>
-    private array $onBeforeConversionToEntity; // <EventHandler<BeforeConversionToEntityEventArgs>>
-    private array $onAfterConversionToEntity; // <EventHandler<AfterConversionToEntityEventArgs>>
-    private array $onBeforeRequest ;// <EventHandler<BeforeRequestEventArgs>>
-    private array $onSucceedRequest ;// <EventHandler<SucceedRequestEventArgs>>
-    private array $onFailedRequest ;// <EventHandler<FailedRequestEventArgs>>
-    private array $onTopologyUpdated ;// <EventHandler<TopologyUpdatedEventArgs>>
     protected array|null $urls;
     protected ?string $database;
     protected bool $initialized=false;
     private ?DocumentConventions $conventions=null;
 
-
-    public abstract function addBeforeCloseListener(VoidArgs $event): void;
-    public abstract function removeBeforeCloseListener(VoidArgs $event): void;
-    public abstract function addAfterCloseListener(VoidArgs $event): void;
-    public abstract function removeAfterCloseListener(VoidArgs $event):void;
-
-    protected bool $disposed;
+    protected ?bool $disposed=null;
     public function isDisposed(): bool { return $this->disposed; }
-
     public function getEffectiveDatabase(string $database): string
     {
         return self::effectiveDatabase($database);
     }
-
     public static function effectiveDatabase(string $database, ?IDocumentStore $store = null): string
     {
         if (null === $database) {
@@ -74,34 +49,17 @@ abstract class DocumentStoreBase implements IDocumentStore
     {
         return $this->database = $database;
     }
-    public function close()
-    {
-        // TODO: Implement close() method.
-    }
+    public function close() { }
 
-    public function getIdentifier(): string
-    {
-        // TODO: Implement getIdentifier() method.
-    }
+    public function getIdentifier(): string { }
 
-    public function setIdentifier(string $identifier): void
-    {
-        // TODO: Implement setIdentifier() method.
-    }
+    public function setIdentifier(string $identifier): void { }
 
-    public function initialize(): IDocumentStore
-    {
-        // TODO: Implement initialize() method.
-    }
+    public function initialize(): IDocumentStore{ }
 
-    public function openSession(SessionOptions $sessionOptions): IDocumentStore
+    public function openSession(SessionOptions $sessionOptions): IDocumentSession
     {
-        $this->assertInitialized();
-        $this->ensureNotClosed();
-        $sessionID = Uuid::uuid4()->toString();
-        dd($sessionID);
     }
-
 
     function executeIndex(IAbstractIndexCreationTask $task, string $database): void
     {
@@ -133,11 +91,7 @@ abstract class DocumentStoreBase implements IDocumentStore
         return $this->urls;
     }
 
-    public function bulkInsert(string $database): BulkInsertOperation
-    {
-        // TODO: Implement bulkInsert() method.
-    }
-
+    public function bulkInsert(string $database): BulkInsertOperation{ }
     /**
      * @return string|null
      */
@@ -145,36 +99,12 @@ abstract class DocumentStoreBase implements IDocumentStore
     {
         return $this->database;
     }
-
-    public function getRequestExecutor(?string $databaseName = null): RequestExecutor
-    {
-        // TODO: Implement getRequestExecutor() method.
-    }
-
-    public function timeSeries(): TimeSeriesOperations
-    {
-        // TODO: Implement timeSeries() method.
-    }
-
-    public function maintenance(): MaintenanceOperationExecutor
-    {
-        // TODO: Implement maintenance() method.
-    }
-
-    public function operations(): OperationExecutor
-    {
-        // TODO: Implement operations() method.
-    }
-
-    public function smuggler(): DatabaseSmuggler
-    {
-        // TODO: Implement smuggler() method.
-    }
-
-    public function setRequestTimeout(int $timeout, ?string $database): Closable
-    {
-        // TODO: Implement setRequestTimeout() method.
-    }
+    public function getRequestExecutor(?string $databaseName = null): RequestExecutor{}
+    public function timeSeries(): TimeSeriesOperations{}
+    public function maintenance(): MaintenanceOperationExecutor {}
+    public function operations(): OperationExecutor{ }
+    public function smuggler(): DatabaseSmuggler{ }
+    public function setRequestTimeout(int $timeout, ?string $database): Closable{}
 
     protected function ensureNotClosed():void {
         if ($this->disposed) {
@@ -202,24 +132,17 @@ abstract class DocumentStoreBase implements IDocumentStore
     public function setUrls(string|array $values): void
     {
         if (null === $values) throw new \InvalidArgumentException("value cannot be null");
-
         $collect = $values;
-
         if (is_array($values)) {
-
             $collect = [];
             for ($i = 0; $i < count($values); $i++) {
-
                 $values[$i] ?: throw new \InvalidArgumentException("value cannot be null");
-                // TODO: check URL to migrate to an Utils (UrlUtils::checkUrl()). based on occurrences
                 if (false === filter_var($values[$i], FILTER_VALIDATE_URL)) {
                     throw new \InvalidArgumentException("The url " . $values[$i] . " is not valid");
                 }
-                // TODO rtrim to StringUtils
                 $collect[$i] = rtrim($values[$i], "/");
             }
         }
-
         $this->urls = $collect;
     }
 }

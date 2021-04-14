@@ -18,7 +18,8 @@ class MaintenanceOperationExecutor
     public function __construct(DocumentStore $store, ?string $databaseName=null)
     {
         $this->store = $store;
-        $this->databaseName = ObjectUtils::firstNonNull($databaseName, [$this->store->getDatabase()]);
+        $this->databaseName = $databaseName;
+      //  $this->databaseName = ObjectUtils::firstNonNull($databaseName, [$this->store->getDatabase()]);
     }
 
     private function getRequestExecutor(): RequestExecutor

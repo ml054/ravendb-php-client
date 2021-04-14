@@ -49,5 +49,6 @@ class Constants
     // EVENT DISPATCHERS CONSTANTS
     public const EVENT_DISPATCHER_KEY="event.request.dispatcher";
     public const EVENT_INMEMO_KEY="event.in.memory.dispatcher";
+    public const EVENT_ENTITY_TEST_KEY="event.entity.test.dispatcher";
 
 }

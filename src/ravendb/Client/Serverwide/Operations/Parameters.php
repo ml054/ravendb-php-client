@@ -6,23 +6,23 @@ use RavenDB\Client\Util\Duration;
 
 class Parameters {
 
-        private ?string $databaseNames=null;
+        private array $databaseNames;
         private bool $hardDelete=true;
-        private ?string $fromNodes=null;
+        private array $fromNodes;
         private ?int $timeToWaitForConfirmation=null;
 
     /**
-         * @return string|null
+         * @return array|null
          */
-        public function getDatabaseNames(): ?string
+        public function getDatabaseNames(): array
         {
             return $this->databaseNames;
         }
 
     /**
-     * @param string $databaseNames
+     * @param array $databaseNames
      */
-    public function setDatabaseNames(string $databaseNames): void
+    public function setDatabaseNames(array $databaseNames): void
     {
         $this->databaseNames = $databaseNames;
     }
@@ -44,17 +44,17 @@ class Parameters {
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getFromNodes(): ?string
+    public function getFromNodes(): ?array
     {
         return $this->fromNodes;
     }
 
     /**
-     * @param string|null $fromNodes
+     * @param array $fromNodes
      */
-    public function setFromNodes(string|null $fromNodes): void
+    public function setFromNodes(array $fromNodes): void
     {
         $this->fromNodes = $fromNodes;
     }

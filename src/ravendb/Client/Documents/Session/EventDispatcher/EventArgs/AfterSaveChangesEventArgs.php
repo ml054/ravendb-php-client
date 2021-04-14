@@ -5,14 +5,14 @@ namespace RavenDB\Client\Documents\Session\EventDispatcher\EventArgs;
 use RavenDB\Client\Documents\Session\IMetadataDictionary;
 use RavenDB\Client\Documents\Session\InMemoryDocumentSessionOperations;
 
-class BeforeStoreEventArgs implements IInMemoryDocumentSessionEvent
+class AfterSaveChangesEventArgs implements IInMemoryDocumentSessionEvent
 {
     private IMetadataDictionary $_documentMetadata;
-    private ?InMemoryDocumentSessionOperations $session;
+    private InMemoryDocumentSessionOperations $session;
     private string $documentId;
     private object $entity;
 
-    public function __construct(?InMemoryDocumentSessionOperations $session, string $documentId, object $entity)
+    public function __construct(InMemoryDocumentSessionOperations $session, string $documentId, object $entity)
     {
         $this->session = $session;
         $this->documentId = $documentId;
@@ -22,7 +22,7 @@ class BeforeStoreEventArgs implements IInMemoryDocumentSessionEvent
     public function getDocumentMetadata(): IMetadataDictionary
     {
         if(null === $this->_documentMetadata){
-            $this->_documentMetadata = $this->session->getMetadataFor($this->entity); // TODO
+            $this->_documentMetadata = $this->session->getMetadataFor($this->entity);
         }
         return $this->_documentMetadata;
     }

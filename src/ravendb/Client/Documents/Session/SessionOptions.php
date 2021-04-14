@@ -8,7 +8,7 @@ use RavenDB\Client\Http\RequestExecutor;
 class SessionOptions
 {
     private string $database;
-    private bool $noTracking;
+    private ?bool $noTracking=true;
     private bool $noCaching;
     private RequestExecutor $requestExecutor;
     private TransactionMode $transactionMode;
