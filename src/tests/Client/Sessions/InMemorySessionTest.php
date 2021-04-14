@@ -43,7 +43,7 @@ class InMemorySessionTest extends RemoteTestBase
         $handler = new BeforeStoreEventArgs(null,'454545',new \stdClass());
         $instance->removeBeforeStoreListener($handler);
     }
-    // WILL SIMULATE A SEQUENCE - A LISTENER CAN MANAGE MULTIPLE EVENTS. MORE TO COME
+    // WILL SIMULATE A SEQUENCE - AN EVENT CAN MANAGE MULTIPLE LISTENERS
     public function testCanRunEventsSequence(){
         $handler  = new BeforeRequestEventArgs('database_name','url',55);
         $dispatcher = new EventDispatcher();
