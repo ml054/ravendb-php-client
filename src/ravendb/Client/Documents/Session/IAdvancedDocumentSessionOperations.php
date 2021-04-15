@@ -14,44 +14,13 @@ Advanced session operations
 interface IAdvancedDocumentSessionOperations
 {
     public function getDocumentStore():IDocumentStore;
-
     /**
      * Allow extensions to provide additional state per session
-     * @return External state
      */
     public function getExternalState();
-
     public function getCurrentSessionNode():ServerNode;
-
     public function getRequestExecutor():RequestExecutor;
-
     public function getSessionInfo():SessionInfo;
-
-    /** TODO CONFIRM THE INTEGRATION OF EVENLISTNER
-     * void addBeforeStoreListener(EventHandler<BeforeStoreEventArgs> handler);
-    void removeBeforeStoreListener(EventHandler<BeforeStoreEventArgs> handler);
-
-    void addAfterSaveChangesListener(EventHandler<AfterSaveChangesEventArgs> handler);
-    void removeAfterSaveChangesListener(EventHandler<AfterSaveChangesEventArgs> handler);
-
-    void addBeforeDeleteListener(EventHandler<BeforeDeleteEventArgs> handler);
-    void removeBeforeDeleteListener(EventHandler<BeforeDeleteEventArgs> handler);
-
-    void addBeforeQueryListener(EventHandler<BeforeQueryEventArgs> handler);
-    void removeBeforeQueryListener(EventHandler<BeforeQueryEventArgs> handler);
-
-    void addBeforeConversionToDocumentListener(EventHandler<BeforeConversionToDocumentEventArgs> handler);
-    void removeBeforeConversionToDocumentListener(EventHandler<BeforeConversionToDocumentEventArgs> handler);
-
-    void addAfterConversionToDocumentListener(EventHandler<AfterConversionToDocumentEventArgs> handler);
-    void removeAfterConversionToDocumentListener(EventHandler<AfterConversionToDocumentEventArgs> handler);
-
-    void addBeforeConversionToEntityListener(EventHandler<BeforeConversionToEntityEventArgs> handler);
-    void removeBeforeConversionToEntityListener(EventHandler<BeforeConversionToEntityEventArgs> handler);
-
-    void addAfterConversionToEntityListener(EventHandler<AfterConversionToEntityEventArgs> handler);
-    void removeAfterConversionToEntityListener(EventHandler<AfterConversionToEntityEventArgs> handler);
-    */
 
     /**
      * Gets a value indicating whether any of the entities tracked by the session has changes.
@@ -119,7 +88,7 @@ interface IAdvancedDocumentSessionOperations
      * Remove the entity from the delete queue and stops tracking changes for this entity.
      * @param $entity
      */
-    public function evict($entity);
+    public function evict($entity):void;
 
     /**
      * Gets the document id for the specified entity.
@@ -129,7 +98,7 @@ interface IAdvancedDocumentSessionOperations
      * @param object $entity //Entity to get id from return entity id
      * @return  $entity
      */
-    public function getDocumentId(object $entity);
+    public function getDocumentId(object $entity):string;
 
     /**
      * Gets the metadata for the specified entity.
@@ -185,7 +154,7 @@ interface IAdvancedDocumentSessionOperations
      * @param id Id of document
      * @return true is entity is loaded in session
      */
-    public function isLoaded(string $id):string;
+    public function isLoaded(string $id):bool;
 
     /**
      * Mark the entity as one that should be ignore for change tracking purposes,
@@ -196,7 +165,6 @@ interface IAdvancedDocumentSessionOperations
 
     /**
      * Returns all changes for each entity stored within session. Including name of the field/property that changed, its old and new value and change type.
-     * @return Document changes
      */
     public function whatChanged():DocumentsChanges;
 

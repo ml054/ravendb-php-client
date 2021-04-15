@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php /** @noinspection ALL */
+
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace RavenDB\Client\Documents\Session;
 
@@ -29,6 +31,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public bool $noTracking;
     public ?BatchOptions $_saveChangesOptions=null;
     private int $numberOfRequests;
+    private array $externalState;
     // TODO : PRIORITY ON THE CRUD OPERATION AND UNIT OF WORK
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
@@ -47,6 +50,12 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         return $this->databaseName;
     }
 
+    public function getExternalState(){
+        if(null === $this->externalState){
+            $this->externalState = [];
+        }
+        return $this->externalState;
+    }
 
     public function prepareForSaveChanges():SaveChangesData {
         return new SaveChangesData($this);
@@ -55,10 +64,14 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function getConvetions():DocumentConventions {
         return $this->_requestExecutor->getConventions();
     }
-    /** LifeCycle/UOW methods **/
-    public function prepareForEntitiesPuts(SaveChangesData $result):void {
 
+    public function getDocumentId(object $instance):string|null {
+        if(null === $instance) return null;
     }
+
+    /** LifeCycle/UOW methods **/
+    public function prepareForEntitiesPuts(SaveChangesData $result):void { }
+
     public function prepareForEntitiesDeletion(SaveChangesData $result, array $changes):void { }
     public function prepareForCreatingRevisionsFromIds(SaveChangesData $result):void { }
     public function prepareCompareExchangeEntities(SaveChangesData $result):void { }
@@ -69,7 +82,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             " being opened or default database can be defined using 'DocumentStore.setDatabase()' method");
     }
     public function getCurrentSessionNode():ServerNode {
-
     }
 
     public function getDocumentStore():IDocumentStore {

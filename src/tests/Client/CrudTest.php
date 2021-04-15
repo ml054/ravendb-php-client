@@ -69,7 +69,6 @@ class CrudTest extends RemoteTestBase
                 $family = (new FamilyMembers())->setMembers([$member1,$member2]);
                 $session->store($family,"family/1");
                 $session->saveChanges();
-
                 $member1 = (new Member())->setName("RavenDB")->setAge(4);
                 $member2 = (new Member())->setName("Hibernating Rhinos")->setAge(8);
                 $newFamily = $session->load(FamilyMembers::class,"family/1");

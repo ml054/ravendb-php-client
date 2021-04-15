@@ -24,7 +24,7 @@ final class StringUtils
     }
 
     public static function isString($string){
-        return self::isNotBlank($string) && is_string($string);
+        return self::isNotBlank($string) && is_string($string) ?? false;
     }
 
     public static function isArray($string){

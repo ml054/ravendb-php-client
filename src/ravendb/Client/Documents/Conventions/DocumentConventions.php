@@ -21,20 +21,21 @@ class DocumentConventions
     private ?bool $_useOptimisticConcurrency = null;
     private ?bool $_throwIfQueryPageSizeIsNotSet = null;
     private ?int $_maxNumberOfRequestsPerSession = null;
-    private ?Duration $_requestTimeout = null;
-    private ?Duration $_firstBroadcastAttemptTimeout = null;
-    private ?Duration $_secondBroadcastAttemptTimeout = null;
+    private ?int $_requestTimeout = null;
+    private ?int $_firstBroadcastAttemptTimeout = null;
+    private ?int $_secondBroadcastAttemptTimeout = null;
     private ?LoadBalanceBehavior $_loadBalanceBehavior = null;
     private ?ReadBalanceBehavior $_readBalanceBehavior = null;
     //private ObjectMapper $_entityMapper; /*TODO : IMPORT THE CLASS*/
     private ?bool $_useCompression=null;
     private ?Closure $_documentIdGenerator=null;
+    private int $_loadBalancerContextSeed;
     public function getMaxHttpCacheSize(): ?int
     {
         return $this->_maxHttpCacheSize;
     }
 
-    public function getRequestTimeout(): ?Duration
+    public function getRequestTimeout(): ?int
     {
         return $this->_requestTimeout;
     }
@@ -50,6 +51,24 @@ class DocumentConventions
         $this->assertNotFrozen();
         $this->_maxHttpCacheSize = $maxHttpCacheSize;
     }
+
+    /**
+     * @return int
+     */
+    public function getLoadBalancerContextSeed(): int
+    {
+        return $this->_loadBalancerContextSeed;
+    }
+
+    /**
+     * @param int $loadBalancerContextSeed
+     */
+    public function setLoadBalancerContextSeed(int $seed): void
+    {
+        $this->assertNotFrozen();
+        $this->_loadBalancerContextSeed = $seed;
+    }
+
 
     // TODO: REFACTOR
     public function clone(): DocumentConventions

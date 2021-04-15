@@ -26,7 +26,10 @@ class SessionInfo
             throw new InvalidArgumentException("Session cannot be null");
         }
         $this->_session = $session;
+        $this->_loadBalancerContextSeed = $session->getConvetions()->getLoadBalancerContextSeed();
     }
+
+
 
 
 }
