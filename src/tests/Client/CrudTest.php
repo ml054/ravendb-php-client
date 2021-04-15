@@ -272,10 +272,10 @@ class CrudTest extends RemoteTestBase
 
                     $user3 = new User();
                     $user3->setName("user3")->setAge(1);
-                    $session->store($user2,"users/3");
+                    $session->store($user3,"users/3");
 
                     $user4 = (new User())->setName("user4");
-                    $session->store($user2,"users/4");
+                    $session->store($user4,"users/4");
 
                     $session->delete($user2);
                     $user3->setAge(3);
