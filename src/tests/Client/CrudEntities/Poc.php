@@ -1,6 +1,6 @@
 <?php
 
-namespace RavenDB\Tests\Client;
+namespace RavenDB\Tests\Client\CrudEntities;
 
 use RavenDB\Client\Infrastructure\Entities\User;
 

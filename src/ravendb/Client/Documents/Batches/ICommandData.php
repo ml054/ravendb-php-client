@@ -10,7 +10,6 @@ interface ICommandData
     public function getId():string;
     public function getName():string;
     public function getChangeVector():string;
-    public function getType():CommandType;
-    public function serialize(JsonGenerator $generator, DocumentConventions $conventions):void;
-    public function onBeforeSaveChanges(InMemoryDocumentSessionOperations $session):void;
+//   public function getType():CommandType;
+ //   public function serialize(JsonGenerator $generator, DocumentConventions $conventions):void;
 }

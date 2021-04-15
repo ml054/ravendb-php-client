@@ -5,11 +5,11 @@ namespace RavenDB\Client\Infrastructure\Entities;
 class User
 {
     private string $id;
-    private string $name;
-    private string $lastName;
-    private string $addressId;
+    private ?string $name=null;
+    private ?string $lastName=null;
+    private ?string $addressId=null;
     private int $count;
-    private int $age;
+    private ?int $age=null;
 
     /**
      * @return string

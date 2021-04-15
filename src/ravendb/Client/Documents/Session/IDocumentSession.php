@@ -27,7 +27,7 @@ interface IDocumentSession extends Closable
      * @param string $changeVector
      * @param string $id
      */
-    public function store(object $entity, string $changeVector, string $id): void;
+    public function store(object $entity, string $id,string $changeVector=null): void;
 
     /**
      * Begin a load while including the specified path
@@ -37,4 +37,10 @@ interface IDocumentSession extends Closable
      */
     public function include(string $path): ILoaderWithInclude;
 
+    /**
+     *  Loads the specified entity with the specified id.
+     */
+    public function load(string $clazz, string $id);
+
+    public function advanced();
 }

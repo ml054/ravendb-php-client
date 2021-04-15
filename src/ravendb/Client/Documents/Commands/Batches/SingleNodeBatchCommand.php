@@ -2,6 +2,7 @@
 
 namespace RavenDB\Client\Documents\Commands\Batches;
 
+use RavenDB\Client\Data\Driver\RavenDB;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
@@ -35,9 +36,18 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
 
     }
 
+    /**
+     * @throws \Exception
+     */
     public function createRequest(ServerNode $node): array|string|object
     {
-        dd("here");
+        $url = $node->getUrl()."/databases/".$node->getDatabase()."/bulk_docs";
+        $httpClient = new RavenDB();
+        $curlopt = [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true
+        ];
+        return $httpClient->createCurlRequest($url,$curlopt);
     }
 
     public function close()

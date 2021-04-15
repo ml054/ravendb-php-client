@@ -71,6 +71,7 @@ class DocumentsChanges
     }
 
     /**
+     * Path of field on which the change occurred.
      * @return String
      */
     public function getFieldPath(): string
@@ -79,6 +80,7 @@ class DocumentsChanges
     }
 
     /**
+     * fieldPath Path of field on which the change occurred.
      * @param String $fieldPath
      */
     public function setFieldPath(string $fieldPath): void

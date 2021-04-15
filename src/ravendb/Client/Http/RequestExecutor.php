@@ -262,9 +262,9 @@ class RequestExecutor implements Closable
 
     /*
       * TODO: COMPLETE THE EXECUTE COMMAND*/
-    public function execute(RavenCommand $command)
+    public function execute(RavenCommand $command,?SessionInfo $sessionInfo=null)
     {
-        $this->_executeOnSpecificNode($command,null,null);
+        $this->_executeOnSpecificNode($command,$sessionInfo,null);
     }
     private function createRequest(ServerNode $node, RavenCommand $command): array|null|object
     {
@@ -278,8 +278,7 @@ class RequestExecutor implements Closable
             throw new \InvalidArgumentException('Unable to parse URL');
         }
     }
-    // TODO MANDATORY this method is called `execute` in c# and java code
-    public function _executeOnSpecificNode(RavenCommand $command, ?array $sessionInfo = null, ?object $options = null): void
+    public function _executeOnSpecificNode(RavenCommand $command, ?SessionInfo $sessionInfo = null, ?object $options = null): void
     {
         if ($command->failoverTopologyEtag === RequestExecutor::$INITIAL_TOPOLOGY_ETAG) {
             $command->failoverTopologyEtag = RequestExecutor::$INITIAL_TOPOLOGY_ETAG;
@@ -298,7 +297,7 @@ class RequestExecutor implements Closable
         if(!$request){
             return;
         }
-        $this->_sendRequestToServer($node,0,$command,false,$request,null);
+        $this->_sendRequestToServer($node,0,$command,false,$request,$sessionInfo);
     }
 
     private function _sendRequestToServer(
