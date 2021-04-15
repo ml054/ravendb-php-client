@@ -26,7 +26,6 @@ class CrudTest extends RemoteTestBase
                 $poc->setName("aviv");
                 $session->store($poc,"users/1");
                 $session->saveChanges();
-
             } finally {
                 $store->close();
             }
@@ -58,8 +57,7 @@ class CrudTest extends RemoteTestBase
     public function testCrudOperationsWithArrayOfObjects(){
         try{
             $store = $this->getDocumentStore();
-            $options = new SessionOptions();
-            $options->setDatabase('new_db_1');
+            $options = (new SessionOptions())->setDatabase('new_db_1');
             try {
                 /**
                  * @var FamilyMembers $newFamily
@@ -94,8 +92,7 @@ class CrudTest extends RemoteTestBase
     public function testCrudOperationsWithArrayInObject(){
         try{
             $store = $this->getDocumentStore();
-            $options = new SessionOptions();
-            $options->setDatabase('new_db_1');
+            $options = (new SessionOptions())->setDatabase('new_db_1');
             try {
                 /**
                  * @var Family $newFamily
@@ -119,8 +116,7 @@ class CrudTest extends RemoteTestBase
         try{
 
             $store = $this->getDocumentStore();
-            $options = new SessionOptions();
-            $options->setDatabase('new_db_1');
+            $options = (new SessionOptions())->setDatabase('new_db_1');
             try {
                 /**
                  * @var Arr2 $newArr
@@ -145,19 +141,95 @@ class CrudTest extends RemoteTestBase
             $store->close();
         }
     }
-    public function testcrudOperationsWithNull(){
+    public function testCrudOperationsWithNull(){
+        try{
+            $store = $this->getDocumentStore();
+            $options = (new SessionOptions())->setDatabase('new_db_1');
+            try {
+                $session = $store->openSession($options);
+                $user = (new User())->setName(null);
+                $session->store($user,"users/1");
+                $session->saveChanges();
+
+                $user2 = $session->load(User::class,"users/1");
+                // ASSERTIONS
+            } finally {
+                $store->close();
+            }
+        } finally {
+            $store->close();
+        }
+    }
+    public function testCrudCanUpdatePropertyToNull(){
+        try{
+            $store = $this->getDocumentStore();
+            $options = (new SessionOptions())->setDatabase('new_db_1');
+            try {
+                $session = $store->openSession($options);
+                $user = (new User())->setName("user1");
+                $session->store($user,"users/1");
+                $session->saveChanges();
+            } finally {
+                $store->close();
+            }
+
+            try {
+                $session = $store->openSession($options);
+                $user = $session->load(User::class,"users/1");
+                $user->setName(null);
+                $session->saveChanges();
+            } finally {
+                $store->close();
+            }
+
+            try {
+                $session = $store->openSession($options);
+                $user = $session->load(User::class,"users/1");
+                AssertUtils::assertThat($user->getName())::isNull();
+            } finally {
+                $store->close();
+            }
+        } finally {
+            $store->close();
+        }
+    }
+    public function testCrudOperationsWithArrayInObject2(){
+        try{
+            $store = $this->getDocumentStore();
+            $options = (new SessionOptions())->setDatabase('new_db_1');
+            try {
+                $session = $store->openSession($options);
+                $family = (new Family())->setNames("Hibernating Rhinos","RavenDB");
+                $session->store($family,"family/1");
+                $session->saveChanges();
+
+                $newFamily = $session->load(Family::class,"family/1");
+                $newFamily->setNames(["Hibernating Rhinos", "RavenDB"]);
+                // ASSERT #1
+                $newFamily->setNames(["RavenDB", "Hibernating Rhinos"]);
+                // ASSERT #2
+
+                $session->saveChanges();
+            } finally {
+                $store->close();
+            }
+        } finally {
+            $store->close();
+        }
+    }
+    public function testCrudOperationsWithArrayInObject3(){
             try{
                 $store = $this->getDocumentStore();
-                $options = new SessionOptions();
-                $options->setDatabase('new_db_1');
+                $options = (new SessionOptions())->setDatabase('new_db_1');
                 try {
                    $session = $store->openSession($options);
-                   $user = (new User())->setName(null);
-                   $session->store($user,"users/1");
+                   $family = (new Family())->setNames(["Hibernating Rhinos","RavenDB"]);
+                   $session->store($family,"family/1");
                    $session->saveChanges();
 
-                   $user2 = $session->load(User::class,"users/1");
-                   // ASSERTIONS
+                   $newFamily = $session->load(Family::class,"family/1");
+                   $newFamily->setNames(["RavenDB"]);
+                   // whatChanged ASSERTION
                 } finally {
                     $store->close();
                 }
@@ -165,4 +237,73 @@ class CrudTest extends RemoteTestBase
                 $store->close();
             }
         }
+    public function testCrudOperationsWithArrayInObject4(){
+            try{
+                $store = $this->getDocumentStore();
+                $options = (new SessionOptions())->setDatabase('new_db_1');
+                try {
+                   $session = $store->openSession($options);
+                   $family = (new Family())->setNames(["Hibernating Rhinos", "RavenDB"]);
+                   $session->store($family,"family/1");
+                   $session->saveChanges();
+
+                   $newFamily = $session->load(Family::class,"family/1");
+                   $newFamily->setNames(["RavenDB", "Hibernating Rhinos", "Toli", "Mitzi", "Boki"]);
+                   // whatChanged ASSERTION
+                } finally {
+                    $store->close();
+                }
+            } finally {
+                $store->close();
+            }
+        }
+    public function testCrudOperationsWithWhatChanged(){
+            try{
+                $store = $this->getDocumentStore();
+                $options = (new SessionOptions())->setDatabase('new_db_1');
+                try {
+                    $session = $store->openSession($options);
+
+                    $user1 = (new User())->setLastName("user1");
+                    $session->store($user1,"users/1");
+
+                    $user2 = (new User())->setName("user2")->setAge(1);
+                    $session->store($user2,"users/2");
+
+                    $user3 = new User();
+                    $user3->setName("user3")->setAge(1);
+                    $session->store($user2,"users/3");
+
+                    $user4 = (new User())->setName("user4");
+                    $session->store($user2,"users/4");
+
+                    $session->delete($user2);
+                    $user3->setAge(3);
+                    // ASSERTION #1
+                    $tempUser = $session->load(User::class,"users/2");
+                    AssertUtils::assertThat($tempUser->getAge())::isNull();
+                    // ASSERTION #2
+                    $tempUser = $session->load(User::class,"users/3");
+                    AssertUtils::assertThat($tempUser->getAge())::isEqualTo(3);
+                    // ASSERTION #3
+                    $user1 = $session->load(User::class,"users/1");
+                    $user4 = $session->load(User::class,"users/4");
+                    $session->delete($user4);
+                    $user1->setAge(10);
+                    // whatChanged ASSERTION :: TO RUN BEFORE SAVE CHANGE
+                    $session->saveChanges();
+
+                    $tempUser = $session->load(User::class,"users/4");
+                    AssertUtils::assertThat($tempUser)::isNull();
+
+                    $tempUser = $session->load(User::class,"users/1");
+                    AssertUtils::assertThat($tempUser)::isEqualTo(10);
+
+                } finally {
+                    $store->close();
+                }
+            } finally {
+                $store->close();
+            }
+    }
 }
