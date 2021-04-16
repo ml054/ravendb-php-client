@@ -7,13 +7,16 @@ use DateTimeImmutable;
 use RavenDB\Client\Documents\Batches\ICommandData;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStore;
+use RavenDB\Client\Documents\Linq\IDocumentQuery;
+use RavenDB\Client\Documents\Linq\IDocumentQueryGenerator;
 use RavenDB\Client\Documents\Session\Loaders\ILoaderWithInclude;
 use RavenDB\Client\Documents\Session\Operations\BatchOperation;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\StringUtils;
 
-class DocumentSession extends InMemoryDocumentSessionOperations implements IDocumentSessionImpl,IAdvancedSessionOperations
+class DocumentSession extends InMemoryDocumentSessionOperations
+    implements IDocumentSessionImpl,IAdvancedSessionOperations,IDocumentQueryGenerator
 {
     private DocumentStore $documentStore;
     private string $id;
@@ -56,13 +59,13 @@ class DocumentSession extends InMemoryDocumentSessionOperations implements IDocu
         // TODO: Implement delete() method.
     }
 
-    public function store(object $entity, string $id, string $changeVector=null): void
+    public function store(object $entity, ?string $id = null, ?string $changeVector = null): void
     {
         $serializer = JsonExtensions::serializer();
         $json = $serializer->normalize($entity);
         $pascalizer = StringUtils::pascalize($json);
         $encode = $serializer->encode($pascalizer,'json');
-        dd($encode);
+        dd($entity,$encode);
     }
 
     public function include(string $path): ILoaderWithInclude
@@ -185,5 +188,20 @@ class DocumentSession extends InMemoryDocumentSessionOperations implements IDocu
     public function waitForReplicationAfterSaveChanges(): void
     {
         // TODO: Implement waitForReplicationAfterSaveChanges() method.
+    }
+
+    public function exists(): bool
+    {
+        // TODO: Implement exists() method.
+    }
+
+    public function getSession(): InMemoryDocumentSessionOperations
+    {
+        // TODO: Implement getSession() method.
+    }
+
+    public function documentQuery(): IDocumentQuery
+    {
+        // TODO: Implement documentQuery() method.
     }
 }

@@ -11,9 +11,9 @@ class Family
         return $this->names;
     }
 
-    public function setNames(array $names): void
+    public function setNames(array $names): self
     {
         $this->names = $names;
+        return $this;
     }
-
 }

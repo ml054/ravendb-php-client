@@ -20,7 +20,7 @@ abstract class DocumentStoreBase implements IDocumentStore
     protected ?string $database;
     protected bool $initialized=false;
     private ?DocumentConventions $conventions=null;
-
+    private array $_lastRaftIndexPerDatabase; //Map@Java
     protected ?bool $disposed=null;
     public function isDisposed(): bool { return $this->disposed; }
     public function getEffectiveDatabase(string $database): string
@@ -145,4 +145,22 @@ abstract class DocumentStoreBase implements IDocumentStore
         }
         $this->urls = $collect;
     }
+
+    /**
+     * @return array
+     */
+    public function getLastRaftIndexPerDatabase(): array
+    {
+        return $this->_lastRaftIndexPerDatabase;
+    }
+
+    /**
+     * @param array $lastRaftIndexPerDatabase
+     */
+    public function setLastRaftIndexPerDatabase(array $lastRaftIndexPerDatabase): void
+    {
+
+        $this->_lastRaftIndexPerDatabase = $lastRaftIndexPerDatabase;
+    }
+
 }

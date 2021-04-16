@@ -45,7 +45,7 @@ final class StringUtils
      */
     public static function pascalize($content): array
     {
-        if(!is_array($content) ||(is_array($content) && count($content) === 0)) throw new \Exception('Only Array is supported for now');
+        if(!is_array($content) ||(count($content) === 0)) throw new \Exception('Only Array is supported for now');
         $format = [];
         foreach($content as $key=>$data){
             $format[ucfirst($key)] = $data;

@@ -4,17 +4,17 @@ namespace RavenDB\Client\Infrastructure\Entities;
 
 class User
 {
-    private string $id;
+    private ?string $id=null;
     private ?string $name=null;
     private ?string $lastName=null;
     private ?string $addressId=null;
-    private int $count;
+    private ?int $count=null;
     private ?int $age=null;
 
     /**
      * @return string
      */
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -30,15 +30,16 @@ class User
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @param string $name
+     * @param string|null $name
+     * @return User
      */
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
         return $this;
@@ -47,7 +48,7 @@ class User
     /**
      * @return string
      */
-    public function getLastName(): string
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
@@ -63,7 +64,7 @@ class User
     /**
      * @return string
      */
-    public function getAddressId(): string
+    public function getAddressId(): ?string
     {
         return $this->addressId;
     }
@@ -79,7 +80,7 @@ class User
     /**
      * @return int
      */
-    public function getCount(): int
+    public function getCount(): ?int
     {
         return $this->count;
     }

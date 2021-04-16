@@ -10,7 +10,8 @@ class FamilyMembers
         return $this->members;
     }
 
-    public function setMembers(array $members): void {
+    public function setMembers(array $members): self {
         $this->members = $members;
+        return $this;
     }
 }

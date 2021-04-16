@@ -1,5 +1,6 @@
 <?php
 namespace RavenDB\Client\Serverwide\Commands;
+use RavenDB\Client\Data\Driver\RavenDB;
 use RavenDB\Client\Http\ClusterTopologyResponse;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
@@ -13,15 +14,19 @@ class GetClusterTopologyCommand extends RavenCommand
         $this->_debugTag = $debugTag !== null ? $debugTag : null;
     }
 
-    public function createRequest(ServerNode $node): array
+    /**
+     * @throws \Exception
+     */
+    public function createRequest(ServerNode $node): \CurlHandle
     {
         $url = $node->getUrl() . "/cluster/topology";
         if ($this->_debugTag !== null) $url .= "?" . $this->_debugTag;
-
-        return [
+        $httpClient = new RavenDB();
+        $curlopt = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true
         ];
+        return $httpClient->createCurlRequest($url,$curlopt);
     }
 
     public function setResponse(string|array $response, bool $fromCache): ClusterTopologyResponse

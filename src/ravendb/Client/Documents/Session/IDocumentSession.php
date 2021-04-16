@@ -42,5 +42,5 @@ interface IDocumentSession extends Closable
      */
     public function load(string $clazz, string $id);
 
-    public function advanced();
+    public function advanced():IAdvancedSessionOperations;
 }

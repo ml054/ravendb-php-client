@@ -21,8 +21,9 @@ class Member
     {
         return $this->age;
     }
-    public function setAge(int $age): void
+    public function setAge(int $age): self
     {
         $this->age = $age;
+        return $this;
     }
 }

@@ -32,6 +32,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public ?BatchOptions $_saveChangesOptions=null;
     private int $numberOfRequests;
     private array $externalState;
+    private array $deferredCommands;
     // TODO : PRIORITY ON THE CRUD OPERATION AND UNIT OF WORK
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
@@ -57,10 +58,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         return $this->externalState;
     }
 
-    public function prepareForSaveChanges():SaveChangesData {
-        return new SaveChangesData($this);
-    }
-
     public function getConvetions():DocumentConventions {
         return $this->_requestExecutor->getConventions();
     }
@@ -69,12 +66,22 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         if(null === $instance) return null;
     }
 
-    /** LifeCycle/UOW methods **/
-    public function prepareForEntitiesPuts(SaveChangesData $result):void { }
-
-    public function prepareForEntitiesDeletion(SaveChangesData $result, array $changes):void { }
+    /***************** LifeCycle/UOW/Workflow ********************/
+    public function prepareForSaveChanges():SaveChangesData {
+        $result = new SaveChangesData($this);
+        $deferredCommandsCount = count($this->deferredCommands);
+        $this->prepareForEntitiesDeletion($result,null);
+        $this->prepareForEntitiesPuts($result);
+        $this->prepareForCreatingRevisionsFromIds($result);
+        $this->prepareCompareExchangeEntities($result);
+        return $result;
+    }
+    public function prepareForEntitiesPuts(SaveChangesData $result,array $changes):void {
+    }
+    public function prepareForEntitiesDeletion(SaveChangesData $result, ?array $changes=null):void { }
     public function prepareForCreatingRevisionsFromIds(SaveChangesData $result):void { }
     public function prepareCompareExchangeEntities(SaveChangesData $result):void { }
+    /** *************************************************** **/
 
     private static function throwNoDatabase(){
         throw new IllegalStateException("Cannot open a Session without specifying a name of a database ".
@@ -82,6 +89,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             " being opened or default database can be defined using 'DocumentStore.setDatabase()' method");
     }
     public function getCurrentSessionNode():ServerNode {
+        return $this->getSessionInfo()->getCurrentSessionNode($this->_requestExecutor);
     }
 
     public function getDocumentStore():IDocumentStore {
@@ -92,7 +100,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         return $this->_requestExecutor;
     }
 
-    public function getSessionInfo(): SessionInfo{
+    public function getSessionInfo(): SessionInfo {
         return $this->sessionInfo;
     }
 
@@ -113,10 +121,12 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function documentsByEntity():DocumentsByEntityHolder{
         return new DocumentsByEntityHolder();
     }
+
     /**
-     * Gets the number of entities held in memory to manage Unit of Work
-     * @return number of entities held in memory
+     * @return int
      */
-
-
+    public function getDeferredCommands(): int
+    {
+        return count($this->deferredCommands);
+    }
 }

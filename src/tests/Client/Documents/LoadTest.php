@@ -17,7 +17,7 @@ class LoadTest extends RemoteTestBase
                    $session = $store->openSession($options);
                    $foo = (new Foo())->setName("Beginning");
                    $session->store($foo);
-                   // TODO TO BE CONTINUED
+                   // TODO
                    $session->saveChanges();
                 } finally {
                     $store->close();
