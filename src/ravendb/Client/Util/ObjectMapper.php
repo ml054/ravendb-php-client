@@ -12,4 +12,13 @@ trait ObjectMapper
     {
        return JsonExtensions::getDefaultMapper();
     }
+
+    /**
+     * @throws \Exception
+     */
+    public function serialize(object $object){
+        if(!is_object($object)) throw new \Exception("Data source must be an object");
+        $serializer = JsonExtensions::storeSerializer();
+        return $serializer->serialize($object,'json');
+    }
 }

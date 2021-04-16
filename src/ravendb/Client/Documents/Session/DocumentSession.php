@@ -13,11 +13,13 @@ use RavenDB\Client\Documents\Session\Loaders\ILoaderWithInclude;
 use RavenDB\Client\Documents\Session\Operations\BatchOperation;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Extensions\JsonExtensions;
+use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\StringUtils;
 
 class DocumentSession extends InMemoryDocumentSessionOperations
     implements IDocumentSessionImpl,IAdvancedSessionOperations,IDocumentQueryGenerator
 {
+    use ObjectMapper;
     private DocumentStore $documentStore;
     private string $id;
     private SessionOptions $options;
@@ -59,13 +61,13 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         // TODO: Implement delete() method.
     }
 
+    /**
+     * !!!!! NO USER DATA FORMATING --- ONLY SERIALIZE FOR RAVENDB READY. NO CASSING
+    */
     public function store(object $entity, ?string $id = null, ?string $changeVector = null): void
     {
-        $serializer = JsonExtensions::serializer();
-        $json = $serializer->normalize($entity);
-        $pascalizer = StringUtils::pascalize($json);
-        $encode = $serializer->encode($pascalizer,'json');
-        dd($entity,$encode);
+        $data = $this->serialize($entity);
+        dd($data);
     }
 
     public function include(string $path): ILoaderWithInclude
