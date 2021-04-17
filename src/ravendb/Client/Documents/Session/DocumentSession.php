@@ -62,7 +62,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     }
 
     /**
-     * !!!!! NO USER DATA FORMATING --- ONLY SERIALIZE FOR RAVENDB READY. NO CASSING
+     * !!!!! NO USER DATA FORMATING ( case or anything )--- ONLY SERIALIZE FOR RAVENDB READY
     */
     public function store(object $entity, ?string $id = null, ?string $changeVector = null): void
     {
