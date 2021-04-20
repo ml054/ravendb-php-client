@@ -4,3 +4,11 @@
 .phpunit.result.cache
 phpunit.xml
 /vendor/
+composer.phar
+composer-setup.php
+.idea/modules.xml
+.idea/php-test-framework.xml
+.idea/vcs.xml
+.idea/ravendb-php-clientV50.iml
+.idea/php.xml
+/tests/Client/Lab/

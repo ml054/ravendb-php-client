@@ -16,7 +16,6 @@ class DeleteDatabaseCommand extends RavenCommand
      */
     public function __construct(DocumentConventions $conventions, Parameters $parameters)
     {
-
         if ( null === $conventions ) throw new \InvalidArgumentException("Conventions cannot be null");
         if ( null === $parameters ) throw new \InvalidArgumentException("Parameters cannot be null");
 

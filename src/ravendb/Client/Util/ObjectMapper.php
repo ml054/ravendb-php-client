@@ -1,14 +1,11 @@
 <?php
-
-
 namespace RavenDB\Client\Util;
 
-// TODO CROSS-CLASS TRAIT - THIS IS DRAFT SUBJECT TO CHANGES
 use RavenDB\Client\Extensions\JsonExtensions;
 
 trait ObjectMapper
 {
-    public static function mapper(): JsonExtensions
+    public function mapper(): JsonExtensions
     {
        return JsonExtensions::getDefaultMapper();
     }
@@ -16,7 +13,7 @@ trait ObjectMapper
     /**
      * @throws \Exception
      */
-    public function serialize(object $object){
+    public function serialize(object $object):string {
         if(!is_object($object)) throw new \Exception("Data source must be an object");
         $serializer = JsonExtensions::storeSerializer();
         return $serializer->serialize($object,'json');

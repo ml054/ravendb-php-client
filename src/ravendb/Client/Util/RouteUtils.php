@@ -14,7 +14,6 @@ class RouteUtils
 
     /**
      * @throws \Exception
-     * TODO IMPROVE
      */
     public static function store(DocumentStore|ServerNode $store, string $route, array $params):string{
         $url = null;
@@ -27,7 +26,6 @@ class RouteUtils
     }
 
     public static function request(string $url, string $route, array $params):string{
-        // TODO MANAGE THE ARRAY PARAMETER
         return $url.$route.http_build_query($params);
     }
 }

@@ -44,6 +44,12 @@ class JsonExtensions
         return new Serializer($normalizers,$encoders);
     }
 
+    public static function storeSerializer(){
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new DateTimeNormalizer(),new ObjectNormalizer()];
+        return new Serializer($normalizers,$encoders);
+    }
+
     /**
      * @param string $data
      * @param string $className
