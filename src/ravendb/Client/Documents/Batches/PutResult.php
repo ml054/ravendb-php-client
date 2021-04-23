@@ -26,6 +26,4 @@ class PutResult
     {
         $this->changeVector = $changeVector;
     }
-
-
 }

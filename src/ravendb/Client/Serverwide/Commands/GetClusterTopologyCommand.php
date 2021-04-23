@@ -4,6 +4,7 @@ use RavenDB\Client\Data\Driver\RavenDB;
 use RavenDB\Client\Http\ClusterTopologyResponse;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
+use RavenDB\Client\Methods\HttpRequestBase;
 
 class GetClusterTopologyCommand extends RavenCommand
 {
@@ -21,7 +22,7 @@ class GetClusterTopologyCommand extends RavenCommand
     {
         $url = $node->getUrl() . "/cluster/topology";
         if ($this->_debugTag !== null) $url .= "?" . $this->_debugTag;
-        $httpClient = new RavenDB();
+        $httpClient = new HttpRequestBase();
         $curlopt = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true

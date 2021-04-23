@@ -11,6 +11,7 @@ use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Http\IRaftCommand;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
+use RavenDB\Client\Methods\HttpRequestBase;
 use RavenDB\Client\Serverwide\DatabaseRecord;
 use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\RaftIdGenerator;
@@ -62,7 +63,7 @@ class CreateDatabaseCommand extends RavenCommand implements IRaftCommand
         $request = null;
         try{
             $databaseDocument = $this->mapper()::writeValueAsString($this->databaseRecord,$this->databaseName);
-            $httpClient = new RavenDB();
+            $httpClient = new HttpRequestBase();
             $curlopt = [
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,

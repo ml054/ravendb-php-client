@@ -6,6 +6,7 @@ use RavenDB\Client\Data\Driver\RavenDB;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
+use RavenDB\Client\Methods\HttpRequestBase;
 
 class DeleteDatabaseCommand extends RavenCommand
 {
@@ -32,7 +33,7 @@ class DeleteDatabaseCommand extends RavenCommand
     public function createRequest(ServerNode $node): array|string|object
     {
         $url = $node->getUrl()."/admin/databases";
-        $httpClient = new RavenDB();
+        $httpClient = new HttpRequestBase();
         $curlopt = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,

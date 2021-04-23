@@ -65,11 +65,11 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     /**
      * !!!!! NO USER DATA FORMATING ( case or anything )--- ONLY SERIALIZE FOR RAVENDB READY
     */
-    public function store(?object $entity=null, ?string $id = null, ?string $changeVector = null): void
+    public function store(?object $entity, ?string $id = null, ?string $changeVector = null): void
     {
-        dd("Here");
-
         $data = $this->serialize($entity);
+        //dd($data);
+
     }
 
     public function include(string $path): ILoaderWithInclude

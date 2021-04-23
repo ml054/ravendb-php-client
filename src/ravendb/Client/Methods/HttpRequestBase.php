@@ -1,8 +1,8 @@
 <?php
-namespace RavenDB\Client\Data\Driver;
+namespace RavenDB\Client\Methods;
 use CurlHandle;
 use Exception;
-class RavenDB
+class HttpRequestBase
 {
     private string|object $response;
 

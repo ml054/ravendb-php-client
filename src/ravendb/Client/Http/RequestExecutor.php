@@ -18,6 +18,7 @@ use RavenDB\Client\Documents\Session\SessionInfo;
 use RavenDB\Client\Http\NodeSelector;
 use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Http\Topology;
+use RavenDB\Client\Methods\HttpRequestBase;
 use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Util\ConcurrentHashMap;
 use RavenDB\Client\Util\Duration;
@@ -310,7 +311,7 @@ class RequestExecutor implements Closable
     {
         try {
             $this->numberOfServerRequests++;
-            $httpClient = new RavenDB();
+            $httpClient = new HttpRequestBase();
             $httpClient->execute($request);
             $command->setResponse($httpClient->getResponse(), false);
         } catch (\Exception $e) {

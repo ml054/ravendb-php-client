@@ -7,6 +7,7 @@ use Exception;
 use RavenDB\Client\Data\Driver\RavenDB;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
+use RavenDB\Client\Methods\HttpRequestBase;
 
 class GetDatabaseNamesCommand extends RavenCommand
 {
@@ -34,7 +35,7 @@ class GetDatabaseNamesCommand extends RavenCommand
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true
         ];
-        $httpClient = new RavenDB();
+        $httpClient = new HttpRequestBase();
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 
