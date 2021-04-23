@@ -77,11 +77,16 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         return $result;
     }
     public function prepareForEntitiesPuts(SaveChangesData $result,array $changes):void {
+         
     }
     public function prepareForEntitiesDeletion(SaveChangesData $result, ?array $changes=null):void { }
     public function prepareForCreatingRevisionsFromIds(SaveChangesData $result):void { }
     public function prepareCompareExchangeEntities(SaveChangesData $result):void { }
     /** *************************************************** **/
+
+    public function internalPrepareEntitiesPuts():Closable{
+
+    }
 
     private static function throwNoDatabase(){
         throw new IllegalStateException("Cannot open a Session without specifying a name of a database ".

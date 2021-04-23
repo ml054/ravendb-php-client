@@ -2,7 +2,6 @@
 
 namespace RavenDB\Client\Util;
 use Ramsey\Uuid\Uuid;
-
 class RaftIdGenerator
 {
     public function __construct(){ }

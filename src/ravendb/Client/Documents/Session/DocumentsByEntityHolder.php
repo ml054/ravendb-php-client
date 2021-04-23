@@ -7,6 +7,7 @@ class DocumentsByEntityHolder
     private array $_documentsByEntity=[];
     private bool $_prepareEntitiesPuts;
     private array $_onBeforeStoreDocumentsByEntity;
+
     public function size(){
         return count($this->_documentsByEntity) + (null !== $this->_onBeforeStoreDocumentsByEntity ? count($this->_onBeforeStoreDocumentsByEntity) : 0);
     }

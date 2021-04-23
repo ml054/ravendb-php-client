@@ -11,11 +11,11 @@ class CrudDatabaseCommand extends RavenCommand
 {
     use ObjectMapper;
     private string $database;
-    private string $body;
-    public function __construct(string $database,string $body)
+    private string $command;
+    public function __construct(string $command,string $database)
     {
         $this->database=$database;
-        $this->body = $body;
+        $this->command = $command;
     }
 
     public function isReadRequest(): bool
@@ -28,9 +28,9 @@ class CrudDatabaseCommand extends RavenCommand
      */
     public function createRequest(ServerNode $node): array|string|object
     {
-        $url = $node->getUrl()."/databases/".$this->database."/bulk_docs";
-        $body = $this->serialize($this->entity);
-        dd($body);
+        $url = $node->getUrl()."/databases/".$this->database."/docs";
+        //$url = $node->getUrl()."/databases/".$this->database."/bulk_docs";
+        dd($this->command);
         $httpClient = new RavenDB();
         $curlopt = [
             CURLOPT_URL => $url,

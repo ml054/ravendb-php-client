@@ -10,12 +10,12 @@ class CrudDatabaseOperation implements IServerOperation
     private object $entity;
     private string $database;
     private string $body;
-
-    public function __construct(object $entity,string $database,string $body)
+    private string $id;
+    private string $command;
+    public function __construct(string $command,string $database)
     {
-        $this->entity = $entity;
+        $this->command = $command;
         $this->database = $database;
-        $this->body = $body;
     }
     /**
      * @param DocumentConventions|null $conventions
@@ -23,6 +23,6 @@ class CrudDatabaseOperation implements IServerOperation
      */
     public function getCommand(?DocumentConventions $conventions = null): RavenCommand
     {
-        return new CrudDatabaseCommand($this->entity,$this->database,$this->body);
+        return new CrudDatabaseCommand($this->command,$this->database);
     }
 }

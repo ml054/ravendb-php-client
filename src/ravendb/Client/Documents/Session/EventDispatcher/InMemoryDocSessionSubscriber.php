@@ -15,7 +15,7 @@ class InMemoryDocSessionSubscriber implements EventSubscriberInterface
         return [
             "onBeforeStore.add" => "addBeforeStoreListener",
             "onBeforeStore.remove" => "removeBeforeStoreListener",
-            "onSequenceBeforeStore"=>[ // THIS DEMONSTRATES AN EVENT CAN MANAGE MULTIPLE LISTENERS IN A SEQUENCE WITH PRIORITY
+            "onSequenceBeforeStore"=>[
                 ['addBeforeStoreListener', 5],
                 ['processingListener', -5],
                 ['removeBeforeStoreListener', -10],
