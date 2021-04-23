@@ -35,12 +35,10 @@ class CrudTestDatabase extends RemoteTestBase
                 $family  = (new FamilyMembers())->setMembers($members);
                 $serializer = JsonExtensions::storeSerializer();
 
-                // wrapping in a batch command : ravendb server compliance for batch deployment. so far
                 $newDocument = (new Document("PUT"))->setDocument($family);
                 $command = (new Command())->setCommands([$newDocument]);
-                dd($serializer->serialize($command,'json'));
-
-                $operation = new CrudDatabaseOperation($family,'DemoDB');
+                $request = $serializer->serialize($command,'json');
+                $operation = new CrudDatabaseOperation($request,'DemoDB',"person/1");
                 $command = $operation->getCommand($conventions);
                 $executor->execute($command);
                 } finally {

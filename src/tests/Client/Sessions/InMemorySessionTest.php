@@ -1,6 +1,6 @@
 <?php
 namespace RavenDB\Tests\Client\Sessions;
-
+use Doctrine\ORM\UnitOfWork;
 use RavenDB\Client\Documents\Session\EventDispatcher\EventArgs\BeforeRequestEventArgs;
 use RavenDB\Client\Documents\Session\EventDispatcher\EventArgs\BeforeStoreEventArgs;
 use RavenDB\Client\Documents\Session\EventDispatcher\InMemoryDocSessionDispatcher;
