@@ -4,6 +4,7 @@
 
 namespace RavenDB\Client\Documents\Session;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStoreBase;
@@ -13,6 +14,7 @@ use RavenDB\Client\Documents\Operations\SessionOperationExecutor;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Http\ServerNode;
+use RavenDB\Client\Json\MetadataAsDictionary;
 use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Util\ObjectUtils;
 use RavenDB\Client\Util\StringUtils;
@@ -21,6 +23,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 {
     protected RequestExecutor $_requestExecutor;
     private OperationExecutor $_operationExecutor;
+    protected ArrayCollection $_knownMissingIds;
     private const TRANSACTION_MODE_SINGLE_NODE = "SINGLE_NODE"; // NO ENUM YET IN PHP
     private const TRANSACTION_MODE_CLUSTER_WIDE = "CLUSTER_WIDE"; // NO ENUM YET IN PHP
     protected SessionInfo $sessionInfo;
@@ -77,7 +80,58 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         return $result;
     }
     public function prepareForEntitiesPuts(SaveChangesData $result,array $changes):void {
-         
+         $putsContext = $this->documentsByEntity()->prepareEntitiesPuts();
+         $shouldIgnoreEntityChanges = $this->getConvetions()->getShouldIgnoreEntityChanges();
+
+         foreach($this->documentsByEntity() as $entity){
+             /**
+              *@var DocumentsByEntityEnumeratorResult $entity
+              */
+             if($entity->getValue()->isIgnoreChanges()) continue;
+             if(null !== $shouldIgnoreEntityChanges){
+                 if($shouldIgnoreEntityChanges->check(
+                     $this,
+                     $entity->getValue()->getEntity(),
+                     $entity->getValue()->getId())){
+                     continue;
+                 }
+             }
+
+             if($this->isDeleted($entity->getValue()->getId())){
+                 continue;
+             }
+             $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
+
+         }
+    }
+
+    /**
+     * Returns whether a document with the specified id is deleted
+     * or known to be missing
+     *
+     * @param id Document id to check
+     * @return true is document is deleted
+     */
+    public function isDeleted(string $id) {
+        return $this->_knownMissingIds->containsKey(id);
+    }
+
+    private static function updateMetadataModifications(DocumentInfo $documentInfo):bool{
+        $dirty = false;
+        if(null !== $documentInfo->getMetadataInstance()){
+            $dirty = true;
+        }
+        foreach ($documentInfo->getMetadataInstance() as $pop) { // TODO : CHECK FOR THE KEYSET
+            $dirty = false;
+            /**
+             * @var MetadataAsDictionary $propValue
+            */
+            $propValue = $documentInfo->getMetadataInstance()->getLong($pop);
+            if(null === $propValue || $propValue instanceof MetadataAsDictionary && ($propValue->isDirty())){
+                $dirty = true;
+            }
+
+        }
     }
     public function prepareForEntitiesDeletion(SaveChangesData $result, ?array $changes=null):void { }
     public function prepareForCreatingRevisionsFromIds(SaveChangesData $result):void { }

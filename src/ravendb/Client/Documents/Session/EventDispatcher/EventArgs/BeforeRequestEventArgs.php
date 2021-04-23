@@ -9,6 +9,7 @@ class BeforeRequestEventArgs implements IEventHandler
     private string $database;
     private string $url;
     private int $attemptNumber;
+    private string $data;
     public function __construct(string $database, string $url, int $attemptNumber)
     {
         $this->database = $database;
@@ -29,5 +30,15 @@ class BeforeRequestEventArgs implements IEventHandler
     public function getAttemptNumber(): int
     {
         return $this->attemptNumber;
+    }
+
+    public function getData(): string
+    {
+        return $this->data;
+    }
+
+    public function setData(string $data): void
+    {
+        $this->data = $data;
     }
 }

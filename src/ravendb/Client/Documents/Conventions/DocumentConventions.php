@@ -30,6 +30,8 @@ class DocumentConventions
     private ?bool $_useCompression=null;
     private ?Closure $_documentIdGenerator=null;
     private int $_loadBalancerContextSeed;
+    private IShouldIgnoreEntityChanges $_shouldIgnoreEntityChanges;
+
     public function getMaxHttpCacheSize(): ?int
     {
         return $this->_maxHttpCacheSize;
@@ -150,7 +152,15 @@ class DocumentConventions
     public function setDocumentIdGenerator(?string $stringArg=null, ?object $objectArg=null): ?Closure
     {
         return $this->_documentIdGenerator = function($documentIdGenerator) use($stringArg,$objectArg){
-                // todo call the $documentIdGenerator->generateID($stringArg,$objectArg) to test
         };
     }
+
+    /**
+     * @return IShouldIgnoreEntityChanges
+     */
+    public function getShouldIgnoreEntityChanges(): IShouldIgnoreEntityChanges
+    {
+        return $this->_shouldIgnoreEntityChanges;
+    }
+
 }
