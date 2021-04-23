@@ -37,19 +37,20 @@ class PutDocumentCommand extends RavenCommand
      */
     public function createRequest(ServerNode $node): array|string|object
     {
-        $url = $node->getUrl()."/databases/".$node->getDatabase()."/docs?id=".urlencode($this->_id);
+        $url = $node->getUrl()."/databases/".$node->getDatabase()."/bulk_docs";
         $httpClient = new HttpRequestBase();
-
+      //  dd($node->getDatabase());
         $serialize = $this->serialize($this->_document);
-        dd($serialize);
+       // dd($serialize);
         $curlopt = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYHOST=>"2",
             CURLOPT_SSL_VERIFYPEER=>"1",
-            CURLOPT_CUSTOMREQUEST=>"PUT",
-            CURLOPT_POSTFIELDS=>$this->command
+          //  CURLOPT_CUSTOMREQUEST=>"PUT",
+            CURLOPT_POSTFIELDS=>$serialize
         ];
+        //dd($curlopt);
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 

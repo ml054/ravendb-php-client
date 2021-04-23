@@ -6,6 +6,7 @@ class Member
 {
     private $name;
     private int $age;
+    private string|null $id;
 
     public function getName()
     {
@@ -26,4 +27,21 @@ class Member
         $this->age = $age;
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string|null $id
+     */
+    public function setId(?string $id): void
+    {
+        $this->id = $id;
+    }
+
 }

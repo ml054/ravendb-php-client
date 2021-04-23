@@ -100,13 +100,13 @@ class CrudTest extends RemoteTestBase
                  * @var Family $newFamily
                  */
                 $session = $store->openSession($options);
-                $family = (new Family())->setNames(["Hibernating Rhinos", "RavenDB"]);
-                $session->store($family,'family/1');
+                $family = (new Family())->setNames(["Hibernating Rhinos", "RavenDB"])->setId("family/1");
+                $session->store($family,$family->getId());
                 $session->saveChanges();
-                $newFamily = $session->load(Family::class,'family/1');
-                $newFamily->setNames(["Toli", "Mitzi", "Boki"]);
+               /* $newFamily = $session->load(Family::class,"family/1");
+                $newFamily->setNames(["Toli", "Mitzi", "Boki"]);*/
                 // ASSERTION HERE
-                $session->saveChanges();
+                //$session->saveChanges();
             } finally {
                 $store->close();
             }
@@ -245,7 +245,8 @@ class CrudTest extends RemoteTestBase
     public function testCrudOperationsWithArrayInObject4(){
         try{
             $store = $this->getDocumentStore();
-            $options = (new SessionOptions())->setDatabase('new_db_1');
+            $options = new SessionOptions();
+            $options->setDatabase('new_db_1');
             try {
                 $session = $store->openSession($options);
                 $family = (new Family())->setNames(["Hibernating Rhinos", "RavenDB"]);
@@ -314,7 +315,8 @@ class CrudTest extends RemoteTestBase
     public function testCrudOperations(){
         try{
             $store = $this->getDocumentStore();
-            $options = (new SessionOptions())->setDatabase('new_db_1');
+            $options = (new SessionOptions());
+            $options->setDatabase('new_db_1');
             try {
                 $session = $store->openSession($options);
                 $user1 = (new User())->setLastName("user1");

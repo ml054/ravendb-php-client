@@ -206,7 +206,4 @@ abstract class RavenCommand
         return ResponseDisposeHandling::AUTOMATIC;
     }
 
-    public function RavenCommandResponseType(string $type){
-
-    }
 }

@@ -163,4 +163,16 @@ class DocumentConventions
         return $this->_shouldIgnoreEntityChanges;
     }
 
+    /**
+     * Whether UseOptimisticConcurrency is set to true by default for all opened sessions
+     * return true if optimistic concurrency is enabled
+     * @return bool|null
+     */
+    public function isUseOptimisticConcurrency(): ?bool
+    {
+        return $this->_useOptimisticConcurrency;
+    }
+
+
+
 }

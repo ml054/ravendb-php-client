@@ -36,6 +36,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     private int $numberOfRequests;
     private array $externalState;
     private array $deferredCommands;
+    private bool $useOptimisticConcurrency;
+    private int $maxNumberOfRequestsPerSession;
     // TODO : PRIORITY ON THE CRUD OPERATION AND UNIT OF WORK
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
@@ -45,9 +47,29 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             static::throwNoDatabase();
         }
         $this->_documentStore = $documentStore;
-        $this->_requestExecutor = $documentStore->getRequestExecutor($this->databaseName);
+        $this->_requestExecutor = ObjectUtils::firstNonNull($options->getRequestExecutor(),$documentStore->getRequestExecutor($this->databaseName));
         $this->noTracking = $options->isNoTracking();
+        $this->useOptimisticConcurrency = $this->_requestExecutor->getConventions()->isUseOptimisticConcurrency();
+        $this->maxNumberOfRequestsPerSession
     }
+
+    /**
+     * @return bool
+     */
+    public function isUseOptimisticConcurrency(): bool
+    {
+        return $this->useOptimisticConcurrency;
+    }
+
+    /**
+     * @param bool $useOptimisticConcurrency
+     */
+    public function setUseOptimisticConcurrency(bool $useOptimisticConcurrency): void
+    {
+        $this->useOptimisticConcurrency = $useOptimisticConcurrency;
+    }
+
+
 
     public function getDatabaseName(): string
     {
@@ -190,5 +212,20 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function getDeferredCommands(): int
     {
         return count($this->deferredCommands);
+    }
+
+    public function storeEntityInUnitOfWork(string $id, object $entity, string $changeVector, ObjectNode $metadata, ConcurrencyCheckMode $forceConcurrencyCheck){
+        if(null != $id){
+            $this->_knownMissingIds->remove($id);
+        }
+        $documentInfo = new DocumentInfo();
+        $documentInfo->setId($id);
+        $documentInfo->setMetadataInstance($metadata);
+        $documentInfo->setChangeVector($changeVector);
+        $documentInfo->setConcurrencyCheckMode($forceConcurrencyCheck);
+        $documentInfo->setEntity($entity);
+        $documentInfo->setNewDocument(true);
+        $documentInfo->setDocument(null);
+        $this->documentsByEntity;
     }
 }
