@@ -123,7 +123,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
              if($this->isDeleted($entity->getValue()->getId())) continue;
 
              $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
-
+             // TODO IMPLEMENT THE SERIALIZER
+             // ObjectNode document = entityToJson.convertEntityToJson(entity.getKey(), entity.getValue());
              /**
               * var ObjectNode $document
              */

@@ -45,10 +45,6 @@ class Constants
 
     // THE CLIENT
     public const CLIENT_VERSION="5.0.0";
-
-    // EVENT DISPATCHERS CONSTANTS
-    public const EVENT_DISPATCHER_KEY="event.request.dispatcher";
-    public const EVENT_INMEMO_KEY="event.in.memory.dispatcher";
-    public const CHANGE_SET_DISPATCHER="event.change.set.dispatcher";
-    public const EVENT_ENTITY_TEST_KEY="event.entity.test.dispatcher";
+    // TODO IMPLEMENT CONST FOR DOCUMENT CHANGE TYPE
+    public const CHANGE_TYPE_DOCUMENT_ADDED="DOCUMENT_ADDED";
 }

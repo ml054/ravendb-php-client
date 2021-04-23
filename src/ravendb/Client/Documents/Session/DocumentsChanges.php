@@ -2,6 +2,8 @@
 
 namespace RavenDB\Client\Documents\Session;
 
+use RavenDB\Client\Util\StringUtils;
+
 class DocumentsChanges
 {
     const ChangeType = [
@@ -19,7 +21,7 @@ class DocumentsChanges
 
     private object $fieldNewValue;
 
-    private array $change = self::ChangeType;
+    private string $change;
 
     private String $fieldName;
 
@@ -88,4 +90,26 @@ class DocumentsChanges
         $this->fieldPath = $fieldPath;
     }
 
+    /**
+     * @return string
+     */
+    public function getChange(): string
+    {
+        return $this->change;
+    }
+
+    /**
+     * @param string $change
+     * @throws \Exception
+     */
+    public function setChange(string $change): void
+    {
+        // TODO CHANGE THE match version of php java ENUM
+        if(!in_array($change,self::ChangeType)) throw new \Exception('Invalid Change Type');
+        $this->change = self::ChangeType[$change];
+    }
+
+    public function getFieldFullName(){
+        return StringUtils::isEmpty($this->fieldPath) ? $this->fieldName : $this->fieldPath.".".$this->fieldName;
+    }
 }

@@ -40,6 +40,11 @@ final class StringUtils
         return str_starts_with($string,$needle);
     }
 
+    public static function isEmpty($string): bool
+    {
+        return empty($string) ?? false;
+    }
+
     /**
      * @throws \Exception
      */
