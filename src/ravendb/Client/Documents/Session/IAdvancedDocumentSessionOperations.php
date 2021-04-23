@@ -3,6 +3,7 @@
 namespace RavenDB\Client\Documents\Session;
 
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
 use RavenDB\Client\Documents\Batches\ICommandData;
 use RavenDB\Client\Documents\IDocumentStore;
 use RavenDB\Client\Http\RequestExecutor;
@@ -13,11 +14,11 @@ Advanced session operations
  */
 interface IAdvancedDocumentSessionOperations
 {
-    public function getDocumentStore():IDocumentStore;
+    public function getDocumentStore():IDocumentStore|ArrayCollection;
     /**
      * Allow extensions to provide additional state per session
      */
-    public function getExternalState();
+    public function getExternalState():IDocumentStore|ArrayCollection;
     public function getCurrentSessionNode():ServerNode;
     public function getRequestExecutor():RequestExecutor;
     public function getSessionInfo():SessionInfo;

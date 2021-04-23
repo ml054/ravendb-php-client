@@ -81,8 +81,7 @@ class DocumentStore extends DocumentStoreBase
 
     public function getRequestExecutor(?string $database=null): RequestExecutor
     {
-        $database = $this->internalGetRequestExecutor($database);
-        return $database;
+        return $this->internalGetRequestExecutor($database);
     }
 
     private function internalGetRequestExecutor($databaseName):RequestExecutor

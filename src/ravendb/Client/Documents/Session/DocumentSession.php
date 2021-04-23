@@ -4,6 +4,7 @@
 
 namespace RavenDB\Client\Documents\Session;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
 use RavenDB\Client\Documents\Batches\ICommandData;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStore;
@@ -23,7 +24,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     private DocumentStore $documentStore;
     private string $id;
     private SessionOptions $options;
-    private array $externalState;
+    private ArrayCollection $externalState;
 
     public function __construct(DocumentStore $documentStore, string $id, SessionOptions $options)
     {
@@ -64,10 +65,11 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     /**
      * !!!!! NO USER DATA FORMATING ( case or anything )--- ONLY SERIALIZE FOR RAVENDB READY
     */
-    public function store(?object $entity, ?string $id = null, ?string $changeVector = null): void
+    public function store(?object $entity=null, ?string $id = null, ?string $changeVector = null): void
     {
+        dd("Here");
+
         $data = $this->serialize($entity);
-        dd($data);
     }
 
     public function include(string $path): ILoaderWithInclude
@@ -85,9 +87,9 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         return $this;
     }
 
-    public function getExternalState(){
+    public function getExternalState():ArrayCollection{
         if(null === $this->externalState){
-            $this->externalState = [];
+            $this->externalState = new ArrayCollection();
         }
         return $this->externalState;
     }
@@ -192,9 +194,12 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         // TODO: Implement waitForReplicationAfterSaveChanges() method.
     }
 
-    public function exists(): bool
+    public function exists(string $id): bool
     {
-        // TODO: Implement exists() method.
+        if(null === $id) throw new \InvalidArgumentException('id cannot be null');
+        if($this->_knownMissingIds->containsKey($id)) return false;
+        if(null !== $this->_knownMissingIds->get($id)) return true;
+
     }
 
     public function getSession(): InMemoryDocumentSessionOperations

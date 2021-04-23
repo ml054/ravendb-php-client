@@ -1,7 +1,7 @@
 <?php
 namespace RavenDB\Client\Http;
 // TODO INJECT THE CLASS RESPONSE
-use Symfony\Component\Serializer\Annotation\SerializedName;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class ClusterTopologyResponse
 {
@@ -10,7 +10,7 @@ class ClusterTopologyResponse
 
     public ClusterTopology $topology;
     public string|int $etag;
-    private NodeStatus $status;
+    private ArrayCollection $status;
 
     /**
      * @return string
@@ -77,9 +77,9 @@ class ClusterTopologyResponse
     }
 
     /**
-     * @return NodeStatus
+     * @return ArrayCollection
      */
-    public function getStatus(): NodeStatus
+    public function getStatus(): ArrayCollection
     {
         return $this->status;
     }
@@ -87,7 +87,7 @@ class ClusterTopologyResponse
     /**
      * @param NodeStatus $status
      */
-    public function setStatus(NodeStatus $status): void
+    public function setStatus(ArrayCollection $status): void
     {
         $this->status = $status;
     }

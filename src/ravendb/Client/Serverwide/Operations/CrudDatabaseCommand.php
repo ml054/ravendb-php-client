@@ -30,7 +30,7 @@ class CrudDatabaseCommand extends RavenCommand
     {
         $url = $node->getUrl()."/databases/".$this->database."/docs";
         //$url = $node->getUrl()."/databases/".$this->database."/bulk_docs";
-        dd($this->command);
+
         $httpClient = new RavenDB();
         $curlopt = [
             CURLOPT_URL => $url,
@@ -38,13 +38,14 @@ class CrudDatabaseCommand extends RavenCommand
             CURLOPT_SSL_VERIFYHOST=>"2",
             CURLOPT_SSL_VERIFYPEER=>"1",
             CURLOPT_CUSTOMREQUEST=>"PUT",
-            CURLOPT_POSTFIELDS=>$body
+            CURLOPT_POSTFIELDS=>$this->command
         ];
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 
     public function setResponse(array|string $response, bool $fromCache)
     {
+        dd("here");
         parent::setResponse($response, $fromCache);
     }
 }

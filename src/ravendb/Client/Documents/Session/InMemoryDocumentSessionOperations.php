@@ -18,7 +18,7 @@ use RavenDB\Client\Json\MetadataAsDictionary;
 use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Util\ObjectUtils;
 use RavenDB\Client\Util\StringUtils;
-
+use RavenDB\Client\DataBind\Node\ObjectNode;
 abstract class InMemoryDocumentSessionOperations implements Closable
 {
     protected RequestExecutor $_requestExecutor;
@@ -88,6 +88,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
               *@var DocumentsByEntityEnumeratorResult $entity
               */
              if($entity->getValue()->isIgnoreChanges()) continue;
+
              if(null !== $shouldIgnoreEntityChanges){
                  if($shouldIgnoreEntityChanges->check(
                      $this,
@@ -97,11 +98,14 @@ abstract class InMemoryDocumentSessionOperations implements Closable
                  }
              }
 
-             if($this->isDeleted($entity->getValue()->getId())){
-                 continue;
-             }
+             if($this->isDeleted($entity->getValue()->getId())) continue;
+
              $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
 
+             /**
+              * var ObjectNode $document
+             */
+         //    $document =
          }
     }
 
@@ -130,7 +134,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             if(null === $propValue || $propValue instanceof MetadataAsDictionary && ($propValue->isDirty())){
                 $dirty = true;
             }
-
         }
     }
     public function prepareForEntitiesDeletion(SaveChangesData $result, ?array $changes=null):void { }
@@ -151,7 +154,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         return $this->getSessionInfo()->getCurrentSessionNode($this->_requestExecutor);
     }
 
-    public function getDocumentStore():IDocumentStore {
+    public function getDocumentStore():IDocumentStore|ArrayCollection {
         return $this->_documentStore;
     }
 

@@ -6,6 +6,8 @@ use RavenDB\Client\Constants;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\StringUtils;
+use RuntimeException;
+
 abstract class RavenCommand
 {
     protected object $resultClass;
@@ -23,6 +25,10 @@ abstract class RavenCommand
     const RESPONSE_TYPE_OBJECT = "OBJECT"; // NO ENUM YET IN PHP
     const RESPONSE_TYPE_RAW = "RAW"; // NO ENUM YET IN PHP
 
+    protected function __construct($resultClass)
+    {
+        $this->resultClass = $resultClass;
+    }
 
     public abstract function isReadRequest(): bool;
 
@@ -163,7 +169,7 @@ abstract class RavenCommand
 
     public function processResponse(string $cache, string $response, string $url): string
     {
-        $entity = $response->getEntity(); // TODO CHECK IF CloseableHttpResponse IS TO IMPLEMENT
+        $entity = $response->getEntity();
 
         if(null === $entity){
             return ResponseDisposeHandling::AUTOMATIC;
@@ -177,7 +183,6 @@ abstract class RavenCommand
             if ($this->responseType == RavenCommandResponseType::OBJECT) {
                 $contentLength = $entity->getContentLength();
                 if ($contentLength === 0) {
-                   // HttpClientUtils.closeQuietly(response); // TODO CHECK WITH MARCIN IF HERE CURL SHOULD CLOSE THE SESSION
                     return ResponseDisposeHandling::AUTOMATIC;
                 }
 
@@ -200,42 +205,8 @@ abstract class RavenCommand
     }
         return ResponseDisposeHandling::AUTOMATIC;
     }
-}
-/*
 
-
-    protected void cacheResponse(HttpCache cache, String url, CloseableHttpResponse response, String responseJson) {
-        if (!canCache()) {
-            return;
-        }
-
-        String changeVector = HttpExtensions.getEtagHeader(response);
-        if (changeVector == null) {
-            return;
-        }
-
-        cache.set(url, changeVector, responseJson);
-    }
-
-    protected static void throwInvalidResponse() {
-        throw new IllegalStateException("Response is invalid");
-    }
-
-    protected static void throwInvalidResponse(Exception cause) {
-        throw new IllegalStateException("Response is invalid: " + cause.getMessage(), cause);
-    }
-
-    @SuppressWarnings("unused")
-    protected void addChangeVectorIfNotNull(String changeVector, HttpRequestBase request) {
-        if (changeVector != null) {
-            request.addHeader("If-Match", "\"" + changeVector + "\"");
-        }
-    }
-
-    @SuppressWarnings({"unused", "EmptyMethod"})
-    public void onResponseFailure(CloseableHttpResponse response) {
+    public function RavenCommandResponseType(string $type){
 
     }
 }
-
- * */
