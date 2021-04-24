@@ -10,7 +10,7 @@ use RuntimeException;
 
 abstract class RavenCommand
 {
-    protected ?object $resultClass;
+    protected object|array $resultClass;
     protected int $statusCode;
     protected ?int $timeout=null;
     protected bool $canCache;

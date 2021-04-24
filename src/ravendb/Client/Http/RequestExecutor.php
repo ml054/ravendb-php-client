@@ -310,6 +310,7 @@ class RequestExecutor implements Closable
         ?string $url=null,
         ?string $abortController=null):void
     {
+        dd("here");
         try {
             $this->numberOfServerRequests++;
             $httpClient = new HttpRequestBase();

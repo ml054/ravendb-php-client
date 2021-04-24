@@ -7,6 +7,7 @@ namespace RavenDB\Client\Documents\Session;
  * InMemoryDocumentSessionOperations subclass dependencies : DeletedEntitiesHolder, DocumentsByEntityHolder, ReplicationWaitOptsBuilder
 */
 use Doctrine\Common\Collections\ArrayCollection;
+use Ramsey\Uuid\Uuid;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStoreBase;
@@ -26,6 +27,12 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     protected RequestExecutor $_requestExecutor;
     private OperationExecutor $_operationExecutor;
     protected ArrayCollection $_knownMissingIds;
+    public DocumentsByEntityHolder $documentsByEntity;
+    public DocumentsById $documentsById;
+    public ArrayCollection $deferredCommands;
+    public ArrayCollection $deferredCommandsMap;
+    protected ArrayCollection $pendingLazyOperations;
+    protected ArrayCollection $onEvaluateLazy;
     private const TRANSACTION_MODE_SINGLE_NODE = "SINGLE_NODE"; // NO ENUM YET IN PHP
     private const TRANSACTION_MODE_CLUSTER_WIDE = "CLUSTER_WIDE"; // NO ENUM YET IN PHP
     protected SessionInfo $sessionInfo;
@@ -37,10 +44,11 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public ?BatchOptions $_saveChangesOptions=null;
     private int $numberOfRequests;
     private array $externalState;
-    private array $deferredCommands;
     private bool $useOptimisticConcurrency;
     private int $maxNumberOfRequestsPerSession;
-    // TODO : PRIORITY ON THE CRUD OPERATION AND UNIT OF WORK
+    protected bool $generateDocumentKeysOnStore;
+    private bool $_isDisposal;
+    public ArrayCollection $includedDocumentsById;
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
         $this->id = $id;
@@ -54,13 +62,26 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->useOptimisticConcurrency = $this->_requestExecutor->getConventions()->isUseOptimisticConcurrency();
         $this->maxNumberOfRequestsPerSession;
     }
-
+    public function getId(){
+        return $this->id;
+    }
+    public function getCurrentSessionNode():ServerNode {
+        return $this->getSessionInfo()->getCurrentSessionNode($this->_requestExecutor);
+    }
     /**
      * @return bool
      */
     public function isUseOptimisticConcurrency(): bool
     {
         return $this->useOptimisticConcurrency;
+    }
+
+    /**
+     * @return DocumentsByEntityHolder
+     */
+    public function getDocumentsByEntity(): DocumentsByEntityHolder
+    {
+        return $this->documentsByEntity = new DocumentsByEntityHolder();
     }
 
     /**
@@ -96,11 +117,15 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     /***************** LifeCycle/UOW/Workflow ********************/
     public function prepareForSaveChanges():SaveChangesData {
         $result = new SaveChangesData($this);
-        $deferredCommandsCount = count($this->deferredCommands);
+        $deferredCommandsCount = $this->deferredCommands->count();
         $this->prepareForEntitiesDeletion($result,null);
         $this->prepareForEntitiesPuts($result);
         $this->prepareForCreatingRevisionsFromIds($result);
         $this->prepareCompareExchangeEntities($result);
+        if($this->deferredCommands->count() > $this->deferredCommands){
+            // this allow OnBeforeStore to call Defer during the call to include. TODO CHECK TECH TEAM
+            // additional values during the same SaveChanges call. Behavior are not yet scheduled for php
+        }
         return $result;
     }
     public function prepareForEntitiesPuts(SaveChangesData $result,array $changes):void {
@@ -130,7 +155,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
              /**
               * var ObjectNode $document
              */
-         //    $document =
          }
     }
 
@@ -175,9 +199,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             "to operate on. Database name can be passed as an argument when Session is".
             " being opened or default database can be defined using 'DocumentStore.setDatabase()' method");
     }
-    public function getCurrentSessionNode():ServerNode {
-        return $this->getSessionInfo()->getCurrentSessionNode($this->_requestExecutor);
-    }
 
     public function getDocumentStore():IDocumentStore|ArrayCollection {
         return $this->_documentStore;
@@ -203,13 +224,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     }
 
     /**
-     * hold the data required to manage the data for RavenDB's Unit of Work
-     */
-    public function documentsByEntity():DocumentsByEntityHolder{
-        return new DocumentsByEntityHolder();
-    }
-
-    /**
      * @return int
      */
     public function getDeferredCommands(): int
@@ -229,6 +243,24 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $documentInfo->setEntity($entity);
         $documentInfo->setNewDocument(true);
         $documentInfo->setDocument(null);
-        $this->documentsByEntity;
+        $this->documentsByEntity->put($entity,$documentInfo);
+        if(null === $id){
+            $this->documentsById->add($documentInfo);
+        }
+    }
+
+    public function registerMissing(array $ids):void {
+        if ($this->noTracking) {
+            return;
+        }
+        $this->_knownMissingIds->add($ids);
+    }
+
+    public function storeInternal(object $entity, string $changeVector, string $id, ConcurrencyCheckMode $forceConcurrencyCheck){
+        if($this->noTracking) throw new IllegalStateException("Cannot store entity. Entity tracking is disabled in this session.");
+        if(null === $entity) throw new \InvalidArgumentException("Entity cannot be null");
+
+        $value = $this->documentsByEntity->get($entity);
+        if(null !== )
     }
 }

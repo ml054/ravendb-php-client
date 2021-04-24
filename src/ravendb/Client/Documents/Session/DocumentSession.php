@@ -12,6 +12,7 @@ use RavenDB\Client\Documents\Linq\IDocumentQuery;
 use RavenDB\Client\Documents\Linq\IDocumentQueryGenerator;
 use RavenDB\Client\Documents\Session\Loaders\ILoaderWithInclude;
 use RavenDB\Client\Documents\Session\Operations\BatchOperation;
+use RavenDB\Client\Documents\Session\Operations\LoadOperation;
 use RavenDB\Client\Exceptions\IllegalStateException;
 use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\ObjectMapper;
@@ -28,7 +29,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
 
     public function __construct(DocumentStore $documentStore, string $id, SessionOptions $options)
     {
-        dd($options);
         $this->documentStore = $documentStore;
         $this->id = $id;
         $this->options = $options;
@@ -53,10 +53,17 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     /**
      *  Loads the specified entity with the specified id.
      */
-    public function load(string $clazz, string $id)
+    public function load(string $clazz, string $id, ?ArrayCollection $includes=null)
     {
-
+        $loadOperation = new LoadOperation($this);
+        $loadOperation->byId($id);
+        $command = $loadOperation->createRequest();
+        if(null !== $command){
+            $this->_requestExecutor->execute($command,$this->sessionInfo);
+        }
+        return $loadOperation->getDocument($clazz,$id);
     }
+
 
     public function delete(string $id, string $expectedChangeVector)
     {
@@ -69,8 +76,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     public function store(?object $entity, ?string $id = null, ?string $changeVector = null): void
     {
         $data = $this->serialize($entity);
-        //dd($data);
-
+        dd($data);
     }
 
     public function include(string $path): ILoaderWithInclude
@@ -195,21 +201,25 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         // TODO: Implement waitForReplicationAfterSaveChanges() method.
     }
 
-    public function exists(string $id): bool
-    {
-        if(null === $id) throw new \InvalidArgumentException('id cannot be null');
-        if($this->_knownMissingIds->containsKey($id)) return false;
-        if(null !== $this->_knownMissingIds->get($id)) return true;
-
-    }
-
     public function getSession(): InMemoryDocumentSessionOperations
     {
         // TODO: Implement getSession() method.
     }
 
-    public function documentQuery(): IDocumentQuery
+    public function exists(string $id): bool
     {
-        // TODO: Implement documentQuery() method.
+        if(null === $id) throw new \InvalidArgumentException('id cannot be null');
+        if($this->_knownMissingIds->containsKey($id)) return false;
+        if(null !== $this->_knownMissingIds->get($id)) return true;
+    }
+
+    public function loadInternal(array $ids, LoadOperation $operation, ?OutputStream $stream=null){
+        $operation->byIds($ids);
+        $command = $operation->createRequest();
+        if(null !== $command){
+            $this->_requestExecutor->execute($command,$this->sessionInfo);
+        }else{
+            return $operation->setResult($command->getResult());
+        }
     }
 }

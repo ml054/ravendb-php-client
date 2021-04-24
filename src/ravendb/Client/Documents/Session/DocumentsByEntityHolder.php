@@ -5,25 +5,29 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class DocumentsByEntityHolder
 {
-    private ArrayCollection $_documentsByEntity;
+    private ArrayCollection $_inner;
     private ArrayCollection $_onBeforeStoreDocumentsByEntity;
     private bool $_prepareEntitiesPuts;
 
-    public function size():int{
-        return $this->_documentsByEntity->count() + (null !== $this->_onBeforeStoreDocumentsByEntity ? count($this->_onBeforeStoreDocumentsByEntity) : 0);
+    public function __construct()
+    {
+        $this->_inner = new ArrayCollection();
     }
 
+    public function size():int{
+        return $this->_inner->count() + (null !== $this->_onBeforeStoreDocumentsByEntity ? count($this->_onBeforeStoreDocumentsByEntity) : 0);
+    }
     /**
      * @throws \Exception
      */
     public function evict($entity):void {
         if($this->_prepareEntitiesPuts) throw new \Exception("Cannot Evict entity during OnBeforeStore");
-        $this->_documentsByEntity->remove($entity);
+        $this->_inner->remove($entity);
     }
 
     public function put(object $entity, DocumentInfo $documentInfo):void {
         if(!$this->_prepareEntitiesPuts){
-            $this->_documentsByEntity->set($entity,$documentInfo);
+            $this->_inner->set($entity,$documentInfo);
             return;
         }
         $this->createOnBeforeStoreDocumentsByEntityIfNeeded();
@@ -41,12 +45,12 @@ class DocumentsByEntityHolder
     }
 
     public function clear():void {
-        $this->_documentsByEntity->clear();
+        $this->_inner->clear();
         if(null !== $this->_onBeforeStoreDocumentsByEntity) $this->_onBeforeStoreDocumentsByEntity->clear();
     }
 
     public function get(object $entity):DocumentInfo{
-        $documentInfo = $this->_documentsByEntity->get($entity);
+        $documentInfo = $this->_inner->get($entity);
         if(null !== $documentInfo){
             return $documentInfo;
         }
@@ -60,12 +64,12 @@ class DocumentsByEntityHolder
      * TODO CHECK WITH TECH IF THIS IS CLOSURE TYPE OF IMPLEMENTATION IN JAVA
      */
     public function iterator(): ArrayCollection {
-        $firstIterator = $this->_documentsByEntity->getIterator();
-        $secondIterator = $this->_documentsByEntity;
+        $firstIterator = $this->_inner->getIterator();
+        $secondIterator = $this->_inner;
         $firstIteratorFunc = function () use ($firstIterator){
         };
 
-        $secondIterator = $this->_documentsByEntity;
+        $secondIterator = $this->_inner;
         $secondIteratorFunc = function () use ($secondIterator){
         };
     }
