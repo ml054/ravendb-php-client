@@ -10,7 +10,7 @@ class SessionOptions
     private string $database;
     private ?bool $noTracking=true;
     private bool $noCaching;
-    private RequestExecutor $requestExecutor;
+    private ?RequestExecutor $requestExecutor=null;
     private TransactionMode $transactionMode;
 
     public function getDatabase(): string
@@ -23,12 +23,12 @@ class SessionOptions
         $this->database = $database;
     }
 
-    public function getRequestExecutor(): RequestExecutor
+    public function getRequestExecutor(): ?RequestExecutor
     {
         return $this->requestExecutor;
     }
 
-    public function setRequestExecutor(RequestExecutor $requestExecutor): RequestExecutor
+    public function setRequestExecutor(?RequestExecutor $requestExecutor): RequestExecutor
     {
         return $this->requestExecutor = $requestExecutor;
     }

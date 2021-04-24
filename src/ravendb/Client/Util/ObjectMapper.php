@@ -13,9 +13,9 @@ trait ObjectMapper
     /**
      * @throws \Exception
      */
-    public function serialize(?object $object=null): ?string {
+    public function serialize(?object $object=null): void {
         if(!is_object($object)) throw new \Exception("Data source must be an object");
         $serializer = JsonExtensions::storeSerializer();
-        return $serializer->serialize($object,'json');
+        $serializer->serialize($object,'json');
     }
 }

@@ -28,6 +28,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
 
     public function __construct(DocumentStore $documentStore, string $id, SessionOptions $options)
     {
+        dd($options);
         $this->documentStore = $documentStore;
         $this->id = $id;
         $this->options = $options;
@@ -119,7 +120,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         // TODO: Implement isUseOptimisticConcurrency() method.
     }
 
-    public function setUseOptimisticConcurrency(bool $useOptimisticConcurrency)
+    public function setUseOptimisticConcurrency(bool $useOptimisticConcurrency):void
     {
         // TODO: Implement setUseOptimisticConcurrency() method.
     }

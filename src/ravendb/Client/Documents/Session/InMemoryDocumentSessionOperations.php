@@ -3,7 +3,9 @@
 /** @noinspection PhpUnhandledExceptionInspection */
 
 namespace RavenDB\Client\Documents\Session;
-
+/**
+ * InMemoryDocumentSessionOperations subclass dependencies : DeletedEntitiesHolder, DocumentsByEntityHolder, ReplicationWaitOptsBuilder
+*/
 use Doctrine\Common\Collections\ArrayCollection;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
@@ -50,7 +52,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->_requestExecutor = ObjectUtils::firstNonNull($options->getRequestExecutor(),$documentStore->getRequestExecutor($this->databaseName));
         $this->noTracking = $options->isNoTracking();
         $this->useOptimisticConcurrency = $this->_requestExecutor->getConventions()->isUseOptimisticConcurrency();
-        $this->maxNumberOfRequestsPerSession
+        $this->maxNumberOfRequestsPerSession;
     }
 
     /**

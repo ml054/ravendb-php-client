@@ -47,4 +47,7 @@ class Constants
     public const CLIENT_VERSION="5.0.0";
     // TODO IMPLEMENT CONST FOR DOCUMENT CHANGE TYPE
     public const CHANGE_TYPE_DOCUMENT_ADDED="DOCUMENT_ADDED";
+    public const QUERY_DELETE="DELETE";
+    public const QUERY_PUT="PUT";
+    public const QUERY_GET="GET";
 }

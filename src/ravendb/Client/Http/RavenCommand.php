@@ -17,7 +17,7 @@ abstract class RavenCommand
     protected string $selectedNodeTag;
     protected int $numberOfAttempts;
     public const CLIENT_VERSION = Constants::CLIENT_VERSION;
-    protected null|string|array|object $result=null;
+    protected string|array|object $result;
     public int $failoverTopologyEtag = -2;
     protected RavenCommandResponseType|string $responseType;
     private ServerNode|array $failedNodes;
@@ -70,7 +70,7 @@ abstract class RavenCommand
         $this->statusCode = $statusCode;
     }
 
-    public function getResult(): array|string|null|object
+    public function getResult(): array|string|object
     {
         return $this->result;
     }

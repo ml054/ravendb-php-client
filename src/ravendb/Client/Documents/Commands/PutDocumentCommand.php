@@ -2,9 +2,8 @@
 
 namespace RavenDB\Client\Documents\Commands;
 
-use RavenDB\Client\Data\Driver\RavenDB;
-use RavenDB\Client\DataBind\Node\ObjectNode;
 use RavenDB\Client\Documents\Batches\PutResult;
+use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Methods\HttpRequestBase;
@@ -37,26 +36,28 @@ class PutDocumentCommand extends RavenCommand
      */
     public function createRequest(ServerNode $node): array|string|object
     {
-        $url = $node->getUrl()."/databases/".$node->getDatabase()."/bulk_docs";
+        $url = $node->getUrl()."/databases/".$node->getDatabase()."/docs?id=".urlencode($this->_id);
         $httpClient = new HttpRequestBase();
-      //  dd($node->getDatabase());
-        $serialize = $this->serialize($this->_document);
-       // dd($serialize);
+        $serializer = JsonExtensions::storeSerializer();
+        $serialize = $serializer->serialize($this->_document,'json');
+
         $curlopt = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYHOST=>"2",
             CURLOPT_SSL_VERIFYPEER=>"1",
-          //  CURLOPT_CUSTOMREQUEST=>"PUT",
-            CURLOPT_POSTFIELDS=>$serialize
+            CURLOPT_CUSTOMREQUEST=>"PUT",
+            CURLOPT_POSTFIELDS=>$serialize,
+            CURLOPT_HTTPHEADER=>[
+                "application/json"
+            ]
         ];
-        //dd($curlopt);
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 
-    public function setResponse(array|string $response, bool $fromCache)
+    public function setResponse(array|string $response, bool $fromCache):PutResult
     {
-        if(null === $response) throw new \Exception("Response cannot be null");
-        return $this->result = $this->mapper()::readValue($response,PutResult::class);
+       return $this->result = $this->mapper()::readValue($response,PutResult::class);
     }
+
 }
