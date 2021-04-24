@@ -2,6 +2,7 @@
 
 namespace RavenDB\Tests\Client;
 use RavenDB\Client\Documents\Session\SessionOptions;
+use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Infrastructure\Entities\User;
 use RavenDB\Client\Util\AssertUtils;
 use RavenDB\Tests\Client\CrudEntities\Arr1;
@@ -94,6 +95,7 @@ class CrudTest extends RemoteTestBase
         try{
             $store = $this->getDocumentStore();
             $options = new SessionOptions();
+            $options->setRequestExecutor($store->getRequestExecutor());
             $options->setDatabase('new_db_1');
             try {
                 /**
@@ -103,10 +105,6 @@ class CrudTest extends RemoteTestBase
                 $family = (new Family())->setNames(["Hibernating Rhinos", "RavenDB"])->setId("family/1");
                 $session->store($family,$family->getId());
                 $session->saveChanges();
-               /* $newFamily = $session->load(Family::class,"family/1");
-                $newFamily->setNames(["Toli", "Mitzi", "Boki"]);*/
-                // ASSERTION HERE
-                //$session->saveChanges();
             } finally {
                 $store->close();
             }
@@ -153,9 +151,8 @@ class CrudTest extends RemoteTestBase
                 $session = $store->openSession($options);
                 $user = (new User())->setName(null);
                 $session->store($user,"users/1");
-                $session->saveChanges();
-
-                $user2 = $session->load(User::class,"users/1");
+              //  $session->saveChanges();
+              //  $user2 = $session->load(User::class,"users/1");
                 // ASSERTIONS
             } finally {
                 $store->close();
@@ -225,16 +222,14 @@ class CrudTest extends RemoteTestBase
     public function testCrudOperationsWithArrayInObject3(){
         try{
             $store = $this->getDocumentStore();
-            $options = (new SessionOptions())->setDatabase('new_db_1');
+            $options = new SessionOptions();
+            $options->setDatabase('new_db_1');
             try {
                 $session = $store->openSession($options);
                 $family = (new Family())->setNames(["Hibernating Rhinos","RavenDB"]);
                 $session->store($family,"family/1");
-                $session->saveChanges();
-
                 $newFamily = $session->load(Family::class,"family/1");
-                $newFamily->setNames(["RavenDB"]);
-                // whatChanged ASSERTION
+             //   $newFamily->setNames(["RavenDB"]);
             } finally {
                 $store->close();
             }

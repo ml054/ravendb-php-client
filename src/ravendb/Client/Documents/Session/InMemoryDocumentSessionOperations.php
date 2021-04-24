@@ -24,10 +24,15 @@ use RavenDB\Client\Util\StringUtils;
 use RavenDB\Client\DataBind\Node\ObjectNode;
 abstract class InMemoryDocumentSessionOperations implements Closable
 {
+    public const ConcurrencyCheckMode = [
+        "AUTO"=>"AUTO",
+        "FORCED"=>"FORCE",
+        "DISABLED"=>"DISABLED"
+    ]; // to export to constance
     protected RequestExecutor $_requestExecutor;
     private OperationExecutor $_operationExecutor;
     protected ArrayCollection $_knownMissingIds;
-    public DocumentsByEntityHolder $documentsByEntity;
+    public DocumentInfo $documentsByEntity;
     public DocumentsById $documentsById;
     public ArrayCollection $deferredCommands;
     public ArrayCollection $deferredCommandsMap;
@@ -40,7 +45,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     private string $id;
     private string $databaseName;
     protected DocumentStoreBase $_documentStore;
-    public bool $noTracking;
+    public bool $noTracking=false;
     public ?BatchOptions $_saveChangesOptions=null;
     private int $numberOfRequests;
     private array $externalState;
@@ -52,15 +57,17 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
         $this->id = $id;
-        $this->databaseName = ObjectUtils::firstNonNull([$options->getDatabase(),$documentStore->getDatabase()]);
+        $this->databaseName = ObjectUtils::firstNonNull(["DemoDB"]);
+      //  $this->databaseName = ObjectUtils::firstNonNull([$options->getDatabase(),$documentStore->getDatabase()]);
         if(StringUtils::isBlank($this->databaseName)){
             static::throwNoDatabase();
         }
         $this->_documentStore = $documentStore;
-        $this->_requestExecutor = ObjectUtils::firstNonNull($options->getRequestExecutor(),$documentStore->getRequestExecutor($this->databaseName));
+        $this->_requestExecutor = $documentStore->getRequestExecutor($this->databaseName);
         $this->noTracking = $options->isNoTracking();
         $this->useOptimisticConcurrency = $this->_requestExecutor->getConventions()->isUseOptimisticConcurrency();
-        $this->maxNumberOfRequestsPerSession;
+        $this->maxNumberOfRequestsPerSession=4;
+       // $this->documentsByEntity= new ArrayCollection();
     }
     public function getId(){
         return $this->id;
@@ -76,13 +83,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         return $this->useOptimisticConcurrency;
     }
 
-    /**
-     * @return DocumentsByEntityHolder
-     */
-    public function getDocumentsByEntity(): DocumentsByEntityHolder
-    {
-        return $this->documentsByEntity = new DocumentsByEntityHolder();
-    }
 
     /**
      * @param bool $useOptimisticConcurrency
@@ -91,8 +91,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     {
         $this->useOptimisticConcurrency = $useOptimisticConcurrency;
     }
-
-
 
     public function getDatabaseName(): string
     {
@@ -231,11 +229,25 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         return count($this->deferredCommands);
     }
 
-    public function storeEntityInUnitOfWork(string $id, object $entity, string $changeVector, ObjectNode $metadata, ConcurrencyCheckMode $forceConcurrencyCheck){
+
+    public function registerMissing(array $ids):void {
+        if ($this->noTracking) {
+            return;
+        }
+        $this->_knownMissingIds->add($ids);
+    }
+
+    protected function rememberEntityForDocumentIdGeneration(object $entity): void {
+        throw new \Exception("You cannot set GenerateDocumentIdsOnStore to false without implementing RememberEntityForDocumentIdGeneration");
+    }
+
+   // public function storeEntityInUnitOfWork(string $id, object $entity, string $changeVector, ObjectNode $metadata, ConcurrencyCheckMode $forceConcurrencyCheck){
+    public function storeEntityInUnitOfWork(object $entity, ?string $id = null, ?string $changeVector = null){
         if(null != $id){
             $this->_knownMissingIds->remove($id);
         }
         $documentInfo = new DocumentInfo();
+        $this->documentsByEntity = new ArrayCollection();
         $documentInfo->setId($id);
         $documentInfo->setMetadataInstance($metadata);
         $documentInfo->setChangeVector($changeVector);
@@ -249,18 +261,27 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         }
     }
 
-    public function registerMissing(array $ids):void {
-        if ($this->noTracking) {
-            return;
-        }
-        $this->_knownMissingIds->add($ids);
-    }
-
-    public function storeInternal(object $entity, string $changeVector, string $id, ConcurrencyCheckMode $forceConcurrencyCheck){
-        if($this->noTracking) throw new IllegalStateException("Cannot store entity. Entity tracking is disabled in this session.");
+    public function storeInternal(object|array $entity, ?string $id = null, ?string $changeVector = "something",string $forceConcurrencyCheck="DISABLED"): void {
+        $this->noTracking = false;
+        if(true === $this->noTracking) throw new IllegalStateException("Cannot store entity. Entity tracking is disabled in this session.");
         if(null === $entity) throw new \InvalidArgumentException("Entity cannot be null");
 
-        $value = $this->documentsByEntity->get($entity);
-        if(null !== )
+        $document = new DocumentInfo();
+        $document->setDocument($entity);
+        $value = $document;
+        if(null !== $value){
+            $value->setChangeVector("Test");
+            $value->setConcurrencyCheckMode($this->forceConcurrenceCheck($forceConcurrencyCheck));
+            return;
+        }
+        dd($value);
+        $metadata = "";
+        $forceConcurrencyCheck= false;
+        $this->storeEntityInUnitOfWork($id,$entity,$changeVector,$metadata,$forceConcurrencyCheck);
+    }
+
+    public function forceConcurrenceCheck(string $option){
+        if(!array_key_exists($option,self::ConcurrencyCheckMode)) throw new \Exception("No matching Currence Check to provided option found");
+        return self::ConcurrencyCheckMode[$option];
     }
 }

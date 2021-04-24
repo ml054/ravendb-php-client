@@ -8,14 +8,15 @@ class DocumentsByEntityHolder
     private ArrayCollection $_inner;
     private ArrayCollection $_onBeforeStoreDocumentsByEntity;
     private bool $_prepareEntitiesPuts;
-
-    public function __construct()
+    private array $array;
+    public function __construct(array $array)
     {
-        $this->_inner = new ArrayCollection();
+
     }
 
     public function size():int{
-        return $this->_inner->count() + (null !== $this->_onBeforeStoreDocumentsByEntity ? count($this->_onBeforeStoreDocumentsByEntity) : 0);
+        return $this->_inner->count();
+       // return $this->_inner->count() + (null !== $this->_onBeforeStoreDocumentsByEntity ? count($this->_onBeforeStoreDocumentsByEntity) : 0);
     }
     /**
      * @throws \Exception

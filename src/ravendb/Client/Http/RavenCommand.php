@@ -10,10 +10,11 @@ use RuntimeException;
 
 abstract class RavenCommand
 {
-    protected object|array $resultClass;
+    protected  $resultClass;
     protected int $statusCode;
     protected ?int $timeout=null;
     protected bool $canCache;
+    protected bool $canCacheAggressively;
     protected string $selectedNodeTag;
     protected int $numberOfAttempts;
     public const CLIENT_VERSION = Constants::CLIENT_VERSION;

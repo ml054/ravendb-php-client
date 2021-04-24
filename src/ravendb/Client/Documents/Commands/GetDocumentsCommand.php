@@ -14,15 +14,12 @@ class GetDocumentsCommand extends RavenCommand
     private ?int $_start;
     private ?int $_pageSize;
 
-    public function __construct(string $id, ?array $includes, bool $metadataOnly,?int $start,?int $pageSize)
+    public function __construct(?int $start,?int $pageSize)
     {
         parent::__construct([]);
-        if(null === $id){
+        /*if(null === $id){
             throw new \InvalidArgumentException('id cannot be null');
-        }
-        $this->_id = $id;
-        $this->_includes = $includes;
-        $this->_metadataOnly = $metadataOnly;
+        }*/
         $this->_start = $start;
         $this->_pageSize = $pageSize;
     }
@@ -34,7 +31,7 @@ class GetDocumentsCommand extends RavenCommand
 
     public function createRequest(ServerNode $node): array|string|object
     {
-        dd($node);
+        dd(__METHOD__);
         // TODO: Implement createRequest() method.
     }
 

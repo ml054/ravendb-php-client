@@ -23,7 +23,7 @@ class DocumentInfo
     private string $changeVector;
     private bool $ignoreChanges;
     private ObjectNode $metadata;
-    private ObjectNode $document;
+    private object $document;
     private IMetadataDictionary $metadataInstance;
     private object $entity;
     private bool $newDocument;
@@ -111,7 +111,7 @@ class DocumentInfo
         return $this->document;
     }
 
-    public function setDocument(ObjectNode $document): void
+    public function setDocument(object $document): void
     {
         $this->document = $document;
     }

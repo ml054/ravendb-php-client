@@ -18,10 +18,14 @@ class LoadOperation
     private bool $_includeAllCounters;
     private ArrayCollection $_timeSeriesToInclude;
     private bool $_resultsSet;
+    private ?int $_start;
+    private ?int $_pageSize;
     private GetDocumentsResult|ArrayCollection $_results;
 
     public function __construct(InMemoryDocumentSessionOperations $_session)
     {
+        $this->_start = 0;
+        $this->_pageSize = 10;
         $this->_session = $_session;
     }
 
@@ -47,7 +51,7 @@ class LoadOperation
     }
 
     public function createRequest(): GetDocumentsCommand {
-        return new GetDocumentsCommand($this->_ids, $this->_includes, $this->_countersToInclude, $this->_timeSeriesToInclude, $this->_compareExchangeValuesToInclude, false);
+        return new GetDocumentsCommand($this->_start,$this->_pageSize);
     }
 
 
@@ -70,6 +74,5 @@ class LoadOperation
     }
 
     public function getDocument(object $class, $id){
-        dd("here");
     }
 }

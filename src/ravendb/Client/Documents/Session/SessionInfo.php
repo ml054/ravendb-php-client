@@ -31,7 +31,7 @@ class SessionInfo
         }
         $this->_session = $session;
         $this->_loadBalancerContextSeed = $session->getConvetions()->getLoadBalancerContextSeed();
-        $this->setLastClusterTransactionIndex();
+        $this->setLastClusterTransactionIndex(45);
     }
 
     /**

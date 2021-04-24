@@ -34,6 +34,12 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         $this->options = $options;
         parent::__construct($documentStore,$id,$options);
     }
+
+    public function documentQuery(): IDocumentQuery
+    {
+        // TODO: Implement documentQuery() method.
+    }
+
     public function saveChanges(){
         $saveChangeOperation = new BatchOperation($this);
         $command = $saveChangeOperation->createRequest();
@@ -42,7 +48,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
             if($this->noTracking){
                 throw new IllegalStateException("Cannot execute saveChanges when entity tracking is disabled in session.");
             }
-            $this->_requestExecutor->execute($command,$this->sessionInfo);
+            $this->_requestExecutor->execute($command,null);
         } finally {
             $this->close();
         }
@@ -59,7 +65,8 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         $loadOperation->byId($id);
         $command = $loadOperation->createRequest();
         if(null !== $command){
-            $this->_requestExecutor->execute($command,$this->sessionInfo);
+            $this->sessionInfo = new SessionInfo($this,$this->options,$this->documentStore);
+            $this->_requestExecutor->execute($command,$this->sessionInfo,$this->documentStore);
         }
         return $loadOperation->getDocument($clazz,$id);
     }
@@ -73,10 +80,9 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     /**
      * !!!!! NO USER DATA FORMATING ( case or anything )--- ONLY SERIALIZE FOR RAVENDB READY
     */
-    public function store(?object $entity, ?string $id = null, ?string $changeVector = null): void
+    public function store(object|array $entity, ?string $id = null, ?string $changeVector = null, ?string $forceConcurrencyCheck=null): void
     {
-        $data = $this->serialize($entity);
-        dd($data);
+        $data = $this->storeInternal($entity,$id,$changeVector);
     }
 
     public function include(string $path): ILoaderWithInclude

@@ -18,7 +18,7 @@ class DocumentConventions
     private ?bool $_saveEnumsAsIntegers = null;
     private ?bool $_identityPartsSeparator = null;
     private ?bool $_disableTopologyUpdates = null;
-    private ?bool $_useOptimisticConcurrency = null;
+    private bool $_useOptimisticConcurrency = false;
     private ?bool $_throwIfQueryPageSizeIsNotSet = null;
     private ?int $_maxNumberOfRequestsPerSession = null;
     private ?int $_requestTimeout = null;
@@ -59,13 +59,13 @@ class DocumentConventions
      */
     public function getLoadBalancerContextSeed(): int
     {
-        return $this->_loadBalancerContextSeed;
+        return 45;
     }
 
     /**
      * @param int $loadBalancerContextSeed
      */
-    public function setLoadBalancerContextSeed(int $seed): void
+    public function setLoadBalancerContextSeed(int $seed=45): void
     {
         $this->assertNotFrozen();
         $this->_loadBalancerContextSeed = $seed;
