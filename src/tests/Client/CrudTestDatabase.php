@@ -1,6 +1,8 @@
 <?php /** @noinspection ALL */
 
 namespace RavenDB\Tests\Client;
+use Doctrine\Common\Collections\ArrayCollection;
+use RavenDB\Client\Documents\Batches\PutResult;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\Session\SessionOptions;
 use RavenDB\Client\Extensions\JsonExtensions;
@@ -50,4 +52,45 @@ class CrudTestDatabase extends RemoteTestBase
                 $store->close();
             }
         }
+    public function testCanPutDocument(){
+        $store = $this->getDocumentStore();
+        $conventions = new DocumentConventions();
+        try{
+            $executor = RequestExecutor::create($store->getUrls(), $store->getDatabase(), null, $conventions);
+            try {
+                $member1 = new Member();
+                $member1->setName("Hibernating Rhinos")->setAge(8);
+                $member1->setId("person/5");
+                $member2 = (new Member())->setName("RavenDB")->setAge(4);
+                $member2->setId("person/6");
+                $members = [$member1,$member2];
+                $family  = (new FamilyMembers())->setMembers($members);
+
+                $operation = new PutDocumentOperation('family/2',$family,null);
+                $command = $operation->getCommand($conventions);
+                $executor->execute($command);
+                /**
+                 * @var PutResult $result
+                */
+                $result = $command->getResult();
+                AssertUtils::assertThat($result)::isNotNull();
+                AssertUtils::assertThat($result)::isObject();
+                AssertUtils::assertThat($result->getChangeVector())::isNotNull();
+            } finally {
+                $store->close();
+            }
+        } finally {
+            $store->close();
+        }
+    }
+
+    public function testArrayCollectionSerializer(){
+        $writeStartObject = new ArrayCollection();
+        $writeStartObject->set("id","45");
+        $writeStartObject->set("ChangeVector","A17-000000");
+        $writeStartObject->set("Type","DELETE");
+        $serializer = JsonExtensions::storeSerializer();
+        $request = $serializer->serialize($writeStartObject,'json');
+    }
+
 }

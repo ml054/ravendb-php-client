@@ -40,7 +40,6 @@ class GetClusterTopologyTest extends RemoteTestBase
             AssertUtils::assertThat($topology->getMembers())::hasSize(1);
             AssertUtils::assertThat($topology->getWatchers())::hasSize(0);
             AssertUtils::assertThat($topology->getPromotables())::hasSize(0);
-
         } finally {
             $store->close();
         }
