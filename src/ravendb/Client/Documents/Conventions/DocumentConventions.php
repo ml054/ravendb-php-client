@@ -158,7 +158,7 @@ class DocumentConventions
     /**
      * @return IShouldIgnoreEntityChanges
      */
-    public function getShouldIgnoreEntityChanges(): IShouldIgnoreEntityChanges
+    public function getShouldIgnoreEntityChanges(): ?IShouldIgnoreEntityChanges
     {
         return $this->_shouldIgnoreEntityChanges;
     }

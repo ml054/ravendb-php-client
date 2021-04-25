@@ -22,9 +22,10 @@ class User
     /**
      * @param string $id
      */
-    public function setId(string $id): void
+    public function setId(string $id): self
     {
         $this->id = $id;
+        return $this;
     }
 
     /**

@@ -27,7 +27,7 @@ interface IDocumentSession extends Closable
      * @param string $changeVector
      * @param string $id
      */
-    public function store(object $entity, ?string $id=null,string $changeVector=null,string $forceConcurrencyCheck=null): void;
+    public function store(object $entity, string $id,string $changeVector,string $forceConcurrencyCheck=null);
 
     /**
      * Begin a load while including the specified path

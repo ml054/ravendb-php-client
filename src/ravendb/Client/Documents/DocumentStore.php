@@ -115,7 +115,6 @@ class DocumentStore extends DocumentStoreBase
         $this->assertInitialized();
         $this->ensureNotClosed();
         $sessionID = Uuid::uuid4()->toString();
-
         return new DocumentSession($this,$sessionID,$sessionOptions);
     }
     function executeIndex(IAbstractIndexCreationTask $task, string $database): void

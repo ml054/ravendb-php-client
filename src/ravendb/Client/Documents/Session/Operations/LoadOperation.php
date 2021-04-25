@@ -73,6 +73,6 @@ class LoadOperation
         }
     }
 
-    public function getDocument(object $class, $id){
+    public function getDocument(object|string $class, $id){
     }
 }

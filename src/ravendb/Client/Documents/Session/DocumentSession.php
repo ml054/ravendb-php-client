@@ -41,7 +41,9 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     }
 
     public function saveChanges(){
+
         $saveChangeOperation = new BatchOperation($this);
+      //  dd($saveChangeOperation);
         $command = $saveChangeOperation->createRequest();
         try{
             if(null === $command) return;
@@ -68,6 +70,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
             $this->sessionInfo = new SessionInfo($this,$this->options,$this->documentStore);
             $this->_requestExecutor->execute($command,$this->sessionInfo,$this->documentStore);
         }
+       // dd($clazz);
         return $loadOperation->getDocument($clazz,$id);
     }
 
@@ -80,9 +83,9 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     /**
      * !!!!! NO USER DATA FORMATING ( case or anything )--- ONLY SERIALIZE FOR RAVENDB READY
     */
-    public function store(object|array $entity, ?string $id = null, ?string $changeVector = null, ?string $forceConcurrencyCheck=null): void
+    public function store(object $entity, string $id, string $changeVector,string $forceConcurrencyCheck=null)
     {
-        $data = $this->storeInternal($entity,$id,$changeVector);
+        return $this->storeInternal($entity,$id,$changeVector);
     }
 
     public function include(string $path): ILoaderWithInclude

@@ -2,20 +2,22 @@
 
 namespace RavenDB\Client\Documents\Session;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
 
 class SaveChangesData
 {
-    private ?array $sessionCommands=null;
+    private ArrayCollection $sessionCommands;
     private ?array $entities=null;
     private ?BatchOptions $options=null;
 
     public function __construct(InMemoryDocumentSessionOperations $session)
     {
+        dd($session);
         $this->options = $session->_saveChangesOptions;
     }
 
-    public function getSessionCommands(): array
+    public function getSessionCommands(): ArrayCollection
     {
         return $this->sessionCommands;
     }

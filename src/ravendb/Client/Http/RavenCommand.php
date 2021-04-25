@@ -21,7 +21,7 @@ abstract class RavenCommand
     protected string|array|object $result;
     public int $failoverTopologyEtag = -2;
     protected RavenCommandResponseType|string $responseType;
-    private ServerNode|array $failedNodes;
+   // private ServerNode|array $failedNodes;
     const RESPONSE_TYPE_EMPTY = "EMPTY"; // NO ENUM YET IN PHP
     const RESPONSE_TYPE_OBJECT = "OBJECT"; // NO ENUM YET IN PHP
     const RESPONSE_TYPE_RAW = "RAW"; // NO ENUM YET IN PHP
@@ -156,7 +156,7 @@ abstract class RavenCommand
     public function setResponseRaw(string $response, string|object $stream): void {
         throw new Exception("When " .$this->responseType. " is set to Raw then please override this method to handle the response. ");
     }
-    public function getFailedNodes():ServerNode {
+    /*public function getFailedNodes():ServerNode {
         return $this->failedNodes;
     }
 
@@ -165,8 +165,8 @@ abstract class RavenCommand
     }
 
     public function isFailedWithNode(ServerNode $node):bool {
-        return $this->failedNodes !== null && array_key_exists($node,$this->failedNodes); // TODO : failedNodes.containsKey()
-    }
+        return $this->failedNodes !== null && array_key_exists($node,$this->failedNodes);
+    }*/
 
     public function processResponse(string $cache, string $response, string $url): string
     {

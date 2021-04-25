@@ -9,12 +9,14 @@ namespace RavenDB\Client\Documents\Session;
 use Doctrine\Common\Collections\ArrayCollection;
 use Ramsey\Uuid\Uuid;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
+use RavenDB\Client\Documents\Commands\Batches\PutCommandDataWithJson;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStoreBase;
 use RavenDB\Client\Documents\IDocumentStore;
 use RavenDB\Client\Documents\Operations\OperationExecutor;
 use RavenDB\Client\Documents\Operations\SessionOperationExecutor;
 use RavenDB\Client\Exceptions\IllegalStateException;
+use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Json\MetadataAsDictionary;
@@ -32,7 +34,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     protected RequestExecutor $_requestExecutor;
     private OperationExecutor $_operationExecutor;
     protected ArrayCollection $_knownMissingIds;
-    public DocumentInfo $documentsByEntity;
+    public DocumentsByEntityHolder $documentsByEntity;
     public DocumentsById $documentsById;
     public ArrayCollection $deferredCommands;
     public ArrayCollection $deferredCommandsMap;
@@ -45,7 +47,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     private string $id;
     private string $databaseName;
     protected DocumentStoreBase $_documentStore;
-    public bool $noTracking=false;
+    public bool $noTracking=true;
     public ?BatchOptions $_saveChangesOptions=null;
     private int $numberOfRequests;
     private array $externalState;
@@ -53,6 +55,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     private int $maxNumberOfRequestsPerSession;
     protected bool $generateDocumentKeysOnStore;
     private bool $_isDisposal;
+    private ArrayCollection $internalDocumentsByEntity;
     public ArrayCollection $includedDocumentsById;
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
@@ -67,7 +70,10 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->noTracking = $options->isNoTracking();
         $this->useOptimisticConcurrency = $this->_requestExecutor->getConventions()->isUseOptimisticConcurrency();
         $this->maxNumberOfRequestsPerSession=4;
-       // $this->documentsByEntity= new ArrayCollection();
+        /// implementing UNITOFWORK Internally php flavor
+        $this->internalDocumentsByEntity = new ArrayCollection(
+            [$this->id]
+        );
     }
     public function getId(){
         return $this->id;
@@ -114,46 +120,44 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
     /***************** LifeCycle/UOW/Workflow ********************/
     public function prepareForSaveChanges():SaveChangesData {
+
         $result = new SaveChangesData($this);
-        $deferredCommandsCount = $this->deferredCommands->count();
-        $this->prepareForEntitiesDeletion($result,null);
+   //     dd($result);
+      ///  $this->prepareForEntitiesDeletion($result,null);
         $this->prepareForEntitiesPuts($result);
-        $this->prepareForCreatingRevisionsFromIds($result);
-        $this->prepareCompareExchangeEntities($result);
-        if($this->deferredCommands->count() > $this->deferredCommands){
-            // this allow OnBeforeStore to call Defer during the call to include. TODO CHECK TECH TEAM
-            // additional values during the same SaveChanges call. Behavior are not yet scheduled for php
-        }
+    //    $this->prepareForCreatingRevisionsFromIds($result);
+      //  $this->prepareCompareExchangeEntities($result);
         return $result;
     }
-    public function prepareForEntitiesPuts(SaveChangesData $result,array $changes):void {
-         $putsContext = $this->documentsByEntity()->prepareEntitiesPuts();
-         $shouldIgnoreEntityChanges = $this->getConvetions()->getShouldIgnoreEntityChanges();
-
-         foreach($this->documentsByEntity() as $entity){
-             /**
-              *@var DocumentsByEntityEnumeratorResult $entity
-              */
-             if($entity->getValue()->isIgnoreChanges()) continue;
-
-             if(null !== $shouldIgnoreEntityChanges){
-                 if($shouldIgnoreEntityChanges->check(
-                     $this,
-                     $entity->getValue()->getEntity(),
-                     $entity->getValue()->getId())){
-                     continue;
-                 }
-             }
-
-             if($this->isDeleted($entity->getValue()->getId())) continue;
-
-             $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
-             // TODO IMPLEMENT THE SERIALIZER
-             // ObjectNode document = entityToJson.convertEntityToJson(entity.getKey(), entity.getValue());
-             /**
-              * var ObjectNode $document
-             */
-         }
+    public function prepareForEntitiesPuts(SaveChangesData $result):void {
+        $this->documentsByEntity = new ArrayCollection($result->getEntities());
+        try{
+            $shouldIgnoreEntityChanges = $this->getConvetions()->getShouldIgnoreEntityChanges();
+            foreach($this->documentsByEntity as $entity){
+                /**
+                 *@var DocumentsByEntityEnumeratorResult $entity
+                 */
+                if($entity->getValue()->isIgnoreChanges()) continue;
+                if(null !== $shouldIgnoreEntityChanges){
+                    if($shouldIgnoreEntityChanges->check(
+                        $this,
+                        $entity->getValue()->getEntity(),
+                        $entity->getValue()->getId())){
+                        continue;
+                    }
+                }
+                if($this->isDeleted($entity->getValue()->getId())) continue;
+                $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
+                $document = JsonExtensions::storeSerializer()->serialize([$entity->getKey()=>$entity->getValue()]);
+                $this->documentsByEntity->add($entity->getKey());
+                if($entity->getValue()->getId() !== null){
+                    /// TO COMPLETE
+                }
+                $result->getSessionCommands()->add(new PutCommandDataWithJson($entity->getValue()->getId(),$changeVector,$document,"NONE"));
+            }
+        } finally {
+            $this->close();
+        }
     }
 
     /**
@@ -183,7 +187,9 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             }
         }
     }
-    public function prepareForEntitiesDeletion(SaveChangesData $result, ?array $changes=null):void { }
+    public function prepareForEntitiesDeletion(SaveChangesData $result, ?array $changes=null):void {
+
+    }
     public function prepareForCreatingRevisionsFromIds(SaveChangesData $result):void { }
     public function prepareCompareExchangeEntities(SaveChangesData $result):void { }
     /** *************************************************** **/
@@ -241,43 +247,32 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         throw new \Exception("You cannot set GenerateDocumentIdsOnStore to false without implementing RememberEntityForDocumentIdGeneration");
     }
 
-   // public function storeEntityInUnitOfWork(string $id, object $entity, string $changeVector, ObjectNode $metadata, ConcurrencyCheckMode $forceConcurrencyCheck){
-    public function storeEntityInUnitOfWork(object $entity, ?string $id = null, ?string $changeVector = null){
-        if(null != $id){
-            $this->_knownMissingIds->remove($id);
-        }
+    public function storeEntityInUnitOfWork($entity, ?string $id = null, string $changeVector){
         $documentInfo = new DocumentInfo();
-        $this->documentsByEntity = new ArrayCollection();
+      //  $this->documentsByEntity = new ArrayCollection();
         $documentInfo->setId($id);
-        $documentInfo->setMetadataInstance($metadata);
+      // $documentInfo->setMetadataInstance();
         $documentInfo->setChangeVector($changeVector);
-        $documentInfo->setConcurrencyCheckMode($forceConcurrencyCheck);
+      //  $documentInfo->setConcurrencyCheckMode($forceConcurrencyCheck);
         $documentInfo->setEntity($entity);
-        $documentInfo->setNewDocument(true);
+        $documentInfo->setNewDocument(false);
         $documentInfo->setDocument(null);
-        $this->documentsByEntity->put($entity,$documentInfo);
-        if(null === $id){
-            $this->documentsById->add($documentInfo);
-        }
+
+        $this->internalDocumentsByEntity->set($this->id,$documentInfo);
+
+     //   dd($this->internalDocumentsByEntity[$this->id]);
+      //  dd($this->id);
+        return $documentInfo;
+
     }
 
-    public function storeInternal(object|array $entity, ?string $id = null, ?string $changeVector = "something",string $forceConcurrencyCheck="DISABLED"): void {
-        $this->noTracking = false;
-        if(true === $this->noTracking) throw new IllegalStateException("Cannot store entity. Entity tracking is disabled in this session.");
+    public function storeInternal(object|array $entity, string $id = null, string $changeVector,string $forceConcurrencyCheck="DISABLED") {
+        $this->noTracking = true;
+        if(false === $this->noTracking) throw new IllegalStateException("Cannot store entity. Entity tracking is disabled in this session.");
         if(null === $entity) throw new \InvalidArgumentException("Entity cannot be null");
-
-        $document = new DocumentInfo();
-        $document->setDocument($entity);
-        $value = $document;
-        if(null !== $value){
-            $value->setChangeVector("Test");
-            $value->setConcurrencyCheckMode($this->forceConcurrenceCheck($forceConcurrencyCheck));
-            return;
-        }
-        dd($value);
         $metadata = "";
         $forceConcurrencyCheck= false;
-        $this->storeEntityInUnitOfWork($id,$entity,$changeVector,$metadata,$forceConcurrencyCheck);
+        return $this->storeEntityInUnitOfWork($entity,$id,$changeVector,$metadata,$forceConcurrencyCheck);
     }
 
     public function forceConcurrenceCheck(string $option){

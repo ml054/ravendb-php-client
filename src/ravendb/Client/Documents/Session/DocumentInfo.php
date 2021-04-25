@@ -23,7 +23,7 @@ class DocumentInfo
     private string $changeVector;
     private bool $ignoreChanges;
     private ObjectNode $metadata;
-    private object $document;
+    private ?object $document;
     private IMetadataDictionary $metadataInstance;
     private object $entity;
     private bool $newDocument;
@@ -106,12 +106,12 @@ class DocumentInfo
         $this->metadata = $metadata;
     }
 
-    public function getDocument(): ObjectNode
+    public function getDocument(): ?object
     {
         return $this->document;
     }
 
-    public function setDocument(object $document): void
+    public function setDocument(?object $document=null): void
     {
         $this->document = $document;
     }
@@ -168,7 +168,6 @@ class DocumentInfo
     }
 
     public static function getNewDocumentInfo(ObjectNode $document):DocumentInfo {
-
         $metadata = $document->get(Constants::METADATA_KEY);
         if(null === $metadata || !is_object($metadata)) throw new \Exception("Document must have a metadata");
 
