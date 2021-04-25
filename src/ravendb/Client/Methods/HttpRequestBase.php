@@ -39,6 +39,8 @@ class HttpRequestBase
                     default=>$this->response = json_encode(["code"=>$http_code,"message"=>"Unexpected response from server. Consider the response status code for details"]),
                 };
             }
+        dd($this->response);
+
     }
 
     public function getResponse(): string|array

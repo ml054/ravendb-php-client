@@ -20,7 +20,7 @@ abstract class RavenCommand
     public const CLIENT_VERSION = Constants::CLIENT_VERSION;
     protected string|array|object $result;
     public int $failoverTopologyEtag = -2;
-    protected RavenCommandResponseType|string $responseType;
+    protected ?RavenCommandResponseType $responseType = null;
    // private ServerNode|array $failedNodes;
     const RESPONSE_TYPE_EMPTY = "EMPTY"; // NO ENUM YET IN PHP
     const RESPONSE_TYPE_OBJECT = "OBJECT"; // NO ENUM YET IN PHP
@@ -56,10 +56,10 @@ abstract class RavenCommand
      * TODO REQUESTED IMPLEMENT THE RESPONSE TYPE
     */
 
-    public function getResponseType(): RavenCommandResponseType
+    /*public function getResponseType(): RavenCommandResponseType
     {
         return $this->responseType;
-    }
+    }*/
 
     public function getTimeout(): ?int
     {

@@ -57,9 +57,10 @@ class User
     /**
      * @param string $lastName
      */
-    public function setLastName(string $lastName): void
+    public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
+        return $this;
     }
 
     /**

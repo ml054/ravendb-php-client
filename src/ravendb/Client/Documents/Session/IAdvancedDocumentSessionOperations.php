@@ -27,7 +27,7 @@ interface IAdvancedDocumentSessionOperations
      * Gets a value indicating whether any of the entities tracked by the session has changes.
      * @return true if any entity associated with session has changes
      */
-    public function hasChanges():bool;
+    public function hasChanges(object $entity):bool;
 
     /**
      * Gets the max number of requests per session.
@@ -99,7 +99,7 @@ interface IAdvancedDocumentSessionOperations
      * @param object $entity //Entity to get id from return entity id
      * @return  $entity
      */
-    public function getDocumentId(object $entity):string;
+    public function getDocumentId(object $entity): ?string;
 
     /**
      * Gets the metadata for the specified entity.

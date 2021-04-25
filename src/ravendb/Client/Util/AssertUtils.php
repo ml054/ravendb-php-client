@@ -77,4 +77,9 @@ class AssertUtils
         TestCase::assertTrue($validate);
     }
 
+    public static function isTrue()
+    {
+        TestCase::assertTrue(static::$elements);
+    }
+
 }

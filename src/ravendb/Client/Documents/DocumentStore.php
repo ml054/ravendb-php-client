@@ -2,6 +2,7 @@
 
 namespace RavenDB\Client\Documents;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Ramsey\Uuid\Uuid;
 use RavenDB\Client\Documents\BulkInsertOperation;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;

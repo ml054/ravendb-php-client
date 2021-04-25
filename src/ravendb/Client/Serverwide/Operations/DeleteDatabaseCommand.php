@@ -42,7 +42,6 @@ class DeleteDatabaseCommand extends RavenCommand
             CURLOPT_CUSTOMREQUEST=>"DELETE",
             CURLOPT_POSTFIELDS=>$this->parameters
         ];
-        dd($curlopt);
         $request = $httpClient->createCurlRequest($url,$curlopt);
 
     }

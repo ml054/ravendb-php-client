@@ -11,6 +11,7 @@ use RavenDB\Tests\Client\CrudEntities\Family;
 use RavenDB\Tests\Client\CrudEntities\FamilyMembers;
 use RavenDB\Tests\Client\CrudEntities\Member;
 use RavenDB\Tests\Client\CrudEntities\Poc;
+use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 class CrudTest extends RemoteTestBase
 {
@@ -22,7 +23,7 @@ class CrudTest extends RemoteTestBase
         try{
             $store = $this->getDocumentStore();
             $options = new SessionOptions();
-            $options->setDatabase('new_db_1');
+            $options->setDatabase($store->getDatabase());
             try {
                 $session = $store->openSession($options);
                 $poc = new User();
@@ -61,7 +62,7 @@ class CrudTest extends RemoteTestBase
         try{
             $store = $this->getDocumentStore();
             $options = new SessionOptions();
-            $options->setDatabase('new_db_1');
+            $options->setDatabase($store->getDatabase());
             try {
                 /**
                  * @var FamilyMembers $newFamily
@@ -96,7 +97,7 @@ class CrudTest extends RemoteTestBase
             $store = $this->getDocumentStore();
             $options = new SessionOptions();
             $options->setRequestExecutor($store->getRequestExecutor());
-            $options->setDatabase('new_db_1');
+            $options->setDatabase($store->getDatabase());
             try {
                 /**
                  * @var Family $newFamily
@@ -117,7 +118,7 @@ class CrudTest extends RemoteTestBase
 
             $store = $this->getDocumentStore();
             $options = new SessionOptions();
-            $options->setDatabase('new_db_1');
+            $options->setDatabase($store->getDatabase());
             try {
                 /**
                  * @var Arr2 $newArr
@@ -146,11 +147,11 @@ class CrudTest extends RemoteTestBase
         try{
             $store = $this->getDocumentStore();
             $options = new SessionOptions();
-            $options->setDatabase('new_db_1');
+            $options->setDatabase($store->getDatabase());
             try {
                 $session = $store->openSession($options);
                 $user = (new User())->setName(null);
-                $session->store($user,"users/1");
+                $session->store($user,"users/1",'Vec');
               //  $session->saveChanges();
               //  $user2 = $session->load(User::class,"users/1");
                 // ASSERTIONS
@@ -165,20 +166,29 @@ class CrudTest extends RemoteTestBase
         try{
             $store = $this->getDocumentStore();
             $options = new SessionOptions();
-            $options->setDatabase('new_db_1');
+            $options->setDatabase($store->getDatabase());
+            $options->setRequestExecutor($store->getRequestExecutor());
+
             try {
                 $session = $store->openSession($options);
-                $user = (new User())->setName("user1");
-                $session->store($user,"users/1");
-                $session->saveChanges();
+                /*$user2 = new User();
+                $user2->setName("user2");
+                $user2->setId("user/2");
+                $session->store($user2,"family/1",'Factor');*/
+
+                $user3 = new User();
+                $user3->setId('user3/1');
+                $user3->setName("user3");
+                $session->load(User::class,"family/1");
+              //  $session->saveChanges();
             } finally {
                 $store->close();
             }
 
-            try {
+            /*try {
                 $session = $store->openSession($options);
                 $user = $session->load(User::class,"users/1");
-                $user->setName(null);
+                $user->setName("Nemo");
                 $session->saveChanges();
             } finally {
                 $store->close();
@@ -190,7 +200,7 @@ class CrudTest extends RemoteTestBase
                 AssertUtils::assertThat($user->getName())::isNull();
             } finally {
                 $store->close();
-            }
+            }*/
         } finally {
             $store->close();
         }
@@ -198,7 +208,7 @@ class CrudTest extends RemoteTestBase
     public function testCrudOperationsWithArrayInObject2(){
         try{
             $store = $this->getDocumentStore();
-            $options = (new SessionOptions())->setDatabase('new_db_1');
+            $options = (new SessionOptions())->setDatabase($store->getDatabase());
             try {
                 $session = $store->openSession($options);
                 $family = (new Family())->setNames("Hibernating Rhinos","RavenDB");
@@ -223,11 +233,11 @@ class CrudTest extends RemoteTestBase
         try{
             $store = $this->getDocumentStore();
             $options = new SessionOptions();
-            $options->setDatabase('new_db_1');
+            $options->setDatabase($store->getDatabase());
             try {
                 $session = $store->openSession($options);
                 $family = (new Family())->setNames(["Hibernating Rhinos","RavenDB"]);
-                $session->store($family,"family/1");
+               // $session->store($family,"family/1");
                 $newFamily = $session->load(Family::class,"family/1");
              //   $newFamily->setNames(["RavenDB"]);
             } finally {
@@ -241,7 +251,7 @@ class CrudTest extends RemoteTestBase
         try{
             $store = $this->getDocumentStore();
             $options = new SessionOptions();
-            $options->setDatabase('new_db_1');
+            $options->setDatabase($store->getDatabase());
             try {
                 $session = $store->openSession($options);
                 $family = (new Family())->setNames(["Hibernating Rhinos", "RavenDB"]);
@@ -261,7 +271,7 @@ class CrudTest extends RemoteTestBase
     public function testCrudOperationsWithWhatChanged(){
         try{
             $store = $this->getDocumentStore();
-            $options = (new SessionOptions())->setDatabase('new_db_1');
+            $options = (new SessionOptions())->setDatabase($store->getDatabase());
             try {
                 $session = $store->openSession($options);
 
@@ -311,21 +321,21 @@ class CrudTest extends RemoteTestBase
         try{
             $store = $this->getDocumentStore();
             $options = (new SessionOptions());
-            $options->setDatabase('new_db_1');
+            $options->setDatabase($store->getDatabase());
             try {
                 $session = $store->openSession($options);
-                $user1 = (new User())->setLastName("user1");
-                $session->store($user1,"users/1");
+              //  $user1 = (new User())->setLastName("user1");
+              //  $session->store($user1,"users/1",'adfkasdjfd');
 
-                $user2 = (new User())->setName("user2")->setAge(1);
-                $session->store($user2,"users/2");
+                $user2 = (new User())->setName("user2");
+                $session->store($user2,"users/2",'Vectorfdfdfd');
 
                 $user3 = new User();
                 $user3->setName("user3")->setAge(1);
-                $session->store($user3,"users/3");
+                $session->store($user3,"users/3",'Vectorfdfdfd');
 
                 $user4 = (new User())->setName("user4");
-                $session->store($user4,"users/4");
+                $session->store($user4,"users/4",'Vectorfdfdfd');
 
                 $session->delete($user2);
                 $user3->setAge(3);

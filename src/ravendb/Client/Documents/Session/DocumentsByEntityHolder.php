@@ -7,15 +7,14 @@ class DocumentsByEntityHolder
 {
     private ArrayCollection $_onBeforeStoreDocumentsByEntity;
     private bool $_prepareEntitiesPuts;
-    private ArrayCollection $_documentsByEntity;
-
+    private DocumentInfo|ArrayCollection|DocumentsByEntityHolder $_documentsByEntity;
     public function size():int{
         return $this->_documentsByEntity->count() + (null !== $this->_onBeforeStoreDocumentsByEntity ? count($this->_onBeforeStoreDocumentsByEntity) : 0);
     }
     /**
      * @throws \Exception
      */
-    public function getDocumentsByEntity(){
+    public function getDocumentsByEntity():DocumentInfo|ArrayCollection|DocumentsByEntityHolder {
         return $this->_documentsByEntity = new ArrayCollection();
     }
 
@@ -55,6 +54,9 @@ class DocumentsByEntityHolder
         };
     }
 
+    public function clear():void {
+        $this->_documentsByEntity->clear();
+    }
 }
 /*TODO : CHECK THE LEFT METHODS WITH TECH SUPPORT*/
 /*

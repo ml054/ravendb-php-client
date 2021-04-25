@@ -50,7 +50,6 @@ class GetDatabaseTopologyCommand extends RavenCommand
        }
 
        $this->result = $this->mapper()::readValue($response,$this->resultClass);
-        dd($this->result);
     }
 
     public function isReadRequest(): bool

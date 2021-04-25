@@ -18,6 +18,7 @@ class BatchOperation
     }
 
     public function createRequest(): SingleNodeBatchCommand {
+
         $result = $this->_session->prepareForSaveChanges();
         return new SingleNodeBatchCommand($this->_session->getConvetions(), (array)$result->getSessionCommands(),$result->getOptions());
     }

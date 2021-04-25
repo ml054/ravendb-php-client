@@ -5,7 +5,7 @@
 namespace RavenDB\Client\Documents\Session;
 /**
  * InMemoryDocumentSessionOperations subclass dependencies : DeletedEntitiesHolder, DocumentsByEntityHolder, ReplicationWaitOptsBuilder
-*/
+ */
 use Doctrine\Common\Collections\ArrayCollection;
 use Ramsey\Uuid\Uuid;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
@@ -61,7 +61,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     {
         $this->id = $id;
         $this->databaseName = ObjectUtils::firstNonNull(["DemoDB"]);
-      //  $this->databaseName = ObjectUtils::firstNonNull([$options->getDatabase(),$documentStore->getDatabase()]);
         if(StringUtils::isBlank($this->databaseName)){
             static::throwNoDatabase();
         }
@@ -70,10 +69,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->noTracking = $options->isNoTracking();
         $this->useOptimisticConcurrency = $this->_requestExecutor->getConventions()->isUseOptimisticConcurrency();
         $this->maxNumberOfRequestsPerSession=4;
-        /// implementing UNITOFWORK Internally php flavor
-        $this->internalDocumentsByEntity = new ArrayCollection(
-            [$this->id]
-        );
+        $this->internalDocumentsByEntity = new ArrayCollection();
     }
     public function getId(){
         return $this->id;
@@ -88,6 +84,15 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     {
         return $this->useOptimisticConcurrency;
     }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getInternalDocumentsByEntity(): ArrayCollection
+    {
+        return $this->internalDocumentsByEntity;
+    }
+
 
 
     /**
@@ -105,7 +110,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
     public function getExternalState(){
         if(null === $this->externalState){
-            $this->externalState = [];
+            $this->externalState = new ArrayCollection();
         }
         return $this->externalState;
     }
@@ -120,40 +125,42 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
     /***************** LifeCycle/UOW/Workflow ********************/
     public function prepareForSaveChanges():SaveChangesData {
+        $saveChangesData = new SaveChangesData($this);
 
-        $result = new SaveChangesData($this);
-   //     dd($result);
-      ///  $this->prepareForEntitiesDeletion($result,null);
-        $this->prepareForEntitiesPuts($result);
-    //    $this->prepareForCreatingRevisionsFromIds($result);
-      //  $this->prepareCompareExchangeEntities($result);
-        return $result;
+        $saveChangesData->getEntities();
+        $saveChangesData->getOptions();
+       // $this->prepareForEntitiesDeletion($result,null);
+        $this->prepareForEntitiesPuts($saveChangesData);
+        //$this->prepareForCreatingRevisionsFromIds($result);
+        //$this->prepareCompareExchangeEntities($result);
+        return $saveChangesData;
     }
     public function prepareForEntitiesPuts(SaveChangesData $result):void {
-        $this->documentsByEntity = new ArrayCollection($result->getEntities());
+
         try{
-            $shouldIgnoreEntityChanges = $this->getConvetions()->getShouldIgnoreEntityChanges();
+            $putContext = $this->documentsByEntity->prepareEntitiesPuts();
+          //  $shouldIgnoreEntityChanges = $this->getConventions()->getShouldIgnoreEntityChanges();
             foreach($this->documentsByEntity as $entity){
                 /**
-                 *@var DocumentsByEntityEnumeratorResult $entity
+                 * @var DocumentsByEntityEnumeratorResult $entity
                  */
                 if($entity->getValue()->isIgnoreChanges()) continue;
-                if(null !== $shouldIgnoreEntityChanges){
+
+                if($shouldIgnoreEntityChanges !== null){
                     if($shouldIgnoreEntityChanges->check(
-                        $this,
-                        $entity->getValue()->getEntity(),
-                        $entity->getValue()->getId())){
+                        $this,$entity->getValue()->getEntity(),$entity->getValue()->getId())){
                         continue;
-                    }
+                    };
                 }
                 if($this->isDeleted($entity->getValue()->getId())) continue;
+
                 $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
-                $document = JsonExtensions::storeSerializer()->serialize([$entity->getKey()=>$entity->getValue()]);
-                $this->documentsByEntity->add($entity->getKey());
-                if($entity->getValue()->getId() !== null){
-                    /// TO COMPLETE
+                $document = JsonExtensions::storeSerializer()->encode([$entity->getKey(),$entity->getValue()]);
+                /* TODO CHECK WITH TECH
+                 *  if ((!entityChanged(document, entity.getValue(), null)) && !dirtyMetadata) {
+                    continue;
                 }
-                $result->getSessionCommands()->add(new PutCommandDataWithJson($entity->getValue()->getId(),$changeVector,$document,"NONE"));
+                 * */
             }
         } finally {
             $this->close();
@@ -180,7 +187,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             $dirty = false;
             /**
              * @var MetadataAsDictionary $propValue
-            */
+             */
             $propValue = $documentInfo->getMetadataInstance()->getLong($pop);
             if(null === $propValue || $propValue instanceof MetadataAsDictionary && ($propValue->isDirty())){
                 $dirty = true;
@@ -188,16 +195,15 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         }
     }
     public function prepareForEntitiesDeletion(SaveChangesData $result, ?array $changes=null):void {
-
+        try {
+            //$deletes = $this->dele
+        } finally {
+            $this->close();
+        }
     }
     public function prepareForCreatingRevisionsFromIds(SaveChangesData $result):void { }
     public function prepareCompareExchangeEntities(SaveChangesData $result):void { }
     /** *************************************************** **/
-
-    public function internalPrepareEntitiesPuts():Closable{
-
-    }
-
     private static function throwNoDatabase(){
         throw new IllegalStateException("Cannot open a Session without specifying a name of a database ".
             "to operate on. Database name can be passed as an argument when Session is".
@@ -249,21 +255,14 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
     public function storeEntityInUnitOfWork($entity, ?string $id = null, string $changeVector){
         $documentInfo = new DocumentInfo();
-      //  $this->documentsByEntity = new ArrayCollection();
         $documentInfo->setId($id);
-      // $documentInfo->setMetadataInstance();
         $documentInfo->setChangeVector($changeVector);
-      //  $documentInfo->setConcurrencyCheckMode($forceConcurrencyCheck);
         $documentInfo->setEntity($entity);
-        $documentInfo->setNewDocument(false);
+        $documentInfo->setNewDocument(true);
         $documentInfo->setDocument(null);
-
-        $this->internalDocumentsByEntity->set($this->id,$documentInfo);
-
-     //   dd($this->internalDocumentsByEntity[$this->id]);
-      //  dd($this->id);
-        return $documentInfo;
-
+        $this->documentsByEntity = new DocumentsByEntityHolder();
+        $this->documentsByEntity->prepareEntitiesPuts();
+        return $entity;
     }
 
     public function storeInternal(object|array $entity, string $id = null, string $changeVector,string $forceConcurrencyCheck="DISABLED") {

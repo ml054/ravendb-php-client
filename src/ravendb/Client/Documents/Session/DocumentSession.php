@@ -5,6 +5,7 @@
 namespace RavenDB\Client\Documents\Session;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use RavenDB\Client\Constants;
 use RavenDB\Client\Documents\Batches\ICommandData;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStore;
@@ -26,7 +27,8 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     private string $id;
     private SessionOptions $options;
     private ArrayCollection $externalState;
-
+    private int $getMaxNumberOfRequestsPerSession;
+    private bool $useOptimisticConcurrency;
     public function __construct(DocumentStore $documentStore, string $id, SessionOptions $options)
     {
         $this->documentStore = $documentStore;
@@ -41,13 +43,13 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     }
 
     public function saveChanges(){
-
         $saveChangeOperation = new BatchOperation($this);
-      //  dd($saveChangeOperation);
         $command = $saveChangeOperation->createRequest();
         try{
+            $this->noTracking = true;
+
             if(null === $command) return;
-            if($this->noTracking){
+            if($this->noTracking === false){
                 throw new IllegalStateException("Cannot execute saveChanges when entity tracking is disabled in session.");
             }
             $this->_requestExecutor->execute($command,null);
@@ -55,7 +57,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
             $this->close();
         }
     }
-
     public function close(){ }
 
     /**
@@ -70,7 +71,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
             $this->sessionInfo = new SessionInfo($this,$this->options,$this->documentStore);
             $this->_requestExecutor->execute($command,$this->sessionInfo,$this->documentStore);
         }
-       // dd($clazz);
         return $loadOperation->getDocument($clazz,$id);
     }
 
@@ -83,8 +83,9 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     /**
      * !!!!! NO USER DATA FORMATING ( case or anything )--- ONLY SERIALIZE FOR RAVENDB READY
     */
-    public function store(object $entity, string $id, string $changeVector,string $forceConcurrencyCheck=null)
+    public function store(object|string $entity, string $id, ?string $changeVector = null, ?string $forceConcurrencyCheck = null)
     {
+
         return $this->storeInternal($entity,$id,$changeVector);
     }
 
@@ -110,39 +111,45 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         return $this->externalState;
     }
 
-    public function hasChanges(): bool
+    public function hasChanges(object $entity): bool
     {
-        // TODO: Implement hasChanges() method.
+        $documentInfo = $this->documentsByEntity->get($entity);
+        if(null === $documentInfo) return false;
+        /*
+         * TODO CHECK WITH TECH TEAM
+        ObjectNode document = entityToJson.convertEntityToJson(entity, documentInfo);
+        return entityChanged(document, documentInfo, null);
+         * */
     }
 
     public function getMaxNumberOfRequestsPerSession(): int
     {
-        // TODO: Implement getMaxNumberOfRequestsPerSession() method.
+        return $this->getMaxNumberOfRequestsPerSession;
     }
 
     public function setMaxNumberOfRequestsPerSession(int $maxRequests): void
     {
-        // TODO: Implement setMaxNumberOfRequestsPerSession() method.
+       $this->getMaxNumberOfRequestsPerSession = $maxRequests;
     }
 
     public function storeIdentifier(): string
     {
-        // TODO: Implement storeIdentifier() method.
+        return $this->_documentStore->getIdentifier().";".$this->getDatabaseName();
     }
 
     public function isUseOptimisticConcurrency(): bool
     {
-        // TODO: Implement isUseOptimisticConcurrency() method.
+        return $this->useOptimisticConcurrency;
     }
 
     public function setUseOptimisticConcurrency(bool $useOptimisticConcurrency):void
     {
-        // TODO: Implement setUseOptimisticConcurrency() method.
+        $this->useOptimisticConcurrency = $useOptimisticConcurrency;
     }
 
     public function clear(): void
     {
-        // TODO: Implement clear() method.
+        $this->documentsByEntity->clear();
     }
 
     public function defer(ICommandData $command, ICommandData ...$commands): void
@@ -152,22 +159,32 @@ class DocumentSession extends InMemoryDocumentSessionOperations
 
     public function evict($entity): void
     {
-        // TODO: Implement evict() method.
+
     }
 
-    public function getDocumentId(object $entity): string
+    public function getDocumentId(object $entity): ?string
     {
-        // TODO: Implement getDocumentId() method.
+        if(null === $entity) return null;
+        $value = $this->documentsByEntity->get($entity);
+        return null !== $value ? $value.$this->getId() : null;
     }
 
     public function getMetadataFor($instance): IMetadataDictionary
     {
-        // TODO: Implement getMetadataFor() method.
+        if(null === $instance) throw new \InvalidArgumentException('Instance cannot be null');
+        $documentInfo = $this->getDocumentInfo($instance);
     }
 
     public function getChangeVectorFor(string $instance): string
     {
-        // TODO: Implement getChangeVectorFor() method.
+        if(null === $instance) throw new \InvalidArgumentException('instance cannot be null');
+        $documentInfo = $this->getDocumentInfo($instance);
+        $changeVector = $documentInfo->getMetadata()->get(Constants::METADATA_CHANGE_VECTOR);
+    }
+
+    public function getDocumentInfo(object $instance):DocumentInfo {
+        $documentInfo = $this->documentsByEntity->get($instance);
+        if(null !== $documentInfo) return $documentInfo;
     }
 
     public function getCountersFor(string $instance): array
@@ -182,27 +199,43 @@ class DocumentSession extends InMemoryDocumentSessionOperations
 
     public function getLastModifiedFor(string $instance): DateTimeImmutable
     {
-        // TODO: Implement getLastModifiedFor() method.
+        if(null === $instance) throw new \InvalidArgumentException("Instance cannot be null");
+
+        $documentInfo = $this->getDocumentInfo($instance);
+        $lastModified = $documentInfo->getMetadata()->get(Constants::METADATA_LAST_MODIFIED);
+        if(null !== $lastModified && !is_null($lastModified)){
+            // TODO MAP THE VALUE
+        }
     }
 
     public function hasChanged(object $entity): bool
     {
-        // TODO: Implement hasChanged() method.
+        $documentInfo = $this->documentsByEntity->get($entity);
+        if(null === $documentInfo) return false;
+        /* TODO
+         * ObjectNode document = entityToJson.convertEntityToJson(entity, documentInfo);
+        return entityChanged(document, documentInfo, null);
+         * */
     }
 
     public function isLoaded(string $id): bool
     {
-        // TODO: Implement isLoaded() method.
+
+    }
+
+    public function isLoadedOrDeleted(string $id){
+        $documentInfo = $this->documentsById->getValue($id);
+        return ($documentInfo !== null && ($documentInfo));
     }
 
     public function ignoreChangesFor(object $entity): void
     {
-        // TODO: Implement ignoreChangesFor() method.
+        $this->getDocumentInfo($entity)->setIgnoreChanges(true);
     }
 
     public function whatChanged(): DocumentsChanges
     {
-        // TODO: Implement whatChanged() method.
+        $changes = new ArrayCollection();
     }
 
     public function waitForReplicationAfterSaveChanges(): void
@@ -212,7 +245,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
 
     public function getSession(): InMemoryDocumentSessionOperations
     {
-        // TODO: Implement getSession() method.
+        return $this;
     }
 
     public function exists(string $id): bool
