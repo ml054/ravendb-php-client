@@ -1,13 +1,14 @@
 <?php
 
 namespace RavenDB\Client\Documents\Session;
+use Doctrine\Common\Collections\ArrayCollection;
 use RavenDB\Client\Documents\Batches\ICommandData;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
 
 class SaveChangesData
 {
-    private array $sessionCommands;
-    private array|null $entities=null;
+    private $sessionCommands;
+    private ?ArrayCollection $entities=null;
     private ?BatchOptions $options;
 
     public function __construct(InMemoryDocumentSessionOperations $session)
@@ -15,12 +16,12 @@ class SaveChangesData
         $this->options = $session->_saveChangesOptions;
     }
 
-    public function getSessionCommands(): array|null
+    public function getSessionCommands(): ?array
     {
-        return $this->sessionCommands=["Command here"];
+        return $this->sessionCommands;
     }
 
-    public function getEntities(): array|null
+    public function getEntities(): ?ArrayCollection
     {
         return $this->entities;
     }

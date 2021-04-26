@@ -79,7 +79,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
             }
             $this->_requestExecutor->execute($command,null);
             $saveChangeOperation->setResult($command->getResult());
-         //   dd($command->getResult());
         } finally {
             $this->close();
         }

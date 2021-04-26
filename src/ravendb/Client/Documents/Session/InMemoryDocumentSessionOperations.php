@@ -9,6 +9,7 @@ namespace RavenDB\Client\Documents\Session;
 use Doctrine\Common\Collections\ArrayCollection;
 use Ramsey\Uuid\Uuid;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
+use RavenDB\Client\Documents\Commands\Batches\IndexesWaitOptsBuilder;
 use RavenDB\Client\Documents\Commands\Batches\PutCommandDataWithJson;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStoreBase;
@@ -26,6 +27,7 @@ use RavenDB\Client\Util\StringUtils;
 use RavenDB\Client\DataBind\Node\ObjectNode;
 use RavenDB\Tests\Client\Mapper\ObjectMapper\StorageAdapter;
 use RavenDB\Tests\Client\Mapper\ObjectMapper\UserMapper;
+use function Sodium\add;
 
 abstract class InMemoryDocumentSessionOperations implements Closable
 {
@@ -67,6 +69,9 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         if(StringUtils::isBlank($this->databaseName)){
             static::throwNoDatabase();
         }
+        /// EXTRACTED FROM SUBCLASS
+        $saveChangesOptions = new IndexesWaitOptsBuilder($this);
+        $this->_saveChangesOptions = $saveChangesOptions->getOptions();
         $this->_documentStore = $documentStore;
         $this->_requestExecutor = $documentStore->getRequestExecutor($this->databaseName);
         $this->noTracking = $options->isNoTracking();
@@ -129,7 +134,9 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $result = new SaveChangesData($this);
         $result->getEntities();
         $result->getOptions();
-       // $this->prepareForEntitiesDeletion($result,null);
+
+
+        // $this->prepareForEntitiesDeletion($result,null);
         $this->prepareForEntitiesPuts($result);
         //$this->prepareForCreatingRevisionsFromIds($result);
         //$this->prepareCompareExchangeEntities($result);
@@ -145,16 +152,20 @@ abstract class InMemoryDocumentSessionOperations implements Closable
                  */
                 if($entity->getValue()->isIgnoreChanges()) continue;
 
-                if($shouldIgnoreEntityChanges !== null){
+                if($shouldIgnoreEntityChanges !== null) {
                     if($shouldIgnoreEntityChanges->check(
                         $this,$entity->getValue()->getEntity(),$entity->getValue()->getId())){
                         continue;
                     };
                 }
-                if($this->isDeleted($entity->getValue()->getId())) continue;
 
+                if($this->isDeleted($entity->getValue()->getId())) continue;
                 $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
                 $document = JsonExtensions::storeSerializer()->encode([$entity->getKey(),$entity->getValue()]);
+                (string)$changeVectore;
+                $forceRevisionCreationStrategy = "NONE";
+                $result->getEntities()->add($entity->getKey());
+                $result->getSessionCommands()->add(new PutCommandDataWithJson($entity->getValue()->getId(),$changeVectore,$document,$forceRevisionCreationStrategy));
             }
         } finally {
             $this->close();
@@ -246,8 +257,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     protected function rememberEntityForDocumentIdGeneration(object $entity): void {
         throw new \Exception("You cannot set GenerateDocumentIdsOnStore to false without implementing RememberEntityForDocumentIdGeneration");
     }
-    /**
-     */
+
     public function storeEntityInUnitOfWork($entity, string $id = null, ?string $changeVector=null){
         $documentInfo = new DocumentInfo();
         $documentInfo->setId($id);

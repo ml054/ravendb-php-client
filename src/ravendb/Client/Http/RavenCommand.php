@@ -20,7 +20,8 @@ abstract class RavenCommand
     public const CLIENT_VERSION = Constants::CLIENT_VERSION;
     protected string|array|object $result;
     public int $failoverTopologyEtag = -2;
-    protected ?RavenCommandResponseType $responseType = null;
+    //protected ?RavenCommandResponseType $responseType = null;
+    protected $responseType = "OBJECT";
    // private ServerNode|array $failedNodes;
     const RESPONSE_TYPE_EMPTY = "EMPTY"; // NO ENUM YET IN PHP
     const RESPONSE_TYPE_OBJECT = "OBJECT"; // NO ENUM YET IN PHP

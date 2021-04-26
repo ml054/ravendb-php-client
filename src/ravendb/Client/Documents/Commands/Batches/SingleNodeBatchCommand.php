@@ -26,6 +26,7 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
         $this->_options = $options;
         $this->_conventions = $conventions;
         $this->_mode = self::TRANSACTION_MODE_SINGLE_NODE;
+
         if(null === $conventions){
             throw new \InvalidArgumentException("conventions cannot be null");
         }
@@ -53,7 +54,7 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
                 "application/json"
             ]
         ];
-         return $httpClient->createCurlRequest($url,$curlopt);
+        return $httpClient->createCurlRequest($url,$curlopt);
     }
 
     public function close()

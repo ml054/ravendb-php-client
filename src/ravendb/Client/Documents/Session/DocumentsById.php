@@ -13,7 +13,7 @@ class DocumentsById
         $this->_inner = new ArrayCollection();
     }
 
-    public function getValue(string $id){
+    public function getValue(string $id):DocumentInfo {
         return $this->_inner->get($id);
     }
 
