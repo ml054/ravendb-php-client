@@ -252,7 +252,9 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     protected function rememberEntityForDocumentIdGeneration(object $entity): void {
         throw new \Exception("You cannot set GenerateDocumentIdsOnStore to false without implementing RememberEntityForDocumentIdGeneration");
     }
-
+    /**
+     * TODO : IN PROGRESS IMPLEMENTATION OF InMEMORY STORAGE TO STORE SESSION DATA FROM UNIT OF WORK. COMMITTING JUST FOR THE PURPOSE OF THIS TODO
+    */
     public function storeEntityInUnitOfWork($entity, ?string $id = null, string $changeVector){
         $documentInfo = new DocumentInfo();
         $documentInfo->setId($id);
