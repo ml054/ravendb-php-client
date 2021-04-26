@@ -1,32 +1,26 @@
 <?php
 
 namespace RavenDB\Client\Documents\Session;
-
-use Doctrine\Common\Collections\ArrayCollection;
+use RavenDB\Client\Documents\Batches\ICommandData;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
-use RavenDB\Client\Extensions\JsonExtensions;
 
 class SaveChangesData
 {
-    private ?ArrayCollection $sessionCommands=null;
-    private ?array $entities=null;
-    private ?BatchOptions $options=null;
+    private array $sessionCommands;
+    private array|null $entities=null;
+    private ?BatchOptions $options;
 
     public function __construct(InMemoryDocumentSessionOperations $session)
     {
-        // dd($session->getInternalDocumentsByEntity()->getValues());
-     //   $entity = JsonExtensions::storeSerializer()->normalize($session->getInternalDocumentsByEntity()->getValues(),'json');
-      //  dd($session->_saveChangesOptions);
-        $this->entities = $this->getEntities();
         $this->options = $session->_saveChangesOptions;
     }
 
-    public function getSessionCommands(): ?ArrayCollection
+    public function getSessionCommands(): array|null
     {
-        return $this->sessionCommands;
+        return $this->sessionCommands=["Command here"];
     }
 
-    public function getEntities(): ?array
+    public function getEntities(): array|null
     {
         return $this->entities;
     }

@@ -15,6 +15,7 @@ use RavenDB\Client\Documents\Session\Loaders\ILoaderWithInclude;
 use RavenDB\Client\Documents\Session\Operations\BatchOperation;
 use RavenDB\Client\Documents\Session\Operations\LoadOperation;
 use RavenDB\Client\Exceptions\IllegalStateException;
+use RavenDB\Client\Exceptions\RavenException;
 use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\StringUtils;
@@ -42,21 +43,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         // TODO: Implement documentQuery() method.
     }
 
-    public function saveChanges(){
-        $saveChangeOperation = new BatchOperation($this);
-        $command = $saveChangeOperation->createRequest();
-        try{
-            $this->noTracking = true;
 
-            if(null === $command) return;
-            if($this->noTracking === false){
-                throw new IllegalStateException("Cannot execute saveChanges when entity tracking is disabled in session.");
-            }
-            $this->_requestExecutor->execute($command,null);
-        } finally {
-            $this->close();
-        }
-    }
     public function close(){ }
 
     /**
@@ -73,6 +60,30 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         }
         return $loadOperation->getDocument($clazz,$id);
     }
+    /**
+     * !!!!! NO USER DATA FORMATING ( case or anything )--- ONLY SERIALIZE FOR RAVENDB READY
+     */
+    public function store(object|string $entity, string $id, ?string $changeVector = null, ?string $forceConcurrencyCheck = null)
+    {
+        return $this->storeInternal($entity,$id,$changeVector);
+    }
+
+    public function saveChanges(){
+        $saveChangeOperation = new BatchOperation($this);
+        try{
+            $command = $saveChangeOperation->createRequest();
+            $this->noTracking = true;
+            if(null === $command) return;
+            if($this->noTracking === false) {
+                throw new IllegalStateException("Cannot execute saveChanges when entity tracking is disabled in session.");
+            }
+            $this->_requestExecutor->execute($command,null);
+            $saveChangeOperation->setResult($command->getResult());
+         //   dd($command->getResult());
+        } finally {
+            $this->close();
+        }
+    }
 
 
     public function delete(string $id, string $expectedChangeVector)
@@ -80,14 +91,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         // TODO: Implement delete() method.
     }
 
-    /**
-     * !!!!! NO USER DATA FORMATING ( case or anything )--- ONLY SERIALIZE FOR RAVENDB READY
-    */
-    public function store(object|string $entity, string $id, ?string $changeVector = null, ?string $forceConcurrencyCheck = null)
-    {
-
-        return $this->storeInternal($entity,$id,$changeVector);
-    }
 
     public function include(string $path): ILoaderWithInclude
     {

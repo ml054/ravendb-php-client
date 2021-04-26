@@ -19,38 +19,18 @@ class CrudTest extends RemoteTestBase
      * @throws \Exception
      */
 
-    public function testCrudCanUpdatePropertyFromNullToObject(){
+    public function testCanCrudCanUpdatePropertyToNull(){
         try{
             $store = $this->getDocumentStore();
             $options = new SessionOptions();
             $options->setDatabase($store->getDatabase());
+            $options->setRequestExecutor($store->getRequestExecutor());
             try {
                 $session = $store->openSession($options);
                 $poc = new User();
-                $poc->setName("aviv");
-                $session->store($poc,"users/1");
+                $poc->setName("John");
+                $session->store($poc,"users/2");
                 $session->saveChanges();
-            } finally {
-                $store->close();
-            }
-            try {
-                $session = $store->openSession($options);
-                /**
-                 * @var User $user
-                 */
-                $user = $session->load(User::class,'users/1');
-                $user->setName(null);
-                $session->saveChanges();
-            } finally {
-                $store->close();
-            }
-            try {
-                $session = $store->openSession($options);
-                /**
-                 * @var User $user
-                 */
-                $user = $session->load(User::class,'users/1');
-                AssertUtils::assertThat($user->getName())::isNull();
             } finally {
                 $store->close();
             }
@@ -58,6 +38,7 @@ class CrudTest extends RemoteTestBase
             $store->close();
         }
     }
+
     public function testCrudOperationsWithArrayOfObjects(){
         try{
             $store = $this->getDocumentStore();
@@ -171,15 +152,17 @@ class CrudTest extends RemoteTestBase
 
             try {
                 $session = $store->openSession($options);
-                /*$user2 = new User();
-                $user2->setName("user2");
-                $user2->setId("user/2");
-                $session->store($user2,"family/1",'Factor');*/
+                $user1 = new User();
+                $user1->setName("test");
+                $user1->setId("user/1");
+                $session->store($user1,"user/1","A:148");
 
-                $user3 = new User();
-                $user3->setId('user3/1');
-                $user3->setName("user3");
-                $session->load(User::class,"family/1");
+                $user2 = new User();
+                $user2->setId('user/2');
+                $user2->setName("Clovis");
+                $session->store($user2,"user/2","A:147");
+
+                dd($session);
               //  $session->saveChanges();
             } finally {
                 $store->close();

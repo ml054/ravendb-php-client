@@ -2,6 +2,7 @@
 
 namespace RavenDB\Client\Documents\Session\Operations;
 
+use RavenDB\Client\Documents\Commands\Batches\BatchCommandResult;
 use RavenDB\Client\Documents\Commands\Batches\SingleNodeBatchCommand;
 use RavenDB\Client\Documents\Session\InMemoryDocumentSessionOperations;
 
@@ -18,9 +19,12 @@ class BatchOperation
     }
 
     public function createRequest(): SingleNodeBatchCommand {
-
         $result = $this->_session->prepareForSaveChanges();
-        return new SingleNodeBatchCommand($this->_session->getConvetions(), (array)$result->getSessionCommands(),$result->getOptions());
+        return new SingleNodeBatchCommand($this->_session->getConvetions(), $result->getSessionCommands(),$result->getOptions());
+    }
+
+    public function setResult(BatchCommandResult $result){
+        dd(__METHOD__,"command result");
     }
 
     private function handleCompareExchangePut():void {

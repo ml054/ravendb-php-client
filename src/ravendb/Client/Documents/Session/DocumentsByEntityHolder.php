@@ -5,8 +5,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class DocumentsByEntityHolder
 {
-    private ArrayCollection $_onBeforeStoreDocumentsByEntity;
-    private bool $_prepareEntitiesPuts;
+    private DocumentInfo|array $_onBeforeStoreDocumentsByEntity;
+    private bool $_prepareEntitiesPuts=true;
     private DocumentInfo|ArrayCollection|DocumentsByEntityHolder $_documentsByEntity;
     public function size():int{
         return $this->_documentsByEntity->count() + (null !== $this->_onBeforeStoreDocumentsByEntity ? count($this->_onBeforeStoreDocumentsByEntity) : 0);
@@ -32,9 +32,9 @@ class DocumentsByEntityHolder
         }
     }
 
-    public function prepareEntitiesPuts(){
+   /* public function prepareEntitiesPuts(string $id){
         $this->_prepareEntitiesPuts = true;
-    }
+    }*/
 
     public function get(object $entity):DocumentInfo{
         $documentInfo = $this->getDocumentsByEntity()->get($entity);

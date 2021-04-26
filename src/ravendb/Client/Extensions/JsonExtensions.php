@@ -86,7 +86,7 @@ class JsonExtensions
     {
         $serializer = static::serializer();
         $record = new $object($argument);
-        dd($object);
+        dd(__METHOD__,$object);
         try {
             $normalize = StringUtils::pascalize($serializer->normalize($record));
         } catch (ExceptionInterface $e) {

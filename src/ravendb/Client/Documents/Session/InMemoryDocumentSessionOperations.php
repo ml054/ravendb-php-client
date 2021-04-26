@@ -24,6 +24,9 @@ use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Util\ObjectUtils;
 use RavenDB\Client\Util\StringUtils;
 use RavenDB\Client\DataBind\Node\ObjectNode;
+use RavenDB\Tests\Client\Mapper\ObjectMapper\StorageAdapter;
+use RavenDB\Tests\Client\Mapper\ObjectMapper\UserMapper;
+
 abstract class InMemoryDocumentSessionOperations implements Closable
 {
     public const ConcurrencyCheckMode = [
@@ -93,8 +96,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         return $this->internalDocumentsByEntity;
     }
 
-
-
     /**
      * @param bool $useOptimisticConcurrency
      */
@@ -124,21 +125,19 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     }
 
     /***************** LifeCycle/UOW/Workflow ********************/
-    public function prepareForSaveChanges():SaveChangesData {
-        $saveChangesData = new SaveChangesData($this);
-
-        $saveChangesData->getEntities();
-        $saveChangesData->getOptions();
+    public function prepareForSaveChanges(): SaveChangesData {
+        $result = new SaveChangesData($this);
+        $result->getEntities();
+        $result->getOptions();
        // $this->prepareForEntitiesDeletion($result,null);
-        $this->prepareForEntitiesPuts($saveChangesData);
+        $this->prepareForEntitiesPuts($result);
         //$this->prepareForCreatingRevisionsFromIds($result);
         //$this->prepareCompareExchangeEntities($result);
-        return $saveChangesData;
+        return $result;
     }
     public function prepareForEntitiesPuts(SaveChangesData $result):void {
 
         try{
-            $putContext = $this->documentsByEntity->prepareEntitiesPuts();
           //  $shouldIgnoreEntityChanges = $this->getConventions()->getShouldIgnoreEntityChanges();
             foreach($this->documentsByEntity as $entity){
                 /**
@@ -156,11 +155,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
                 $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
                 $document = JsonExtensions::storeSerializer()->encode([$entity->getKey(),$entity->getValue()]);
-                /* TODO CHECK WITH TECH
-                 *  if ((!entityChanged(document, entity.getValue(), null)) && !dirtyMetadata) {
-                    continue;
-                }
-                 * */
             }
         } finally {
             $this->close();
@@ -253,21 +247,22 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         throw new \Exception("You cannot set GenerateDocumentIdsOnStore to false without implementing RememberEntityForDocumentIdGeneration");
     }
     /**
-     * TODO : IN PROGRESS IMPLEMENTATION OF InMEMORY STORAGE TO STORE SESSION DATA FROM UNIT OF WORK. COMMITTING JUST FOR THE PURPOSE OF THIS TODO
-    */
-    public function storeEntityInUnitOfWork($entity, ?string $id = null, string $changeVector){
+     */
+    public function storeEntityInUnitOfWork($entity, string $id = null, ?string $changeVector=null){
         $documentInfo = new DocumentInfo();
         $documentInfo->setId($id);
-        $documentInfo->setChangeVector($changeVector);
         $documentInfo->setEntity($entity);
         $documentInfo->setNewDocument(true);
         $documentInfo->setDocument(null);
         $this->documentsByEntity = new DocumentsByEntityHolder();
-        $this->documentsByEntity->prepareEntitiesPuts();
-        return $entity;
+        $this->documentsByEntity->put($entity,$documentInfo);
+        if($id !== null){
+            $this->documentsById = new DocumentsById();
+            $this->documentsById->add($documentInfo);
+        }
     }
 
-    public function storeInternal(object|array $entity, string $id = null, string $changeVector,string $forceConcurrencyCheck="DISABLED") {
+    public function storeInternal(object|array $entity, string $id = null, ?string $changeVector=null,string $forceConcurrencyCheck="DISABLED") {
         $this->noTracking = true;
         if(false === $this->noTracking) throw new IllegalStateException("Cannot store entity. Entity tracking is disabled in this session.");
         if(null === $entity) throw new \InvalidArgumentException("Entity cannot be null");

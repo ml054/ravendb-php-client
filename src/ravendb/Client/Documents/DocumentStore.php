@@ -150,16 +150,6 @@ class DocumentStore extends DocumentStoreBase
         // TODO: Implement setRequestTimeout() method.
     }
 
-    public function addBeforeCloseListener(VoidArgs $event): void
-    {
-        // TODO: Implement addBeforeCloseListener() method.
-    }
-
-    public function removeBeforeCloseListener(VoidArgs $event): void
-    {
-        // TODO: Implement removeBeforeCloseListener() method.
-    }
-
     public function addAfterCloseListener(VoidArgs $event): void
     {
         // TODO: Implement addAfterCloseListener() method.

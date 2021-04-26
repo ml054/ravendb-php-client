@@ -33,13 +33,13 @@ class HttpRequestBase
             $response = curl_exec($curlObject);
             if (!curl_errno($curlObject)) {
                 $http_code = curl_getinfo($curlObject, CURLINFO_HTTP_CODE);
+                dd($response);
                 $expectedStatusCode = $this->http_codes[$http_code];
                 match ($http_code){
                     $expectedStatusCode=> $this->response = $response,
                     default=>$this->response = json_encode(["code"=>$http_code,"message"=>"Unexpected response from server. Consider the response status code for details"]),
                 };
             }
-        dd($this->response);
 
     }
 
