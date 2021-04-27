@@ -36,7 +36,7 @@ class PutDocumentCommand extends RavenCommand
      */
     public function createRequest(ServerNode $node): array|string|object
     {
-        $url = $node->getUrl()."/databases/".$node->getDatabase()."/docs?id=".urlencode($this->_id);
+        $url = $node->getUrl()."/databases/".$node->getDatabase()."/docs?id=".$this->_id;
         $httpClient = new HttpRequestBase();
         $serializer = JsonExtensions::storeSerializer();
         $serialize = $serializer->serialize($this->_document,'json');

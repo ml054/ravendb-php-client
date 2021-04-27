@@ -26,11 +26,13 @@ class CrudTest extends RemoteTestBase
             $options->setDatabase($store->getDatabase());
             $options->setRequestExecutor($store->getRequestExecutor());
             try {
+
                 $session = $store->openSession($options);
                 $poc = new User();
                 $poc->setName("John");
                 $session->store($poc,"users/2");
                 $session->saveChanges();
+
             } finally {
                 $store->close();
             }

@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class DocumentsById
 {
-    private ArrayCollection $_inner;
+    private DocumentInfo|ArrayCollection $_inner;
 
     public function __construct()
     {

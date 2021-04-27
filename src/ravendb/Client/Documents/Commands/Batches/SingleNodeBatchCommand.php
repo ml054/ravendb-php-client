@@ -2,6 +2,7 @@
 
 namespace RavenDB\Client\Documents\Commands\Batches;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use RavenDB\Client\Data\Driver\RavenDB;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Http\RavenCommand;
@@ -12,14 +13,14 @@ use RavenDB\Client\Primitives\Closable;
 class SingleNodeBatchCommand extends RavenCommand implements Closable
 {
     private DocumentConventions $_conventions;
-    private ?array $_commands=null;
+    private ?ArrayCollection $_commands=null;
     private string $_mode;
     private array $_attachmentStreams;
     private ?BatchOptions $_options=null;
     private const TRANSACTION_MODE_SINGLE_NODE = "SINGLE_NODE"; // NO ENUM YET IN PHP
     private const TRANSACTION_MODE_CLUSTER_WIDE = "CLUSTER_WIDE"; // NO ENUM YET IN PHP
 
-    public function __construct(DocumentConventions $conventions, ?array $commands, ?BatchOptions $options)
+    public function __construct(DocumentConventions $conventions, ?ArrayCollection $commands, ?BatchOptions $options)
     {
         parent::__construct(BatchCommandResult::class);
         $this->_commands = $commands;
@@ -51,9 +52,10 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
             CURLOPT_CUSTOMREQUEST=>"POST",
             CURLOPT_POSTFIELDS=>$body,
             CURLOPT_HEADEROPT=>[
-                "application/json"
+                "Content-Type: application/json"
             ]
         ];
+       // dd($curlopt);
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 
