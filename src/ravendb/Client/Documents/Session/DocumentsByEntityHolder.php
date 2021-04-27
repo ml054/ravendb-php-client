@@ -1,15 +1,13 @@
 <?php
-
 namespace RavenDB\Client\Documents\Session;
-use Doctrine\Common\Collections\ArrayCollection;
-
+use Ds\Map;
 class DocumentsByEntityHolder
 {
-    private ArrayCollection $_inner;
+    private Map $_inner;
 
     public function __construct()
     {
-        $this->_inner = new ArrayCollection();
+        $this->_inner = new Map();
     }
 
     public function size():int
@@ -24,18 +22,13 @@ class DocumentsByEntityHolder
 
     public function put(object $entity,DocumentInfo $documentInfo):void
     {
-        if($this->_inner->containsKey($documentInfo->getId())) return;
-        $this->_inner->set($entity,$documentInfo);
+        if($this->_inner->hasKey($documentInfo->getId())) return;
+        $this->_inner->put($entity,$documentInfo);
     }
 
     public function clear():void
     {
         $this->_inner->clear();
-    }
-
-    public function getValue(string $id):DocumentInfo
-    {
-        return $this->_inner->get($id);
     }
 
     public function get(object $entity):?DocumentInfo
@@ -47,6 +40,9 @@ class DocumentsByEntityHolder
         return null;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function iterator(){
         return $this->_inner->getIterator();
     }
