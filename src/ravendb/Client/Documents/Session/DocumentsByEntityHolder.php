@@ -7,32 +7,46 @@ class DocumentsByEntityHolder
 {
     /**
      * USING PSALM JAVA TO PHP FRIENDLY POPULAR ANNOTATIONS FOR REFERENCES.
-     * THIS IS TO INSURE AT MAXIMUM DATA CONFORMITY/INTEGRATY AND FOR GENERAL
+     * THIS IS TO ENSURE AT MAXIMUM DATA CONFORMITY/INTEGRATY AND FOR GENERAL
      * MAPPING PURPOSE
      * @psalm-return Map<Object, DocumentInfo>
      */
-    private Map $_onBeforeStoreDocumentsByEntity;
+    private Map $_inner;
 
-    /**
-     * @psalm-return Map<Object, DocumentInfo>
-     */
-    private function _documentsByEntity() {
-        return new Map();
+    public function __construct()
+    {
+        $this->_inner = new Map();
     }
 
-    private bool $_prepareEntitiesPuts = true;
-
     public function size(): int {
-        return $this->_documentsByEntity()->count();
+        return $this->_inner->count();
     }
 
     public function remove(object $entity):void {
-        $this->_documentsByEntity()->remove($entity);
+        $this->_inner->remove($entity);
     }
 
-    public function evict(object $entity):void {
-        if($this->_prepareEntitiesPuts){
+    public function put($entity, DocumentInfo $documentInfo): void {
+            $this->_inner->put($entity,$documentInfo);
+    }
 
+    public function clear ():void {
+        $this->_inner->clear();
+    }
+
+    public function get(object $entity): DocumentInfo {
+        $documentInfo = $this->_inner->get($entity);
+        if(null !== $documentInfo){
+            return $documentInfo;
         }
     }
+
+    /**
+     * TODO implement
+     * @psalm-return \Iterator<DocumentsByEntityEnumeratorResult>
+     */
+    public function iterator(){
+
+    }
+
 }
