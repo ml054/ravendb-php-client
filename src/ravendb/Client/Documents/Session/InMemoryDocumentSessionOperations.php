@@ -78,6 +78,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->useOptimisticConcurrency = $this->_requestExecutor->getConventions()->isUseOptimisticConcurrency();
         $this->maxNumberOfRequestsPerSession=4;
     }
+
+
     public function getId(){
         return $this->id;
     }
@@ -124,10 +126,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     /***************** LifeCycle/UOW/Workflow ********************/
     public function prepareForSaveChanges(): SaveChangesData {
         $result = new SaveChangesData($this);
-        $result->getEntities();
-        $result->getOptions();
-
-
         // $this->prepareForEntitiesDeletion($result,null);
         $this->prepareForEntitiesPuts($result);
         //$this->prepareForCreatingRevisionsFromIds($result);
@@ -135,20 +133,15 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         return $result;
     }
 
-    public function documentsByEntity(): DocumentsByEntityHolder {
-        return new DocumentsByEntityHolder();
-    }
 
     public function prepareForEntitiesPuts(SaveChangesData $result):void {
         try{
 
-        } finally {
-            $this->close();
-        }
-    }
+            $data = $this->documentsByEntity->data();
 
-    public function prepareForEntitiesPuts_(SaveChangesData $result):void {
-        try{
+            foreach($data as $entity){
+
+            }
 
         } finally {
             $this->close();
@@ -247,7 +240,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $documentInfo->setEntity($entity);
         $documentInfo->setNewDocument(true);
         $documentInfo->setDocument(null);
-        $this->documentsByEntity = new DocumentsByEntityHolder(); // TODO CHECK WITH TECH
+        $this->documentsByEntity = new DocumentsByEntityHolder();
         $this->documentsByEntity->put($entity,$documentInfo);
         if($id !== null){
             $this->documentsById = new DocumentsById();
