@@ -1,49 +1,38 @@
 <?php
 namespace RavenDB\Client\Documents\Session;
+
 use Ds\Map;
+
 class DocumentsByEntityHolder
 {
-    private Map $_inner;
-
-    public function __construct()
-    {
-        $this->_inner = new Map();
-    }
-
-    public function size():int
-    {
-        return $this->_inner->count();
-    }
-
-    public function remove(object $entity):void
-    {
-        $this->_inner->remove($entity);
-    }
-
-    public function put(object $entity,DocumentInfo $documentInfo):void
-    {
-        if($this->_inner->hasKey($documentInfo->getId())) return;
-        $this->_inner->put($entity,$documentInfo);
-    }
-
-    public function clear():void
-    {
-        $this->_inner->clear();
-    }
-
-    public function get(object $entity):?DocumentInfo
-    {
-        $documentInfo = $this->_inner->get($entity);
-        if(null !== $documentInfo ){
-            return $documentInfo;
-        }
-        return null;
-    }
+    /**
+     * USING PSALM JAVA TO PHP FRIENDLY POPULAR ANNOTATIONS FOR REFERENCES.
+     * THIS IS TO INSURE AT MAXIMUM DATA CONFIRMITY/INTEGRATY AND FOR GENERAL
+     * MAPPING PURPOSE
+     * @psalm-return Map<Object, DocumentInfo>
+     */
+    private Map $_onBeforeStoreDocumentsByEntity;
 
     /**
-     * @throws \Exception
+     * @psalm-return Map<Object, DocumentInfo>
      */
-    public function iterator(){
-        return $this->_inner->getIterator();
+    private function _documentsByEntity() {
+        return new Map();
+    }
+
+    private bool $_prepareEntitiesPuts = true;
+
+    public function size(): int {
+        return $this->_documentsByEntity()->count();
+    }
+
+    public function remove(object $entity):void {
+        $this->_documentsByEntity()->remove($entity);
+    }
+
+    public function evict(object $entity):void {
+        if($this->_prepareEntitiesPuts){
+
+        }
     }
 }
