@@ -134,28 +134,22 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         //$this->prepareCompareExchangeEntities($result);
         return $result;
     }
+
+    public function documentsByEntity(): DocumentsByEntityHolder {
+        return new DocumentsByEntityHolder();
+    }
+
     public function prepareForEntitiesPuts(SaveChangesData $result):void {
-        try{ // TO REFACTO JUST FOR THE PURPOSE OF COMPLETING THE SINGLENODEBATCHCOMMAND CONCERN
-            foreach($this->documentsByEntity->pairs() as $pair){
-                $result = $pair->value->getEntity();
-                $entity = $this->documentsByEntity->get($result);
-                if($entity instanceof DocumentInfo){
-                    if($entity->isIgnoreChanges()) continue;
-                    if($shouldIgnoreEntityChanges !== null) {
-                        if($shouldIgnoreEntityChanges->check(
-                            $this,$entity->getValue()->getEntity(),$entity->getValue()->getId())){
-                            continue;
-                        };
-                    }
-                    if($this->isDeleted($entity->getValue()->getId())) continue;
-                    $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
-                    $document = JsonExtensions::storeSerializer()->encode([$entity->getKey(),$entity->getValue()]);
-                    (string)$changeVectore;
-                    $forceRevisionCreationStrategy = "NONE";
-                    $result->getEntities()->add($entity->getKey());
-                    $result->getSessionCommands()->add(new PutCommandDataWithJson($entity->getValue()->getId(),$changeVectore,$document,$forceRevisionCreationStrategy));
-                }
-            }
+        try{
+
+        } finally {
+            $this->close();
+        }
+    }
+
+    public function prepareForEntitiesPuts_(SaveChangesData $result):void {
+        try{
+
         } finally {
             $this->close();
         }
