@@ -136,16 +136,15 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
     public function prepareForEntitiesPuts(SaveChangesData $result):void {
         try{
-
-            $data = $this->documentsByEntity->data();
-            dd($data);
-            foreach($data as $entity){
+            // TODO : LIGHT VERSION FOR THE PURPOSE OF REACHING SINGLENODE
+            $entities = $this->documentsByEntity->entities();
+dd($entities);
+            foreach($entities as $index=>$entity){
                if($entity->getValue()->isIgnoreChanges()) continue;
                $document = JsonExtensions::storeSerializer()->serialize($entity->getKey(),$entity->getValue());
                $result->getEntities()->add($entity->getKey());
                $result->getSessionCommands()->add(new PutCommandDataWithJson($entity->getValue()->getId(),null,$document,"NONE"));
             }
-
         } finally {
             $this->close();
         }
