@@ -139,9 +139,9 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         try{
             $serializer = JsonExtensions::storeSerializer();
             $shouldIgnoreEntityChanges = $this->getConvetions()->getShouldIgnoreEntityChanges();
+
             $entities = $this->documentsByEntity->entities();
             /*** @var DocumentsByEntityEnumeratorResult $entity*/
-
             foreach($entities as $index=>$entity){
 
                 $entity->getValue()->setIgnoreChanges(false);
@@ -153,7 +153,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
                 if($this->isDeleted($entity->getValue()->getId())) continue;
                 // $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
-               // $document = $serializer->serialize([$entity->getKey(),$entity->getValue()],'json');
+                //$document = $serializer->serialize([$entity->getKey(),$entity->getValue()],'json');
+                // dd($document);
                 $document = $entity;
                 $result->getEntities()->add($entity->getKey());
                 // HARD CODING CHANGEVECTOR. TO BE REMOVE

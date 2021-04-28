@@ -3,8 +3,12 @@
 namespace RavenDB\Client\Documents\Commands\Batches;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use RavenDB\Client\Constants;
 use RavenDB\Client\Data\Driver\RavenDB;
+use RavenDB\Client\Documents\Batches\Command;
+use RavenDB\Client\Documents\Batches\Operations\Document;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
+use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Methods\HttpRequestBase;
@@ -19,19 +23,31 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
     private ?BatchOptions $_options=null;
     private const TRANSACTION_MODE_SINGLE_NODE = "SINGLE_NODE"; // NO ENUM YET IN PHP
     private const TRANSACTION_MODE_CLUSTER_WIDE = "CLUSTER_WIDE"; // NO ENUM YET IN PHP
-
+    private object $internalSerializer;
+    /**
+     * @throws \Exception
+     */
     public function __construct(DocumentConventions $conventions, ArrayCollection $commands, ?BatchOptions $options)
     {
         parent::__construct(BatchCommandResult::class);
+
         $this->_commands = $commands;
         $this->_options = $options;
+        // TODO IMPLEMENT CONVENTIONS DURING THE SAVING PROCESS. TO CHECK WITH TECH. RESOURCE AVAILABLE BUT ALL SET TO NULL
         $this->_conventions = $conventions;
         $this->_mode = self::TRANSACTION_MODE_SINGLE_NODE;
+        $this->internalSerializer = JsonExtensions::storeSerializer();
         if(null === $conventions){
             throw new \InvalidArgumentException("conventions cannot be null");
         }
         if(null === $commands){
             throw new \InvalidArgumentException("commands cannot be null");
+        }
+        $commandsCollection = $this->_commands->getValues();
+
+        // JUST FOR THE PURPOSE OF CONFIRMING THE INSTANCE OF THE COMMANDS FOR NOW
+        foreach($commandsCollection as $command){
+            if(!$command instanceof PutCommandDataWithJson) throw new \Exception("Wrong command submitted.");
         }
     }
 
@@ -40,17 +56,26 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
      */
     public function createRequest(ServerNode $node): array|string|object
     {
+        $commands = $this->_commands->getValues();
+        $documents = [];
+        foreach($commands as $index=>$command){
+            // THE COMMAND IS AN ARRAYCOLLECTION GIVING ACCESS TO OBJECT LIKE TARGET
+            $type = $command->getType();
+            $docType = (new Document($type))->setDocument($command->getDocument()->getValue());
+            $documents[] = $this->internalSerializer->serialize($docType,'json');
+        }
+        $command = (new Command())->setCommands($documents);
+        $request = $this->internalSerializer->serialize($command,'json');
         $url = $node->getUrl()."/databases/".$node->getDatabase()."/bulk_docs";
         $httpClient = new HttpRequestBase();
-        $body = '{"Commands":[{"Type":"PUT","Document":{"members":[{"name":"Hibernatddding Rhinosddddddd","age":8,"id":"person\/5"},{"name":"RavendddDB","age":4,"id":"person\/6"}]}}]}';
         $curlopt = [
             CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYHOST=>"2",
-            CURLOPT_SSL_VERIFYPEER=>"1",
-            CURLOPT_POSTFIELDS=>$body,
+            CURLOPT_RETURNTRANSFER =>Constants::CURLOPT_RETURNTRANSFER,
+            CURLOPT_SSL_VERIFYHOST=>Constants::CURLOPT_SSL_VERIFYHOST,
+            CURLOPT_SSL_VERIFYPEER=>Constants::CURLOPT_SSL_VERIFYPEER,
+            CURLOPT_POSTFIELDS=>$request,
             CURLOPT_HTTPHEADER=>[
-                "Content-Type: application/json"
+               Constants::HEADERS_CONTENT_TYPE_APPLICATION_JSON
             ]
         ];
         return $httpClient->createCurlRequest($url,$curlopt);

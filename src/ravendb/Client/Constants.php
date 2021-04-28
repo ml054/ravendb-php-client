@@ -37,7 +37,7 @@ class Constants
     public const HEADERS_TRANSFER_ENCODING = "Transfer-Encoding";
     public const HEADERS_CONTENT_ENCODING = "Content-Encoding";
     public const HEADERS_CONTENT_LENGTH = "Content-Length";
-
+    public const HEADERS_CONTENT_TYPE_APPLICATION_JSON = "Content-Type: application/json";
     // RAVENDB ROUTES
     public const ROUTE_ADMIN_DATABASE = "/admin/databases";
     public const ROUTE_DOCS = "/docs";
@@ -50,4 +50,10 @@ class Constants
     public const QUERY_DELETE="DELETE";
     public const QUERY_PUT="PUT";
     public const QUERY_GET="GET";
+
+    // JUST DEFAULT VALUES.
+    public const CURLOPT_RETURNTRANSFER = true;
+    public const CURLOPT_SSL_VERIFYPEER = "1";
+    public const CURLOPT_SSL_VERIFYHOST = "2";
+
 }
