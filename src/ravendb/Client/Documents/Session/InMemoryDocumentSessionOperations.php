@@ -152,11 +152,12 @@ abstract class InMemoryDocumentSessionOperations implements Closable
                 }
 
                 if($this->isDeleted($entity->getValue()->getId())) continue;
-
                 // $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
-                $document = $serializer->serialize([$entity->getKey(),$entity->getValue()],'json');
+               // $document = $serializer->serialize([$entity->getKey(),$entity->getValue()],'json');
+                $document = $entity;
                 $result->getEntities()->add($entity->getKey());
-                $result->getSessionCommands()->add(new PutCommandDataWithJson($entity->getValue()->getId(),null,$document,"NONE"));
+                // HARD CODING CHANGEVECTOR. TO BE REMOVE
+                $result->getSessionCommands()->add(new PutCommandDataWithJson($entity->getValue()->getId(),'PA-Test',$document,"NONE"));
             }
 
         } finally {
