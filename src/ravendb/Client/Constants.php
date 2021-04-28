@@ -66,4 +66,11 @@ class Constants
     public const EXCEPTION_STRING_NO_SESSION_DATABASE = "Cannot open a Session without specifying a name of a database ".
     "to operate on. Database name can be passed as an argument when Session is".
     " being opened or default database can be defined using 'DocumentStore.setDatabase()' method";
+
+    public const EXCEPTION_STRING_ID_GENERATOR = "You cannot set GenerateDocumentIdsOnStore to false without implementing RememberEntityForDocumentIdGeneration";
+
+    public const EXCEPTION_STRING_NO_TRACKING = "Cannot store entity. Entity tracking is disabled in this session.";
+
+    public const EXCEPTION_STRING_EMTPY_ENTITY = "Entity cannot be null";
+    public const EXCEPTION_STRING_INVALID_OPTION = "Invalid option";
 }

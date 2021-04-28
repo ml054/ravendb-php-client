@@ -1,6 +1,9 @@
 <?php /** @noinspection ALL */
 
-/** @noinspection PhpUnhandledExceptionInspection */
+/**
+ * TODO REMOVE ALL PHPSTORM ANNOTATIONS. JUST KEEPING THEM FOR DEV CONCERN
+ * @noinspection PhpUnhandledExceptionInspection
+ */
 
 namespace RavenDB\Client\Documents\Session;
 /**
@@ -38,7 +41,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         "AUTO"=>"AUTO",
         "FORCED"=>"FORCE",
         "DISABLED"=>"DISABLED"
-    ]; // to export to constance
+    ]; // TODO IMPROVE STATIC CONFIG DATA
 
     protected RequestExecutor $_requestExecutor;
     private OperationExecutor $_operationExecutor;
@@ -52,6 +55,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public ArrayCollection $deferredCommandsMap;
     protected ArrayCollection $pendingLazyOperations;
     protected ArrayCollection $onEvaluateLazy;
+    // TODO : IMPLEMENT THE MATCH FUNCTION
     private const TRANSACTION_MODE_SINGLE_NODE = "SINGLE_NODE"; // NO ENUM YET IN PHP
     private const TRANSACTION_MODE_CLUSTER_WIDE = "CLUSTER_WIDE"; // NO ENUM YET IN PHP
     protected SessionInfo $sessionInfo;
@@ -75,6 +79,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
         $this->id = $id;
+        // HARD CODED TO BE REMOVED
         $this->databaseName = ObjectUtils::firstNonNull(["DemoDB"]);
         $this->numberOfRequests = 0;
         $this->maxNumberOfRequestsPerSession=5;
@@ -293,7 +298,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     }
 
     protected function rememberEntityForDocumentIdGeneration(object $entity): void {
-        throw new \Exception("You cannot set GenerateDocumentIdsOnStore to false without implementing RememberEntityForDocumentIdGeneration");
+        throw new \Exception(Constants::EXCEPTION_STRING_ID_GENERATOR);
     }
 
     public function storeEntityInUnitOfWork($entity, string $id = null, ?string $changeVector=null){
@@ -312,15 +317,15 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
     public function storeInternal(object|array $entity, string $id = null, ?string $changeVector=null,string $forceConcurrencyCheck="DISABLED") {
         $this->noTracking = true;
-        if(false === $this->noTracking) throw new IllegalStateException("Cannot store entity. Entity tracking is disabled in this session.");
-        if(null === $entity) throw new \InvalidArgumentException("Entity cannot be null");
-        $metadata = "";
+        if(false === $this->noTracking) throw new IllegalStateException(Constants::EXCEPTION_STRING_NO_TRACKING);
+        if(null === $entity) throw new \InvalidArgumentException(Constants::EXCEPTION_STRING_EMTPY_ENTITY);
+        $metadata = ""; // TODO METADATA
         $forceConcurrencyCheck= false;
         return $this->storeEntityInUnitOfWork($entity,$id,$changeVector,$metadata,$forceConcurrencyCheck);
     }
 
     public function forceConcurrenceCheck(string $option){
-        if(!array_key_exists($option,self::ConcurrencyCheckMode)) throw new \Exception("No matching Currence Check to provided option found");
+        if(!array_key_exists($option,self::ConcurrencyCheckMode)) throw new \Exception(Constants::EXCEPTION_STRING_INVALID_OPTION);
         return self::ConcurrencyCheckMode[$option];
     }
 }
