@@ -8,7 +8,7 @@ use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
 
 class SaveChangesData
 {
-    private $sessionCommands;
+    private ArrayCollection $sessionCommands;
     private ArrayCollection $entities;
     private ?BatchOptions $options;
 
@@ -16,16 +16,15 @@ class SaveChangesData
     {
         $this->options = $session->_saveChangesOptions;
         $this->entities = new ArrayCollection();
+        $this->sessionCommands = new ArrayCollection();
     }
-    /**
-     * @psalm-return array<ICommandData>
-     */
-    public function getSessionCommands()
+
+    public function getSessionCommands() : ArrayCollection
     {
         return $this->sessionCommands;
     }
 
-    public function getEntities(): ArrayCollection
+    public function getEntities() : ArrayCollection
     {
         return $this->entities;
     }

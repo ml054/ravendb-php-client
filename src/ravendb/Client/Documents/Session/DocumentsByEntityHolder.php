@@ -2,6 +2,7 @@
 namespace RavenDB\Client\Documents\Session;
 
 use Ds\Map;
+use Psalm\Context;
 use SebastianBergmann\CodeCoverage\Node\Iterator;
 
 class DocumentsByEntityHolder
@@ -48,7 +49,7 @@ class DocumentsByEntityHolder
      * @psalm-return array<TKey, DocumentsByEntityEnumeratorResult>
      */
     public function data(){
-        $this->_inner->pairs()->toArray();
+        return $this->_inner->pairs()->toArray();
     }
 
     /**

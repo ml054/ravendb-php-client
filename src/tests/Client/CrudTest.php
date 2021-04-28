@@ -29,7 +29,7 @@ class CrudTest extends RemoteTestBase
 
                 $session = $store->openSession($options);
                 $poc = new User();
-                $poc->setName("John");
+                $poc->setName("Peter");
                 $session->store($poc,"users/2");
                 $session->saveChanges();
 

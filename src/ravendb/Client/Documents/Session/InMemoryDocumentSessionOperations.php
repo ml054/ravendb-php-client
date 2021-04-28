@@ -138,9 +138,12 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         try{
 
             $data = $this->documentsByEntity->data();
-
+            dd($data);
             foreach($data as $entity){
-
+               if($entity->getValue()->isIgnoreChanges()) continue;
+               $document = JsonExtensions::storeSerializer()->serialize($entity->getKey(),$entity->getValue());
+               $result->getEntities()->add($entity->getKey());
+               $result->getSessionCommands()->add(new PutCommandDataWithJson($entity->getValue()->getId(),null,$document,"NONE"));
             }
 
         } finally {
