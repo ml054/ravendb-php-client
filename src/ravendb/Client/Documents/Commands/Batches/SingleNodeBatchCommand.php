@@ -58,16 +58,20 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
     public function createRequest(ServerNode $node): array|string|object
     {
         $commands = $this->_commands->getValues();
+
         $documents = [];
         foreach($commands as $index=>$command){
             // THE COMMAND IS AN ARRAYCOLLECTION GIVING ACCESS TO OBJECT LIKE TARGET
             $type = $command->getType();
             $documents[] = (new Document($type))->setDocument($command->getDocument()->getValue());
         }
+
         $command = (new Command())->setCommands($documents);
         $request = $this->internalSerializer->serialize($command,'json');
-        $url = $node->getUrl()."/databases/".$node->getDatabase()."/bulk_docs";
+
         $httpClient = new HttpRequestBase();
+        $url = $node->getUrl()."/databases/".$node->getDatabase()."/bulk_docs";
+
         $curlopt = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER =>Constants::CURLOPT_RETURNTRANSFER,
@@ -79,6 +83,15 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
             ]
         ];
         return $httpClient->createCurlRequest($url,$curlopt);
+    }
+
+    public function setResponse(array|string $response, bool $fromCache)
+    {
+        if (null === $response) {
+            self::throwInvalidResponse(null);
+        }
+
+        dd($response,__METHOD__);
     }
 
     public function close()
