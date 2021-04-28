@@ -51,15 +51,16 @@ class DocumentSession extends InMemoryDocumentSessionOperations
      */
     public function load(string $clazz, string $id, ?ArrayCollection $includes=null)
     {
+
         $loadOperation = new LoadOperation($this);
         $loadOperation->byId($id);
         $command = $loadOperation->createRequest();
-        dd($command);
-
         if(null !== $command){
+
             $this->sessionInfo = new SessionInfo($this,$this->options,$this->documentStore);
             $this->_requestExecutor->execute($command,$this->sessionInfo,$this->documentStore);
         }
+
         return $loadOperation->getDocument($clazz,$id);
     }
     /**

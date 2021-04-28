@@ -3,6 +3,8 @@
 namespace RavenDB\Client\Documents\Commands;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use RavenDB\Client\Constants;
+use RavenDB\Client\Documents\Operations\TimeSeries\TimeSeriesRange;
 use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
@@ -10,51 +12,62 @@ use RavenDB\Client\Methods\HttpRequestBase;
 
 class GetDocumentsCommand extends RavenCommand
 {
-    private string $_id;
-    private ?array $_includes=null;
-    private ?bool $_metadataOnly;
-    private ?int $_start;
-    private ?int $_pageSize;
+    /**
+     * @psalm-var List<TimeSeriesRange>
+     */
+    private  TimeSeriesRange $_timeSeriesIncludes;
+    private string $id;
+    private ArrayCollection $_ids;
+    private ArrayCollection $_includes;
+    private ArrayCollection $_counters;
+    private bool $_includeAllCounters;
+    private ArrayCollection $_compareExchangeValueIncludes;
+    private bool $_metadataOnly;
+    private string $_startWith;
+    private string $_matches;
+    private int $_start;
+    private int $_pageSize;
+    private string $_exclude;
+    private string $_startAfter;
 
-    public function __construct(?int $start,?int $pageSize)
+    public function __construct(string $id,ArrayCollection|null $includes, ?bool $metadataOnly)
     {
-        parent::__construct([]);
-        /*if(null === $id){
-            throw new \InvalidArgumentException('id cannot be null');
-        }*/
-        $this->_start = $start;
-        $this->_pageSize = $pageSize;
+        parent::__construct(GetDocumentsResult::class);
+        $this->id = $id;
     }
 
     public function isReadRequest(): bool
     {
-       return true;
+        return true;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function createRequest(ServerNode $node): \CurlHandle
     {
-        $command = new GetDocumentsCommand(0,10);
-        $url = $node->getUrl()."/databases/".$node->getDatabase()."/docs?start=0&pageSize=20";
-        $serializer = JsonExtensions::storeSerializer();
-        $body = $serializer->serialize($command,'json');
+        $url = $node->getUrl()."/databases/".$node->getDatabase()."/docs?id=".urlencode($this->id);
         $httpClient = new HttpRequestBase();
         $curlopt = [
             CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYHOST=>"2",
-            CURLOPT_SSL_VERIFYPEER=>"1",
-            CURLOPT_CUSTOMREQUEST=>"GET",
-            CURLOPT_POSTFIELDS=>$body,
-            CURLOPT_HEADEROPT=>[
-                "json/application"
+            CURLOPT_RETURNTRANSFER =>Constants::CURLOPT_RETURNTRANSFER,
+            CURLOPT_SSL_VERIFYHOST=>Constants::CURLOPT_SSL_VERIFYHOST,
+            CURLOPT_SSL_VERIFYPEER=>Constants::CURLOPT_SSL_VERIFYPEER,
+            CURLOPT_CUSTOMREQUEST=>Constants::CURLOPT_CUSTOMREQUEST_GET,
+            CURLOPT_HTTPHEADER=>[ // The CURLOPT_HTTPHEADER option must have an array value
+                Constants::HEADERS_CONTENT_TYPE_APPLICATION_JSON
             ]
         ];
-        //dd($curlopt);
+       // dd($curlopt,__METHOD__);
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 
     public function setResponse(array|string $response, bool $fromCache)
     {
-        $this->result = "";
+        if(null === $response){
+            return;
+        }
+        dd($response);
+        $this->result = $this->mapper()::readValue($response,GetDocumentsResult::class);
     }
 }

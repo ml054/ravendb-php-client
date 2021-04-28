@@ -72,6 +72,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     {
         $this->id = $id;
         $this->databaseName = ObjectUtils::firstNonNull(["DemoDB"]);
+        $this->numberOfRequests = 0;
+        $this->maxNumberOfRequestsPerSession=5;
         if(StringUtils::isBlank($this->databaseName)){
             static::throwNoDatabase();
         }

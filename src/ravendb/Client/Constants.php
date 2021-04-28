@@ -47,14 +47,14 @@ class Constants
     public const CLIENT_VERSION="5.0.0";
     // TODO IMPLEMENT CONST FOR DOCUMENT CHANGE TYPE
     public const CHANGE_TYPE_DOCUMENT_ADDED="DOCUMENT_ADDED";
-    public const QUERY_DELETE="DELETE";
-    public const QUERY_PUT="PUT";
-    public const QUERY_GET="GET";
 
     // JUST DEFAULT VALUES.
     public const CURLOPT_RETURNTRANSFER = true;
     public const CURLOPT_SSL_VERIFYPEER = "1";
     public const CURLOPT_SSL_VERIFYHOST = "2";
+    public const CURLOPT_CUSTOMREQUEST_DELETE="DELETE";
+    public const CURLOPT_CUSTOMREQUEST_PUT="PUT";
+    public const CURLOPT_CUSTOMREQUEST_GET="GET";
 
     public const EXCEPTION_STRING_NUMBER_OF_REQUESTS = "The maximum number of requests (%d) allowed for this session has been reached.".
     "Raven limits the number of remote calls that a session is allowed to make as an early warning system. Sessions are expected to be short lived, and ".
@@ -62,5 +62,4 @@ class Constants
     "You can increase the limit by setting DocumentConvention.MaxNumberOfRequestsPerSession or MaxNumberOfRequestsPerSession, but it is".
     "advisable that you'll look into reducing the number of remote calls first, since that will speed up your application significantly and result in a".
     "more responsive application.";
-
 }
