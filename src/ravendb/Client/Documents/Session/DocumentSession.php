@@ -72,13 +72,13 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         $saveChangeOperation = new BatchOperation($this);
         try{
             $command = $saveChangeOperation->createRequest();
+           // dd($command);
             $this->noTracking = true;
             if(null === $command) return;
             if($this->noTracking === false) {
                 throw new IllegalStateException("Cannot execute saveChanges when entity tracking is disabled in session.");
             }
             $this->_requestExecutor->execute($command,null);
-
             $saveChangeOperation->setResult($command->getResult());
         } finally {
             $this->close();

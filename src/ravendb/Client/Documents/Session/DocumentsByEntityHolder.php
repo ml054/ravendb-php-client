@@ -17,14 +17,9 @@ class DocumentsByEntityHolder
      * @psalm-return Map<Object, DocumentInfo>
      */
     private Map $_inner;
-    private $value;
-    private $key;
     public function __construct()
     {
         $this->_inner = new Map();
-
-        $this->setKey(null);
-        $this->setValue(null);
     }
 
     public function size(): int {
@@ -69,10 +64,9 @@ class DocumentsByEntityHolder
         $keys = $this->_inner->keys()->toArray();
         $entities =[];
         foreach($values as $index=>$object){
-            $documentResult = new DocumentsByEntityEnumeratorResult($keys[0],$object,false);
-            $entities[] = JsonExtensions::storeSerializer()->denormalize($documentResult);
+            (object)$documentResult = new DocumentsByEntityEnumeratorResult($keys[0],$object,false);
+            $entities[] = $documentResult;
         }
-        dd($entities);
         return $entities;
     }
     /**
@@ -80,38 +74,4 @@ class DocumentsByEntityHolder
      */
     public function iterator(){
     }
-
-    /**
-     * @return mixed
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    /**
-     * @param mixed $value
-     */
-    public function setValue(mixed $value): void
-    {
-        $this->value = $value;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getKey()
-    {
-        return $this->key;
-    }
-
-    /**
-     * @param mixed $key
-     */
-    public function setKey(mixed $key): void
-    {
-        $this->key = $key;
-    }
-
-
 }

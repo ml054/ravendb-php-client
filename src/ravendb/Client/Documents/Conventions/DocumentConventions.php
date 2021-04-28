@@ -18,7 +18,7 @@ class DocumentConventions
     private ?bool $_saveEnumsAsIntegers = null;
     private ?bool $_identityPartsSeparator = null;
     private ?bool $_disableTopologyUpdates = null;
-    private bool $_useOptimisticConcurrency = false;
+    private ?bool $_useOptimisticConcurrency = false;
     private ?bool $_throwIfQueryPageSizeIsNotSet = null;
     private ?int $_maxNumberOfRequestsPerSession = null;
     private ?int $_requestTimeout = null;
@@ -30,7 +30,7 @@ class DocumentConventions
     private ?bool $_useCompression=null;
     private ?Closure $_documentIdGenerator=null;
     private int $_loadBalancerContextSeed;
-    private IShouldIgnoreEntityChanges $_shouldIgnoreEntityChanges;
+    private ?IShouldIgnoreEntityChanges $_shouldIgnoreEntityChanges=null;
 
     public function getMaxHttpCacheSize(): ?int
     {
