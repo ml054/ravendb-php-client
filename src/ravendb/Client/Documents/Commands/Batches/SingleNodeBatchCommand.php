@@ -42,12 +42,14 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
     {
         $url = $node->getUrl()."/databases/".$node->getDatabase()."/bulk_docs";
         $httpClient = new HttpRequestBase();
+        $body = '{"Commands":[{"Type":"PUT","Document":{"members":[{"name":"Hibernatddding Rhinosddddddd","age":8,"id":"person\/5"},{"name":"RavendddDB","age":4,"id":"person\/6"}]}}]}';
         $curlopt = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYHOST=>"2",
             CURLOPT_SSL_VERIFYPEER=>"1",
-            CURLOPT_HEADEROPT=>[
+            CURLOPT_POSTFIELDS=>$body,
+            CURLOPT_HTTPHEADER=>[
                 "Content-Type: application/json"
             ]
         ];
