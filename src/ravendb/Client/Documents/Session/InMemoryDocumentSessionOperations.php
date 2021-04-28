@@ -7,7 +7,9 @@ namespace RavenDB\Client\Documents\Session;
  * InMemoryDocumentSessionOperations subclass dependencies : DeletedEntitiesHolder, DocumentsByEntityHolder, ReplicationWaitOptsBuilder
  */
 use Doctrine\Common\Collections\ArrayCollection;
+use Ds\Map;
 use Ramsey\Uuid\Uuid;
+use RavenDB\Client\Constants;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
 use RavenDB\Client\Documents\Commands\Batches\IndexesWaitOptsBuilder;
 use RavenDB\Client\Documents\Commands\Batches\PutCommandDataWithJson;
@@ -61,7 +63,10 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     private int $maxNumberOfRequestsPerSession;
     protected bool $generateDocumentKeysOnStore;
     private bool $_isDisposal;
-    public ArrayCollection $includedDocumentsById;
+    /**
+     * @psalm-return Map<string, DocumentInfo>
+    */
+    public Map $includedDocumentsById;
 
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
@@ -72,12 +77,12 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         }
         $saveChangesOptions = new IndexesWaitOptsBuilder($this);
         $this->_knownMissingIds = new ArrayCollection();
+        $this->includedDocumentsById = new Map();
         $this->_saveChangesOptions = $saveChangesOptions->getOptions();
         $this->_documentStore = $documentStore;
         $this->_requestExecutor = $documentStore->getRequestExecutor($this->databaseName);
         $this->noTracking = $options->isNoTracking();
         $this->useOptimisticConcurrency = $this->_requestExecutor->getConventions()->isUseOptimisticConcurrency();
-        $this->maxNumberOfRequestsPerSession=4;
     }
 
 
@@ -104,6 +109,27 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->useOptimisticConcurrency = $useOptimisticConcurrency;
     }
 
+    /**
+     * @return int
+     */
+    public function getMaxNumberOfRequestsPerSession(): int
+    {
+        return $this->maxNumberOfRequestsPerSession;
+    }
+
+    /**
+     * @param int $maxNumberOfRequestsPerSession
+     */
+    public function setMaxNumberOfRequestsPerSession(int $maxNumberOfRequestsPerSession): void
+    {
+        $this->maxNumberOfRequestsPerSession = $maxNumberOfRequestsPerSession;
+    }
+
+    public function incrementRequestCount(){
+        if(++$this->numberOfRequests > $this->maxNumberOfRequestsPerSession)
+            throw new \Exception(StringUtils::format(Constants::EXCEPTION_STRING_NUMBER_OF_REQUESTS,$this->maxNumberOfRequestsPerSession));
+    }
+
     public function getDatabaseName(): string
     {
         return $this->databaseName;
@@ -122,6 +148,20 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
     public function getDocumentId(object $instance):string|null {
         if(null === $instance) return null;
+    }
+
+    public function checkIfIdAlreadyIncluded(array $ids,?ArrayCollection $includes=null):bool {
+        foreach($ids as $id){
+            if($this->_knownMissingIds->contains($id)) continue;
+            $documentInfo = $this->documentsById->getValue($id);
+            if(null === $documentInfo){
+                $documentInfo = $this->includedDocumentsById->get($id);
+                if(null === $documentInfo)return false;
+            }
+            if (null === $documentInfo->getEntity() && null === $documentInfo->getDocument()) return false;
+            //if(null === $includes)continue;
+        }
+        return true;
     }
 
     /***************** LifeCycle/UOW/Workflow ********************/
@@ -153,8 +193,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
                 if($this->isDeleted($entity->getValue()->getId())) continue;
                 // $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
-                //$document = $serializer->serialize([$entity->getKey(),$entity->getValue()],'json');
-                // dd($document);
                 $document = $entity;
                 $result->getEntities()->add($entity->getKey());
                 // HARD CODING CHANGEVECTOR. TO BE REMOVE

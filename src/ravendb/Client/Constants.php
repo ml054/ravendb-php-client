@@ -56,4 +56,11 @@ class Constants
     public const CURLOPT_SSL_VERIFYPEER = "1";
     public const CURLOPT_SSL_VERIFYHOST = "2";
 
+    public const EXCEPTION_STRING_NUMBER_OF_REQUESTS = "The maximum number of requests (%d) allowed for this session has been reached.".
+    "Raven limits the number of remote calls that a session is allowed to make as an early warning system. Sessions are expected to be short lived, and ".
+    "Raven provides facilities like load(String[] keys) to load multiple documents at once and batch saves (call SaveChanges() only once).".
+    "You can increase the limit by setting DocumentConvention.MaxNumberOfRequestsPerSession or MaxNumberOfRequestsPerSession, but it is".
+    "advisable that you'll look into reducing the number of remote calls first, since that will speed up your application significantly and result in a".
+    "more responsive application.";
+
 }

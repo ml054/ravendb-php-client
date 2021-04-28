@@ -45,6 +45,10 @@ final class StringUtils
         return empty($string) ?? false;
     }
 
+    public static function format(string $format, ...$value):string {
+        return printf($format,$value);
+    }
+
     /**
      * @throws \Exception
      */
