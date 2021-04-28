@@ -20,7 +20,7 @@ class BatchOperation
 
     public function createRequest(): SingleNodeBatchCommand {
         $result = $this->_session->prepareForSaveChanges();
-
+        dd($result->getEntities());
         return new SingleNodeBatchCommand($this->_session->getConvetions(), $result->getSessionCommands(),$result->getOptions());
     }
 
