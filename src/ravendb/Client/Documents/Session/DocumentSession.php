@@ -75,7 +75,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         $saveChangeOperation = new BatchOperation($this);
         try{
             $command = $saveChangeOperation->createRequest();
-           // dd($command);
             $this->noTracking = true;
             if(null === $command) return;
             if($this->noTracking === false) {
@@ -122,7 +121,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         $documentInfo = $this->documentsByEntity->get($entity);
         if(null === $documentInfo) return false;
         /*
-         * TODO CHECK WITH TECH TEAM
         ObjectNode document = entityToJson.convertEntityToJson(entity, documentInfo);
         return entityChanged(document, documentInfo, null);
          * */

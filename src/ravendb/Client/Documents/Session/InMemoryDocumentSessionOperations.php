@@ -39,9 +39,13 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         "FORCED"=>"FORCE",
         "DISABLED"=>"DISABLED"
     ]; // to export to constance
+
     protected RequestExecutor $_requestExecutor;
     private OperationExecutor $_operationExecutor;
-    protected ArrayCollection $_knownMissingIds; // TODO protected final Set<String> _knownMissingIds = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    /**
+     * @psalm-var Set<String>
+    */
+    protected ArrayCollection $_knownMissingIds;
     public DocumentsByEntityHolder $documentsByEntity;
     public DocumentsById $documentsById;
     public ArrayCollection $deferredCommands;
@@ -65,7 +69,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     private bool $_isDisposal;
     /**
      * @psalm-return Map<string, DocumentInfo>
-    */
+     */
     public Map $includedDocumentsById;
 
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
@@ -128,7 +132,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     }
 
     public function incrementRequestCount(){
-        if(++$this->numberOfRequests > $this->maxNumberOfRequestsPerSession)
+        if( ++$this->numberOfRequests > $this->maxNumberOfRequestsPerSession)
             throw new \Exception(StringUtils::format(Constants::EXCEPTION_STRING_NUMBER_OF_REQUESTS,$this->maxNumberOfRequestsPerSession));
     }
 
@@ -161,7 +165,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
                 if(null === $documentInfo)return false;
             }
             if (null === $documentInfo->getEntity() && null === $documentInfo->getDocument()) return false;
-            //if(null === $includes)continue;
         }
         return true;
     }
@@ -169,13 +172,12 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     /***************** LifeCycle/UOW/Workflow ********************/
     public function prepareForSaveChanges(): SaveChangesData {
         $result = new SaveChangesData($this);
-        // $this->prepareForEntitiesDeletion($result,null);
+        $this->prepareForEntitiesDeletion($result,null);
         $this->prepareForEntitiesPuts($result);
         //$this->prepareForCreatingRevisionsFromIds($result);
         //$this->prepareCompareExchangeEntities($result);
         return $result;
     }
-
 
     public function prepareForEntitiesPuts(SaveChangesData $result):void {
         try{
@@ -183,7 +185,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             $shouldIgnoreEntityChanges = $this->getConvetions()->getShouldIgnoreEntityChanges();
 
             $entities = $this->documentsByEntity->entities();
-            /*** @var DocumentsByEntityEnumeratorResult $entity*/
+            /*** @var DocumentsByEntityEnumeratorResult $entity */
             foreach($entities as $index=>$entity){
 
                 $entity->getValue()->setIgnoreChanges(false);
@@ -214,7 +216,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
      * @return true is document is deleted
      */
     public function isDeleted(string $id) {
-      //  return $this->_knownMissingIds->containsKey(id); TODO REIMPLEMENT COMMENTED FOR THE PURPOSE OF THE TEST
+        //  return $this->_knownMissingIds->containsKey(id); TODO REIMPLEMENT COMMENTED FOR THE PURPOSE OF THE TEST
     }
 
     private static function updateMetadataModifications(DocumentInfo $documentInfo):bool{
@@ -233,9 +235,13 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             }
         }
     }
-    public function prepareForEntitiesDeletion(SaveChangesData $result, ?array $changes=null):void {
+
+    /**
+     * @psalm-param Map<string, list<DocumentsChanges>> $changes
+     */
+    public function prepareForEntitiesDeletion(SaveChangesData $result, Map $changes):void {
         try {
-            //$deletes = $this->dele
+            foreach($deletedEntities as $deletedEntity){ }
         } finally {
             $this->close();
         }
@@ -244,9 +250,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function prepareCompareExchangeEntities(SaveChangesData $result):void { }
     /** *************************************************** **/
     private static function throwNoDatabase(){
-        throw new IllegalStateException("Cannot open a Session without specifying a name of a database ".
-            "to operate on. Database name can be passed as an argument when Session is".
-            " being opened or default database can be defined using 'DocumentStore.setDatabase()' method");
+        throw new IllegalStateException(Constants::EXCEPTION_STRING_NO_SESSION_DATABASE);
     }
 
     public function getDocumentStore():IDocumentStore|ArrayCollection {

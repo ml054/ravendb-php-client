@@ -62,4 +62,8 @@ class Constants
     "You can increase the limit by setting DocumentConvention.MaxNumberOfRequestsPerSession or MaxNumberOfRequestsPerSession, but it is".
     "advisable that you'll look into reducing the number of remote calls first, since that will speed up your application significantly and result in a".
     "more responsive application.";
+
+    public const EXCEPTION_STRING_NO_SESSION_DATABASE = "Cannot open a Session without specifying a name of a database ".
+    "to operate on. Database name can be passed as an argument when Session is".
+    " being opened or default database can be defined using 'DocumentStore.setDatabase()' method";
 }

@@ -58,7 +58,7 @@ class GetDocumentsCommand extends RavenCommand
                 Constants::HEADERS_CONTENT_TYPE_APPLICATION_JSON
             ]
         ];
-       // dd($curlopt,__METHOD__);
+      //  dd($curlopt,__METHOD__);
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 
