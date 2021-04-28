@@ -56,16 +56,18 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
      */
     public function createRequest(ServerNode $node): array|string|object
     {
+        // TODO SUBJECT TO CHANGES TO CHECK WITH TECH TEAM
         $commands = $this->_commands->getValues();
         $documents = [];
         foreach($commands as $index=>$command){
             // THE COMMAND IS AN ARRAYCOLLECTION GIVING ACCESS TO OBJECT LIKE TARGET
             $type = $command->getType();
-            $docType = (new Document($type))->setDocument($command->getDocument()->getValue());
-            $documents[] = $this->internalSerializer->serialize($docType,'json');
+            $documents[] = (new Document($type))->setDocument($command->getDocument()->getValue());
         }
         $command = (new Command())->setCommands($documents);
         $request = $this->internalSerializer->serialize($command,'json');
+
+        dd($request);
         $url = $node->getUrl()."/databases/".$node->getDatabase()."/bulk_docs";
         $httpClient = new HttpRequestBase();
         $curlopt = [
@@ -73,7 +75,7 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
             CURLOPT_RETURNTRANSFER =>Constants::CURLOPT_RETURNTRANSFER,
             CURLOPT_SSL_VERIFYHOST=>Constants::CURLOPT_SSL_VERIFYHOST,
             CURLOPT_SSL_VERIFYPEER=>Constants::CURLOPT_SSL_VERIFYPEER,
-            CURLOPT_POSTFIELDS=>$request,
+            CURLOPT_POSTFIELDS=>$command,
             CURLOPT_HTTPHEADER=>[
                Constants::HEADERS_CONTENT_TYPE_APPLICATION_JSON
             ]
