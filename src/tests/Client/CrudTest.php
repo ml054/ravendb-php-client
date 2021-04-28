@@ -29,8 +29,8 @@ class CrudTest extends RemoteTestBase
 
                 $session = $store->openSession($options);
                 $poc = new User();
-                $poc->setName("Peter");
-                $session->store($poc,"users/2");
+                $poc->setName("Hello Raven DB");
+                $session->store($poc,"users/1");
                 $session->saveChanges();
 
             } finally {
