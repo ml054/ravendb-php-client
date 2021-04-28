@@ -90,8 +90,7 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
         if (null === $response) {
             self::throwInvalidResponse(null);
         }
-
-        dd($response,__METHOD__);
+        $this->result = $this->mapper()::readValue($response,$this->resultClass);
     }
 
     public function close()

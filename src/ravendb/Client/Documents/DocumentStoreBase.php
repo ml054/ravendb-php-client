@@ -1,6 +1,7 @@
 <?php
 
 namespace RavenDB\Client\Documents;
+use Ds\Map;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\Indexes\IAbstractIndexCreationTask;
 use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
@@ -20,13 +21,20 @@ abstract class DocumentStoreBase implements IDocumentStore
     protected ?string $database;
     protected bool $initialized=false;
     private ?DocumentConventions $conventions=null;
-    private array $_lastRaftIndexPerDatabase; //Map@Java
+    /**
+     * @psalm-return Map<string, string>
+    */
+    private Map $_lastRaftIndexPerDatabase;
+
     protected ?bool $disposed=null;
     public function isDisposed(): bool { return $this->disposed; }
     public function getEffectiveDatabase(string $database): string
     {
         return self::effectiveDatabase($database);
     }
+
+
+
     public static function effectiveDatabase(string $database, ?IDocumentStore $store = null): string
     {
         if (null === $database) {

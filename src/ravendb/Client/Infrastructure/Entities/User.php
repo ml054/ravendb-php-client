@@ -22,14 +22,13 @@ class User
     /**
      * @param string $id
      */
-    public function setId(string $id): self
+    public function setId(string $id): void
     {
         $this->id = $id;
-        return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName(): ?string
     {
@@ -38,12 +37,11 @@ class User
 
     /**
      * @param string|null $name
-     * @return User
+     * @return User|null
      */
-    public function setName(?string $name): self
+    public function setName(?string $name=null): void
     {
         $this->name = $name;
-        return $this;
     }
 
     /**
@@ -57,10 +55,9 @@ class User
     /**
      * @param string $lastName
      */
-    public function setLastName(string $lastName): self
+    public function setLastName(string $lastName): void
     {
         $this->lastName = $lastName;
-        return $this;
     }
 
     /**

@@ -24,7 +24,7 @@ class BatchOperation
     }
 
     public function setResult(BatchCommandResult $result){
-        dd(__METHOD__,"command result");
+
     }
 
     private function handleCompareExchangePut():void {

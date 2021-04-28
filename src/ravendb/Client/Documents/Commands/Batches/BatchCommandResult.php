@@ -1,20 +1,20 @@
 <?php
 
 namespace RavenDB\Client\Documents\Commands\Batches;
-// EMMULATE JAVA RESULT OUTPUT TO INJECT WITH THE MAPPER
+
 class BatchCommandResult
 {
-    private array $result;
+    private BatchCommandArrayNodeResult $results;
     private float $transactionIndex;
 
-    public function getResult(): array
+    public function getResults(): BatchCommandArrayNodeResult
     {
-        return $this->result;
+        return $this->results;
     }
 
-    public function setResult(array $result): void
+    public function setResults(BatchCommandArrayNodeResult $results): void
     {
-        $this->result = $result;
+        $this->results = $results;
     }
 
     public function getTransactionIndex(): float
