@@ -171,11 +171,9 @@ class DocumentInfo
      * @throws \Exception
      */
     public static function getNewDocumentInfo($document):DocumentInfo {
-        // TODO : THIS VERSION IS JUST THE DESIGN OF COMPLETING THE TASK. SUBJECT TO CHANGES. setDocument is expecting an object
         $documentObject = new ObjectNode($document);
 
         $metadata = $documentObject->get(Constants::METADATA_KEY);
-     //   dd($metadata->{@}."id");
         if(null === $metadata || empty($metadata)) throw new \Exception("Document must have a metadata");
 
         $id = $metadata[Constants::METADATA_ID];

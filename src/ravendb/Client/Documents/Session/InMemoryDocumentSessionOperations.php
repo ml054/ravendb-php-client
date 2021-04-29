@@ -80,6 +80,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
      */
     public Map $includedDocumentsById;
     public DeletedEntitiesHolder $deletedEntities;
+
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
         $this->id = $id;

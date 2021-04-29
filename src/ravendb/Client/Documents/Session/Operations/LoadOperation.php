@@ -86,21 +86,28 @@ class LoadOperation
         }*/
     }
 
+    // TODO CHECK WITH TECH THE APPROACH FOR DEFAULT CLASS TYPE VALUE. IF NEEDED IN PHP
     public function getDocument(object|string $class, $id){
-        if($this->_session->isDeleted($id)){
-            return $class; // TODO CHECK WITH TECH THE APPROACH FOR DEFAULT CLASS TYPE VALUE. IF NEEDED IN PHP
+       if($this->_session->isDeleted($id)){
+            return $class;
+       }
+       $doc = $this->_session->documentsById->getValue($id);
+        // SUBJECT TO IMPROVEMENT
+       if($doc !== null){
+           $results = (object) $doc->getDocument()->getNodeDocument();
+
+           if(property_exists($results,'Results') && is_array($results->Results)){
+               foreach($results->Results as $index=>$data) {
+                   $object = (object)$data;
+                   $entity = $object->entity;
+               }
+           }else{
+               $entity = $results->entity;
+           }
+           $convertEntity = $this->mapper()::storeSerializer()->encode($entity,'json');
+           $class = $this->mapper()::readValue($convertEntity,$class);
+           return $class;
         }
-
-        $doc = $this->_session->documentsById->getValue($id);
-        $entity = $doc->getDocument()->getNodeDocument()["entity"];
-        $convertEntity = $this->mapper()::storeSerializer()->encode($entity,'json');
-        $class = $this->mapper()::readValue($convertEntity,$class);
-
-        //
-      /* if($doc !== null){
-            return $this->_session->trackEntity($class,$doc);
-        }*/
-
         // THE RESPONSE IN JAVA VERSION THE FULL QUALIFIED NAMESPACE. WE NEED TO INSTANTIATE IT IN PHP IN ORDER TO ACCESS THE METHODS
         return $class;
     }

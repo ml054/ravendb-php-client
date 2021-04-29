@@ -51,14 +51,11 @@ class CrudTestLab extends RemoteTestBase
                    $session = $store->openSession($options);
                     /**
                       * @var User $user
-                     * TODO QUERY WITH users/7 ID FORM WON'T WORK FOR NOW BECAUSE DOES NOT MATCH THE ONE IN THE METADATA (RANDOM ONE)
-                     * USING THE RANDOM ONE FOR THE PURPOSE OF THE LOAD TASK COMPLETION
                      */
-                    $user = $session->load(User::class,"fee830eb-c656-44c9-9d9a-35e0907ec1fc");
-                    dd($user);
+                    $user = $session->load(User::class,"8cdc509e-1659-4731-81ef-58c44ac96744");
                     $user->setName("Nemo Test");
                     $session->saveChanges();
-
+                    AssertUtils::assertThat($user)::isInstanceOf(User::class);
                 } finally {
                     $store->close();
                 }

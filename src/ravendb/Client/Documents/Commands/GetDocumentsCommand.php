@@ -32,7 +32,6 @@ class GetDocumentsCommand extends RavenCommand
 
     public function __construct(string $id,ArrayCollection|null $includes, ?bool $metadataOnly)
     {
-
         parent::__construct(GetDocumentsResult::class);
         $this->id = $id;
     }
@@ -59,13 +58,13 @@ class GetDocumentsCommand extends RavenCommand
                 Constants::HEADERS_CONTENT_TYPE_APPLICATION_JSON
             ]
         ];
-        //d($url);
+
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 
     public function setResponse(array|string $response, bool $fromCache)
     {
-        if(null === $response){ return; }
         $this->result = $this->mapper()::readValue($response,GetDocumentsResult::class);
+
     }
 }

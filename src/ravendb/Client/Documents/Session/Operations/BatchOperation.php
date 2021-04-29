@@ -10,6 +10,9 @@ use RavenDB\Client\Documents\Session\InMemoryDocumentSessionOperations;
 class BatchOperation
 {
     private InMemoryDocumentSessionOperations $_session;
+    /**
+     * @psalm-var List<Object>
+     */
     private array $_entities;
     private int $_sessionCommandsCount;
     private int $_allCommandsCount;
@@ -27,8 +30,16 @@ class BatchOperation
         return new SingleNodeBatchCommand($this->_session->getConvetions(), $result->getSessionCommands(),$result->getOptions());
     }
 
+    /**
+     * @throws \Exception
+     * TODO : COMPLETE THE RESULT MIGRATIONS
+     */
     public function setResult(BatchCommandResult $result){
-        // TODO COMPLETE THE RESPONSE FORMATING
+
+        if(null === $result->getResults()){
+            throw new \Exception("throwOnNullResults");
+        }
+        return $result->getResults();
     }
 
     private function handleCompareExchangePut():void {
