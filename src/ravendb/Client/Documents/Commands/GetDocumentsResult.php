@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class GetDocumentsResult
 {
     private mixed $includes;
-    private mixed $Results;
+    private mixed $results;
     private mixed $counterIncludes;
     private mixed $timeSeriesIncludes;
     private mixed $compareExchangeValueIncludes;
@@ -72,7 +72,4 @@ class GetDocumentsResult
     {
         $this->nextPageStart = $nextPageStart;
     }
-
-
-
 }

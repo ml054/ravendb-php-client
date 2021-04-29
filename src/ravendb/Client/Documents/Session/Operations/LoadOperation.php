@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use RavenDB\Client\Documents\Commands\GetDocumentsCommand;
 use RavenDB\Client\Documents\Commands\GetDocumentsResult;
 use RavenDB\Client\Documents\Operations\TimeSeries\TimeSeriesRange;
+use RavenDB\Client\Documents\Session\DocumentInfo;
 use RavenDB\Client\Documents\Session\InMemoryDocumentSessionOperations;
 use RavenDB\Client\Util\StringUtils;
 use function Webmozart\Assert\Tests\StaticAnalysis\null;
@@ -52,6 +53,9 @@ class LoadOperation
         return $this;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function setResult(GetDocumentsResult $result):void{
         $this->_resultsSet = true;
         if($this->_session->noTracking){
@@ -59,9 +63,16 @@ class LoadOperation
             return;
         }
         if($result === null){
-            $this->_session->registerMissing($this->_ids);
+            $this->_session->registerMissing([$this->id]);
             return;
         }
+
+        foreach($result->getResults() as $document){
+            if(empty($document)) continue;
+            $newDocument = DocumentInfo::getNewDocumentInfo($document);
+            dd($newDocument);
+        }
+
         foreach($this->_ids as $id){
             $value = $this->_session->documentsById->getValue($id);
             if(null !== $value){
@@ -71,6 +82,6 @@ class LoadOperation
     }
 
     public function getDocument(object|string $class, $id){
-
+        dd(__METHOD__);
     }
 }

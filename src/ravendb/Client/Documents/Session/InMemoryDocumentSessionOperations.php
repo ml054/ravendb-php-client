@@ -66,7 +66,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     private string $id;
     private string $databaseName;
     protected DocumentStoreBase $_documentStore;
-    public bool $noTracking=true;
+    public bool $noTracking=false;
     public ?BatchOptions $_saveChangesOptions=null;
     private int $numberOfRequests;
     private array $externalState;
@@ -105,6 +105,11 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
     public function getId(){
         return $this->id;
+    }
+
+    public function registerIncludes(object $includes){
+        if($this->noTracking || null === $includes) return;
+        // TODO
     }
 
     public function getCurrentSessionNode():ServerNode {

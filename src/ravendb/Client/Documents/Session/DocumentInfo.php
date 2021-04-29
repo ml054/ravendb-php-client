@@ -167,14 +167,14 @@ class DocumentInfo
         };
     }
 
-    public static function getNewDocumentInfo(ObjectNode $document):DocumentInfo {
+    public static function getNewDocumentInfo(ObjectNode|array $document):DocumentInfo {
         $metadata = $document->get(Constants::METADATA_KEY);
         if(null === $metadata || !is_object($metadata)) throw new \Exception("Document must have a metadata");
 
         $id = $document->get(Constants::METADATA_KEY,Constants::METADATA_ID);
         if(null === $id || !StringUtils::isString($id)) throw new \Exception("Document must have a id");
 
-        $changeVector = $document->get(Constants::METADATA_KEY,Constants::METADATA_CHANGE_VECTOR);
+        $changeVector = $document->get(Constants::METADATA_KEY,Constants::METADATA_CHANGE_VECTOR); //
         if(null === $changeVector || !StringUtils::isString($changeVector)) throw new \Exception("Document " . $id." must have a Change Vector");
 
         /** JAVA VERSION WILL CRASH IN PHP AS THE CLASS IS INTANTIATED ITSELF. WILL CAUSE RECURSION ERROR. LEAVING FOR THE DEV PURPOSE */
