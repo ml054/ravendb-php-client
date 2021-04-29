@@ -82,6 +82,13 @@ class LoadOperation
     }
 
     public function getDocument(object|string $class, $id){
-        dd("herer",$class,$id);
+
+        if(null === $id || $this->_session->isDeleted($id)){
+            return null; // TODO check how to implement a default value by class type (and if needed)
+        }
+        $doc = $this->_session->documentsById->getValue($id);
+        if(null !== $doc){
+            // return $this->_session->trackEntity($class,$doc); TODO
+        }
     }
 }

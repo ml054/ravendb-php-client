@@ -20,6 +20,7 @@ class HttpRequestBase
     {
         if(!is_array($curlopt)) throw new Exception('Attempt failed. No array option submitted. Check your configuration');
         $curl = curl_init($url);
+        dd($curl);
         curl_setopt_array($curl, $curlopt);
         return $curl;
     }
@@ -33,6 +34,7 @@ class HttpRequestBase
             $response = curl_exec($curlObject);
             if (!curl_errno($curlObject)) {
                 $http_code = curl_getinfo($curlObject, CURLINFO_HTTP_CODE);
+                dd($http_code);
                 $expectedStatusCode = $this->http_codes[$http_code];
                 match ($http_code){
                     $expectedStatusCode=> $this->response = $response,

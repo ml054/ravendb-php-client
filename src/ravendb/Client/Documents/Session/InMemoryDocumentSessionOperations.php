@@ -29,6 +29,7 @@ use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Infrastructure\Entities\User;
 use RavenDB\Client\Json\MetadataAsDictionary;
 use RavenDB\Client\Primitives\Closable;
+use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\ObjectUtils;
 use RavenDB\Client\Util\StringUtils;
 use RavenDB\Client\DataBind\Node\ObjectNode;
@@ -38,6 +39,7 @@ use function Sodium\add;
 
 abstract class InMemoryDocumentSessionOperations implements Closable
 {
+    use ObjectMapper;
     public const ConcurrencyCheckMode = [
         "AUTO"=>"AUTO",
         "FORCED"=>"FORCE",
@@ -81,7 +83,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     {
         $this->id = $id;
         // HARD CODED TO BE REMOVED
-        $this->databaseName = ObjectUtils::firstNonNull(["DemoDB"]);
+        $this->databaseName = $options->getDatabase();
         $this->numberOfRequests = 0;
         $this->maxNumberOfRequestsPerSession=5;
         if(StringUtils::isBlank($this->databaseName)){
@@ -90,6 +92,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $saveChangesOptions = new IndexesWaitOptsBuilder($this);
         $this->_knownMissingIds = new ArrayCollection();
         $this->includedDocumentsById = new Map();
+        $this->documentsById = new DocumentsById(); // MAPPING IN THE CONSTRUCTOR TO HAVE ACCESS TO THE CONTAINER THROUGH SESSIONS
+        $this->documentsByEntity = new DocumentsByEntityHolder();
         $this->_saveChangesOptions = $saveChangesOptions->getOptions();
         $this->_documentStore = $documentStore;
         $this->_requestExecutor = $documentStore->getRequestExecutor($this->databaseName);
@@ -257,6 +261,36 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     }
     public function prepareForCreatingRevisionsFromIds(SaveChangesData $result):void { }
     public function prepareCompareExchangeEntities(SaveChangesData $result):void { }
+    /**
+     * Tracks the entity.
+     *
+     * @param entityType Entity class
+     * @param id         Id of document
+     * @param document   raw entity
+     * @param metadata   raw document metadata
+     * @param noTracking no tracking
+     * @return entity
+     */
+    public function trackEntity(object $entityType,object $document, ?string $id,  object $metadata, bool $noTracking){
+        $noTracking = $this->noTracking || $noTracking;
+        if(StringUtils::isEmpty($id)){
+            dd("TODO deserializeFromTransformer",__METHOD__);
+        }
+
+        $docInfo = $this->documentsById->getValue($id);
+        if(null !== $docInfo){
+            if(null === $docInfo->getEntity()){
+                dd("entityToJson",__METHOD__);
+            }
+            if(!$noTracking){
+                $this->includedDocumentsById->remove($id);
+                $this->documentsByEntity->put($docInfo->getEntity(),$docInfo);
+            }
+            return $docInfo->getEntity();
+        }
+
+
+    }
     /** *************************************************** **/
     private static function throwNoDatabase(){
         throw new IllegalStateException(Constants::EXCEPTION_STRING_NO_SESSION_DATABASE);
@@ -311,10 +345,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $documentInfo->setEntity($entity);
         $documentInfo->setNewDocument(true);
         $documentInfo->setDocument(null);
-        $this->documentsByEntity = new DocumentsByEntityHolder();
         $this->documentsByEntity->put($entity,$documentInfo);
         if($id !== null){
-            $this->documentsById = new DocumentsById();
             $this->documentsById->add($documentInfo);
         }
     }

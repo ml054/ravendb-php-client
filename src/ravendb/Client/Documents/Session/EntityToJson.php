@@ -3,14 +3,19 @@
 namespace RavenDB\Client\Documents\Session;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Ds\Map;
 
 class EntityToJson
 {
     private InMemoryDocumentSessionOperations $_session;
-    private ArrayCollection $_missingDictionary;
+    /**
+     * @psalm-var Map<Object, Map<String, Object>>
+    */
+    private Map $_missingDictionary;
+
     /**
      * All the listeners for this session
-     * @param $_session
+     * @param InMemoryDocumentSessionOperations $_session
      */
     public function __construct(InMemoryDocumentSessionOperations $_session)
     {
@@ -18,9 +23,9 @@ class EntityToJson
     }
 
     /**
-     * @return ArrayCollection
+     * @psalm-return Map<Object, Map<String, Object>>
      */
-    public function getMissingDictionary(): ArrayCollection
+    public function getMissingDictionary(): Map
     {
         return $this->_missingDictionary;
     }
