@@ -32,9 +32,9 @@ class DocumentsChanges
     }
 
     /**
-     * @param object $fieldOldValue
+     * @param object|string $fieldOldValue
      */
-    public function setFieldOldValue(object $fieldOldValue): void
+    public function setFieldOldValue(object|string $fieldOldValue): void
     {
         $this->fieldOldValue = $fieldOldValue;
     }
@@ -48,9 +48,9 @@ class DocumentsChanges
     }
 
     /**
-     * @param object $fieldNewValue
+     * @param object|string $fieldNewValue
      */
-    public function setFieldNewValue(object $fieldNewValue): void
+    public function setFieldNewValue(object|string $fieldNewValue): void
     {
         $this->fieldNewValue = $fieldNewValue;
     }

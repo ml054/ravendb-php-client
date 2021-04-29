@@ -15,6 +15,7 @@ use Ramsey\Uuid\Uuid;
 use RavenDB\Client\Constants;
 use RavenDB\Client\Documents\Commands\Batches\BatchCommandResult;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
+use RavenDB\Client\Documents\Commands\Batches\DeleteCommandData;
 use RavenDB\Client\Documents\Commands\Batches\IndexesWaitOptsBuilder;
 use RavenDB\Client\Documents\Commands\Batches\PutCommandDataWithJson;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
@@ -82,7 +83,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
         $this->id = $id;
-        $this->deletedEntities = new DeletedEntitiesHolder();
         // HARD CODED TO BE REMOVED
         $this->databaseName = $options->getDatabase();
         $this->numberOfRequests = 0;
@@ -96,6 +96,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->includedDocumentsById = new Map();
         $this->documentsById = new DocumentsById(); // MAPPING IN THE CONSTRUCTOR TO HAVE ACCESS TO THE CONTAINER THROUGH SESSIONS
         $this->documentsByEntity = new DocumentsByEntityHolder();
+        $this->deletedEntities = new DeletedEntitiesHolder();
 
         $this->_saveChangesOptions = $saveChangesOptions->getOptions();
         $this->_documentStore = $documentStore;
@@ -262,8 +263,39 @@ abstract class InMemoryDocumentSessionOperations implements Closable
      */
     public function prepareForEntitiesDeletion(SaveChangesData $result, Map $changes):void {
         try {
-            foreach($this->deletedEntities as $deletedEntity){
-                $documentInfo = $this->documentsByEntity->get($this->deletedEntities->);
+            foreach($this->deletedEntities as  $deletedEntity){
+                $documentInfo = $this->documentsByEntity->get($this->deletedEntities->getEntity());
+
+                if(null === $documentInfo) continue;
+
+                if(null !== $changes){
+                    /**
+                     * @psalm-var List<DocumentsChanges>
+                    */
+                    $docChanges = new ArrayCollection();
+                    $change = new DocumentsChanges();
+                    $change->setFieldNewValue("");
+                    $change->setFieldOldValue("");
+                    $change->setChange("DOCUMENT_DELETED");
+                    $docChanges->add($change);
+                    $changes->put($documentInfo->getId(),$docChanges);
+                }else{
+                    $command = null; // null by design
+                    if(null !== $command){
+                        throw new \Exception("throwInvalidDeletedDocumentWithDeferredCommand");
+                    }
+                    $changeVector = null;
+                    $documentInfo = $this->documentsById->getValue($documentInfo->getId());
+
+                    if (null !== $documentInfo){
+                        $changeVector = $documentInfo->getChangeVector();
+                        if(null !== $documentInfo->getEntity()){
+                            $result->getEntities()->add($documentInfo->getEntity());
+                        }
+                    }
+                    $changeVector = $this->useOptimisticConcurrency ? $changeVector : null;
+                    $result->getSessionCommands()->add(new DeleteCommandData($documentInfo->getId(),$changeVector));
+                }
             }
         } finally {
             $this->close();

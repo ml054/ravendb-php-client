@@ -11,7 +11,10 @@ class SaveChangesData
     private ArrayCollection $sessionCommands;
     private ArrayCollection $entities;
     private ?BatchOptions $options;
-
+    /**
+     * @psalm-var Map<IdTypeAndName, ICommandData>
+    */
+    private Map $deferredCommandsMap;
     public function __construct(InMemoryDocumentSessionOperations $session)
     {
         $this->options = $session->_saveChangesOptions;

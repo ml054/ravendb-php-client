@@ -18,7 +18,9 @@
     "nahid/jsonq": "dev-master",
     "symfony/event-dispatcher": "5.x-dev",
     "symfony/validator": "5.x-dev",
-    "symfony/stopwatch": "5.x-dev"
+    "symfony/stopwatch": "5.x-dev",
+    "vimeo/psalm": "4.x-dev",
+    "php-ds/php-ds": "dev-master"
   },
   "autoload": {
     "psr-4": {

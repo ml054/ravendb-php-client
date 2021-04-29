@@ -12,14 +12,15 @@ class DeletedEntitiesHolder
     /**
      * @psalm-var Set<Object>
     */
-    private DeletedEntitiesEnumeratorResult|ArrayCollection $_deletedEntities;
+    private ArrayCollection $_deletedEntities;
 
     /**
      * @psalm-var Set<Object>
      */
     private ArrayCollection $_onBeforeDeletedEntities;
-
     private bool $_prepareEntitiesDeletes;
+
+
 
     public function __construct()
     {

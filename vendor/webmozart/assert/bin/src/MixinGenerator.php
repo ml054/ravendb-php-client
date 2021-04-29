@@ -7,7 +7,6 @@ namespace Webmozart\Assert\Bin;
 use ArrayAccess;
 use Closure;
 use Countable;
-use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -50,16 +49,19 @@ final class MixinGenerator
 
     public function generate(): string
     {
-        $file = "<?php\n\n";
-        $file .= $this->fileComment()."\n\n";
-        $file .= $this->namespace()."\n";
+        return \sprintf(
+            <<<'PHP'
+<?php
 
-        return $file;
-    }
+/**
+ * provides type inference and auto-completion for magic static methods of Assert.
+ */
 
-    private function fileComment(): string
-    {
-        return $this->phpdoc(['provides type inference and auto-completion for magic static methods of Assert.'], 0);
+%s
+PHP
+            ,
+            $this->namespace()
+        );
     }
 
     private function namespace(): string
@@ -70,20 +72,18 @@ final class MixinGenerator
         $namespace .= sprintf("use %s;\n", ArrayAccess::class);
         $namespace .= sprintf("use %s;\n", Closure::class);
         $namespace .= sprintf("use %s;\n", Countable::class);
-        $namespace .= sprintf("use %s;\n", InvalidArgumentException::class);
         $namespace .= sprintf("use %s;\n", Throwable::class);
         $namespace .= "\n";
 
-        $namespace .= $this->interface($assert);
+        $namespace .= $this->trait($assert);
 
         return $namespace;
     }
 
-    private function interface(ReflectionClass $assert): string
+    private function trait(ReflectionClass $assert): string
     {
         $staticMethods = $this->getMethods($assert);
 
-        $phpdocMethods = [];
         $declaredMethods = [];
 
         foreach ($staticMethods as $method) {
@@ -98,18 +98,21 @@ final class MixinGenerator
             }
         }
 
-        $interface = '';
+        return \sprintf(
+            <<<'PHP'
+/**
+ * This trait aids static analysis tooling in introspecting assertion magic methods.
+ * Do not use this trait directly: it will change, and is not designed for reuse.
+ */
+trait Mixin
+{
+%s
+}
 
-        if (count($phpdocMethods) > 0) {
-            $interface = $this->phpdoc($phpdocMethods, 0)."\n";
-        }
-
-        $interface .= "interface Mixin\n{\n";
-        $interface .= implode("\n\n", $declaredMethods);
-
-        $interface .= "\n}";
-
-        return $interface;
+PHP
+            ,
+            implode("\n\n", $declaredMethods)
+        );
     }
 
     /**
@@ -329,7 +332,15 @@ final class MixinGenerator
         $indentation = str_repeat(' ', $indent);
 
         $staticFunction = $this->phpdoc($phpdocLines, $indent)."\n";
-        $staticFunction .= $indentation.'public static function '.$name.$this->functionParameters($parameters, $defaultValues).';';
+        $staticFunction .= $indentation.'public static function '.$name.$this->functionParameters($parameters, $defaultValues)."\n"
+            .$indentation."{\n"
+            .$indentation.$indentation.'static::__callStatic('
+            .'\'' . $name . '\', array('
+            .implode(', ', \array_map(static function (string $parameter): string {
+                return '$'. $parameter;
+            }, $parameters))
+            ."));\n"
+            .$indentation.'}';
 
         return $staticFunction;
     }
@@ -382,7 +393,9 @@ final class MixinGenerator
             $phpdoc .= "\n".$indentation.rtrim(' * '.$line);
         }
 
-        $phpdoc .= "\n".$indentation.' */';
+        $phpdoc .= "\n".$indentation.' *'
+            . "\n".$indentation.' * @return void'
+            . "\n".$indentation.' */';
 
         return $phpdoc;
     }
@@ -449,6 +462,11 @@ final class MixinGenerator
         foreach ($staticMethods as $staticMethod) {
             $modifiers = $staticMethod->getModifiers();
             if (0 === ($modifiers & ReflectionMethod::IS_PUBLIC)) {
+                continue;
+            }
+
+            if ($staticMethod->getFileName() !== $assert->getFileName()) {
+                // Skip this method - was imported by generated mixin
                 continue;
             }
 

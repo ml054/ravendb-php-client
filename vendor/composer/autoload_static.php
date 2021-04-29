@@ -10,13 +10,18 @@ class ComposerStaticInit66c8c0a31eefa02bd18f6a1ffcdbe957
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
-        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+        'e8aa6e4b5a1db2f56ae794f1505391a8' => __DIR__ . '/..' . '/amphp/amp/lib/functions.php',
+        '76cd0796156622033397994f25b0d8fc' => __DIR__ . '/..' . '/amphp/amp/lib/Internal/functions.php',
         '0d59ee240a4cd96ddbb4ff164fccea4d' => __DIR__ . '/..' . '/symfony/polyfill-php73/bootstrap.php',
         '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
         'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
+        '6cd5651c4fef5ed6b63e8d8b8ffbf3cc' => __DIR__ . '/..' . '/amphp/byte-stream/lib/functions.php',
+        'dc51568953534d6c54b08731e61104e2' => __DIR__ . '/..' . '/vimeo/psalm/src/functions.php',
+        '8e4171839e12546525126d38dac3dafa' => __DIR__ . '/..' . '/vimeo/psalm/src/spl_object_id.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         '4384ae2b1c411dab75a78e15f1b182ad' => __DIR__ . '/..' . '/nahid/qarray/helpers/qarray.php',
         'fd867582e8863a0158e17d8954f1762f' => __DIR__ . '/..' . '/nahid/jsonq/helpers/jsonq.php',
@@ -28,8 +33,13 @@ class ComposerStaticInit66c8c0a31eefa02bd18f6a1ffcdbe957
         array (
             'phpDocumentor\\Reflection\\' => 25,
         ),
+        'X' => 
+        array (
+            'XdgBaseDir\\' => 11,
+        ),
         'W' => 
         array (
+            'Webmozart\\PathUtil\\' => 19,
             'Webmozart\\Assert\\' => 17,
         ),
         'S' => 
@@ -47,6 +57,7 @@ class ComposerStaticInit66c8c0a31eefa02bd18f6a1ffcdbe957
             'Symfony\\Component\\VarDumper\\' => 28,
             'Symfony\\Component\\Validator\\' => 28,
             'Symfony\\Component\\String\\' => 25,
+            'Symfony\\Component\\Stopwatch\\' => 28,
             'Symfony\\Component\\Serializer\\' => 29,
             'Symfony\\Component\\PropertyInfo\\' => 31,
             'Symfony\\Component\\PropertyAccess\\' => 33,
@@ -67,6 +78,7 @@ class ComposerStaticInit66c8c0a31eefa02bd18f6a1ffcdbe957
             'Psr\\EventDispatcher\\' => 20,
             'Psr\\Container\\' => 14,
             'Psr\\Cache\\' => 10,
+            'Psalm\\' => 6,
             'Prophecy\\' => 9,
             'PhpParser\\' => 10,
             'PackageVersions\\' => 16,
@@ -75,6 +87,10 @@ class ComposerStaticInit66c8c0a31eefa02bd18f6a1ffcdbe957
         array (
             'Nahid\\QArray\\' => 13,
             'Nahid\\JsonQ\\' => 12,
+        ),
+        'L' => 
+        array (
+            'LanguageServerProtocol\\' => 23,
         ),
         'D' => 
         array (
@@ -91,9 +107,20 @@ class ComposerStaticInit66c8c0a31eefa02bd18f6a1ffcdbe957
             'Doctrine\\Common\\' => 16,
             'DeepCopy\\' => 9,
         ),
+        'C' => 
+        array (
+            'Composer\\XdebugHandler\\' => 23,
+            'Composer\\Semver\\' => 16,
+        ),
         'B' => 
         array (
             'Brick\\Math\\' => 11,
+        ),
+        'A' => 
+        array (
+            'Amp\\ByteStream\\' => 15,
+            'Amp\\' => 4,
+            'AdvancedJsonRpc\\' => 16,
         ),
     );
 
@@ -103,6 +130,14 @@ class ComposerStaticInit66c8c0a31eefa02bd18f6a1ffcdbe957
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
             1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
             2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
+        ),
+        'XdgBaseDir\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/dnoegel/php-xdg-base-dir/src',
+        ),
+        'Webmozart\\PathUtil\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webmozart/path-util/src',
         ),
         'Webmozart\\Assert\\' => 
         array (
@@ -160,6 +195,10 @@ class ComposerStaticInit66c8c0a31eefa02bd18f6a1ffcdbe957
         array (
             0 => __DIR__ . '/..' . '/symfony/string',
         ),
+        'Symfony\\Component\\Stopwatch\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/stopwatch',
+        ),
         'Symfony\\Component\\Serializer\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/serializer',
@@ -216,6 +255,10 @@ class ComposerStaticInit66c8c0a31eefa02bd18f6a1ffcdbe957
         array (
             0 => __DIR__ . '/..' . '/psr/cache/src',
         ),
+        'Psalm\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/vimeo/psalm/src/Psalm',
+        ),
         'Prophecy\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpspec/prophecy/src/Prophecy',
@@ -235,6 +278,10 @@ class ComposerStaticInit66c8c0a31eefa02bd18f6a1ffcdbe957
         'Nahid\\JsonQ\\' => 
         array (
             0 => __DIR__ . '/..' . '/nahid/jsonq/src',
+        ),
+        'LanguageServerProtocol\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/felixfbecker/language-server-protocol/src',
         ),
         'Doctrine\\Persistence\\' => 
         array (
@@ -286,13 +333,47 @@ class ComposerStaticInit66c8c0a31eefa02bd18f6a1ffcdbe957
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
         ),
+        'Composer\\XdebugHandler\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/xdebug-handler/src',
+        ),
+        'Composer\\Semver\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/semver/src',
+        ),
         'Brick\\Math\\' => 
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
         ),
+        'Amp\\ByteStream\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/amphp/byte-stream/lib',
+        ),
+        'Amp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/amphp/amp/lib',
+        ),
+        'AdvancedJsonRpc\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/felixfbecker/advanced-json-rpc/lib',
+        ),
     );
 
     public static $prefixesPsr0 = array (
+        'L' => 
+        array (
+            'LSS' => 
+            array (
+                0 => __DIR__ . '/..' . '/openlss/lib-array2xml',
+            ),
+        ),
+        'J' => 
+        array (
+            'JsonMapper' => 
+            array (
+                0 => __DIR__ . '/..' . '/netresearch/jsonmapper/src',
+            ),
+        ),
         'A' => 
         array (
             'Analog' => 
