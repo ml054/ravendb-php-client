@@ -90,10 +90,12 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             static::throwNoDatabase();
         }
         $saveChangesOptions = new IndexesWaitOptsBuilder($this);
+        // MAPPING THE CONTAINERS WITHIN CONSTRUCTOR FOR A REASON : IN PHP WE CANNOT AT THIS MOMENT INSTANTIATE AND OBJECT AT THE PROPERTY LEVEL
         $this->_knownMissingIds = new ArrayCollection();
         $this->includedDocumentsById = new Map();
         $this->documentsById = new DocumentsById(); // MAPPING IN THE CONSTRUCTOR TO HAVE ACCESS TO THE CONTAINER THROUGH SESSIONS
         $this->documentsByEntity = new DocumentsByEntityHolder();
+
         $this->_saveChangesOptions = $saveChangesOptions->getOptions();
         $this->_documentStore = $documentStore;
         $this->_requestExecutor = $documentStore->getRequestExecutor($this->databaseName);

@@ -52,17 +52,6 @@ class LoadOperation
         return $this;
     }
 
-    public function byIds(ArrayCollection $ids):LoadOperation {
-        $distinct = new ArrayCollection();
-        foreach ($ids as $id){
-            if(!StringUtils::isEmpty($id)){
-                $distinct->add($id);
-            }
-        }
-        $this->_ids = $distinct->getValues();
-        return $this;
-    }
-
     public function setResult(GetDocumentsResult $result):void{
         $this->_resultsSet = true;
         if($this->_session->noTracking){
@@ -83,12 +72,5 @@ class LoadOperation
 
     public function getDocument(object|string $class, $id){
 
-        if(null === $id || $this->_session->isDeleted($id)){
-            return null; // TODO check how to implement a default value by class type (and if needed)
-        }
-        $doc = $this->_session->documentsById->getValue($id);
-        if(null !== $doc){
-            // return $this->_session->trackEntity($class,$doc); TODO
-        }
     }
 }

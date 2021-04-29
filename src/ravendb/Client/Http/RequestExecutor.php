@@ -314,6 +314,8 @@ class RequestExecutor implements Closable
             $this->numberOfServerRequests++;
             $httpClient = new HttpRequestBase();
             $httpClient->execute($request);
+           // dd($command);
+           // dd($httpClient->getResponse());
             $command->setResponse($httpClient->getResponse(), false);
         } catch (\Exception $e) {
         }

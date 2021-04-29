@@ -59,16 +59,13 @@ class GetDocumentsCommand extends RavenCommand
                 Constants::HEADERS_CONTENT_TYPE_APPLICATION_JSON
             ]
         ];
+        //d($url);
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 
     public function setResponse(array|string $response, bool $fromCache)
     {
-        $this->result = "Tests";
-        if(null === $response){
-            return;
-        }
-
+        if(null === $response){ return; }
         $this->result = $this->mapper()::readValue($response,GetDocumentsResult::class);
     }
 }
