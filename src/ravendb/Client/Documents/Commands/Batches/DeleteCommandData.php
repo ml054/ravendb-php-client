@@ -17,6 +17,7 @@ class DeleteCommandData implements ICommandData
 
     public function __construct(string $id, string $changeVector)
     {
+        $this->id = $id;
         if(null === $id) throw new \InvalidArgumentException('Id cannot be null');
         $this->changeVector = $changeVector;
     }
@@ -35,14 +36,12 @@ class DeleteCommandData implements ICommandData
     {
         return $this->changeVector;
     }
-    /**
-     * RETURN A JSON LIKE RAVENDB COMPLIANCE QUERY STRING
-    */
+
     public function serialize(DocumentConventions $conventions):void {
         $writeObject = new ArrayCollection();
         $writeObject->set("id",$this->id);
         $writeObject->set("ChangeVector",$this->changeVector);
-        $writeObject->set("Type",Constants::QUERY_DELETE);
+        $writeObject->set("Type",Constants::CURLOPT_CUSTOMREQUEST_DELETE);
         $serializer = JsonExtensions::storeSerializer();
         $serializer->serialize($writeObject,'json');
     }

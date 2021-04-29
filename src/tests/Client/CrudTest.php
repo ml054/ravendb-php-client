@@ -17,22 +17,19 @@ class CrudTest extends RemoteTestBase
 
                 try {
                    $session = $store->openSession($options);
-
                    $user = new User();
-                   $user->setName("Raven DB NoSql");
-
+                   $user->setName("Raven DB NoSql - first Test");
                    $session->store($user,"users/1");
                    $session->saveChanges();
 
                 } finally {
                     $store->close();
                 }
-
                 try {
-                    /*$session = $store->openSession($options);
+                    $session = $store->openSession($options);
                     $user = $session->load(User::class,"users/1");
                     $user->setName(null);
-                    $session->saveChanges();*/
+                    $session->saveChanges();
                 } finally {
                     $store->close();
                 }

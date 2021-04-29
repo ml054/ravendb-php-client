@@ -24,4 +24,22 @@ class ObjectNode
         };
         return null;
     }
+
+    /**
+     * @return array
+     */
+    public function getNodeDocument(): array
+    {
+        return $this->document;
+    }
+
+    /**
+     * @param array $document
+     */
+    public function setNodeDocument(array $document): void
+    {
+        $this->document = $document;
+    }
+
+
 }

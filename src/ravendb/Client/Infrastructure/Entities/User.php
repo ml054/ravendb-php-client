@@ -20,9 +20,9 @@ class User
     }
 
     /**
-     * @param string $id
+     * @param string|null $id
      */
-    public function setId(string $id): void
+    public function setId(?string $id): void
     {
         $this->id = $id;
     }
@@ -55,7 +55,7 @@ class User
     /**
      * @param string $lastName
      */
-    public function setLastName(string $lastName): void
+    public function setLastName(?string $lastName): void
     {
         $this->lastName = $lastName;
     }
@@ -71,7 +71,7 @@ class User
     /**
      * @param string $addressId
      */
-    public function setAddressId(string $addressId): void
+    public function setAddressId(?string $addressId): void
     {
         $this->addressId = $addressId;
     }
@@ -87,7 +87,7 @@ class User
     /**
      * @param int $count
      */
-    public function setCount(int $count): void
+    public function setCount(?int $count): void
     {
         $this->count = $count;
     }
@@ -103,7 +103,7 @@ class User
     /**
      * @param int $age
      */
-    public function setAge(int $age): void
+    public function setAge(?int $age): void
     {
         $this->age = $age;
     }

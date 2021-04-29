@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 
 namespace RavenDB\Client\Documents\Session\Operations;
 
@@ -9,11 +9,13 @@ use RavenDB\Client\Documents\Commands\GetDocumentsResult;
 use RavenDB\Client\Documents\Operations\TimeSeries\TimeSeriesRange;
 use RavenDB\Client\Documents\Session\DocumentInfo;
 use RavenDB\Client\Documents\Session\InMemoryDocumentSessionOperations;
+use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\StringUtils;
 use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 class LoadOperation
 {
+    use ObjectMapper;
     private InMemoryDocumentSessionOperations $_session;
     private string $_ids;
     private string $id;
@@ -29,6 +31,7 @@ class LoadOperation
     private ?int $_start;
     private ?int $_pageSize;
     private GetDocumentsResult $_results;
+    private $mapper;
 
     public function __construct(InMemoryDocumentSessionOperations $_session)
     {
@@ -87,12 +90,18 @@ class LoadOperation
         if($this->_session->isDeleted($id)){
             return $class; // TODO CHECK WITH TECH THE APPROACH FOR DEFAULT CLASS TYPE VALUE. IF NEEDED IN PHP
         }
+
         $doc = $this->_session->documentsById->getValue($id);
-       /* TODO GETS TRIGGERED AS THE DOC IS IN THE SESSION. TRACKENTITY TO PUT IN PLACE
-       if($doc !== null){
+        $entity = $doc->getDocument()->getNodeDocument()["entity"];
+        $convertEntity = $this->mapper()::storeSerializer()->encode($entity,'json');
+        $class = $this->mapper()::readValue($convertEntity,$class);
+
+        //
+      /* if($doc !== null){
             return $this->_session->trackEntity($class,$doc);
-        }
-       */
+        }*/
+
+        // THE RESPONSE IN JAVA VERSION THE FULL QUALIFIED NAMESPACE. WE NEED TO INSTANTIATE IT IN PHP IN ORDER TO ACCESS THE METHODS
         return $class;
     }
 }

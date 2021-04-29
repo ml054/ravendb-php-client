@@ -190,7 +190,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     /***************** LifeCycle/UOW/Workflow ********************/
     public function prepareForSaveChanges(): SaveChangesData {
         $result = new SaveChangesData($this);
-        $this->prepareForEntitiesDeletion($result,null);
+      //  $this->prepareForEntitiesDeletion($result,null);
         $this->prepareForEntitiesPuts($result);
         //$this->prepareForCreatingRevisionsFromIds($result);
         //$this->prepareCompareExchangeEntities($result);

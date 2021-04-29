@@ -30,8 +30,8 @@ class CrudTestLab extends RemoteTestBase
 
                 $session = $store->openSession($options);
                 $poc = new User();
-                $poc->setName("Hello Raven nemodev");
-                $session->store($poc, "users/7");
+                $poc->setName("New Test Name");
+                $session->store($poc, "users/78");
                 $session->saveChanges();
 
             } finally {
@@ -54,10 +54,11 @@ class CrudTestLab extends RemoteTestBase
                      * TODO QUERY WITH users/7 ID FORM WON'T WORK FOR NOW BECAUSE DOES NOT MATCH THE ONE IN THE METADATA (RANDOM ONE)
                      * USING THE RANDOM ONE FOR THE PURPOSE OF THE LOAD TASK COMPLETION
                      */
-                    $user = $session->load(User::class,"dd6587f5-3071-4737-ab00-dd898d3302e6");
-                   // dd($user);
-                    $user->setName("My Company");
+                    $user = $session->load(User::class,"fee830eb-c656-44c9-9d9a-35e0907ec1fc");
+                    dd($user);
+                    $user->setName("Nemo Test");
                     $session->saveChanges();
+
                 } finally {
                     $store->close();
                 }
