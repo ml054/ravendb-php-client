@@ -96,7 +96,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->useOptimisticConcurrency = $this->_requestExecutor->getConventions()->isUseOptimisticConcurrency();
     }
 
-
     public function getId(){
         return $this->id;
     }

@@ -100,6 +100,6 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
 
     public function isReadRequest(): bool
     {
-        // TODO: Implement isReadRequest() method.
+        return false;
     }
 }
