@@ -3,23 +3,37 @@
 namespace RavenDB\Client\Documents\Session;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use RavenDB\Client\Primitives\Closable;
+use Ds\Map;
+use Ds\Set;
+use Iterator;
 
 class DeletedEntitiesHolder
 {
-    private ArrayCollection $_deletedEntities;
+    /**
+     * @psalm-var Set<Object>
+    */
+    private DeletedEntitiesEnumeratorResult|ArrayCollection $_deletedEntities;
+
+    /**
+     * @psalm-var Set<Object>
+     */
     private ArrayCollection $_onBeforeDeletedEntities;
+
     private bool $_prepareEntitiesDeletes;
-    private function isEmpty():bool{
-        return $this->size() === 0 ?? false;
-    }
-    public function size():int{
-        return $this->_deletedEntities->count() + (null !== $this->_onBeforeDeletedEntities ? count($this->_onBeforeDeletedEntities) : 0);
+
+    public function __construct()
+    {
+        $this->_deletedEntities = new ArrayCollection();
+        $this->_onBeforeDeletedEntities = new ArrayCollection();
     }
 
-    public function add(object $entity):void {
+    public function size():int {
+        return $this->_deletedEntities->count() + ($this->_onBeforeDeletedEntities !== null ? $this->_onBeforeDeletedEntities->count(): 0);
+    }
+
+    public function add(object $entity){
         if($this->_prepareEntitiesDeletes){
-            if($this->_onBeforeDeletedEntities === null){
+            if(null === $this->_onBeforeDeletedEntities){
                 $this->_onBeforeDeletedEntities = new ArrayCollection();
             }
             $this->_onBeforeDeletedEntities->add($entity);
@@ -30,50 +44,34 @@ class DeletedEntitiesHolder
 
     public function remove(object $entity):void {
         $this->_deletedEntities->remove($entity);
-        if($this->_onBeforeDeletedEntities !== null){
-            $this->_onBeforeDeletedEntities->remove($entity);
+        if(null !== $this->_onBeforeDeletedEntities){
+            $this->_onBeforeDeletedEntities->remove();
         }
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function evict(object $entity):void {
-        if($this->_prepareEntitiesDeletes){
-            throw new \Exception("Cannot Evict entity during OnBeforeDelete");
-        }
+    public function evict(object $entity): void{
+        if($this->_prepareEntitiesDeletes) throw new \InvalidArgumentException("Cannot Evict entity during OnBeforeDelete");
         $this->_deletedEntities->remove($entity);
     }
 
-    public function contains(object $entity): bool {
+    public function contains(object $entity):bool {
         if($this->_deletedEntities->contains($entity)){
             return true;
         }
 
-        if ($this->_onBeforeDeletedEntities === null) {
+        if($this->_onBeforeDeletedEntities === null){
             return false;
         }
-
-        return $this->_onBeforeDeletedEntities->contains($entity);
     }
 
-    public function clear():void {
+    public function clear():void{
         $this->_deletedEntities->clear();
-        if ($this->_onBeforeDeletedEntities != null) {
-            $this-> _onBeforeDeletedEntities->clear();
+        if(null !== $this->_onBeforeDeletedEntities){
+            $this->_onBeforeDeletedEntities->clear();
         }
     }
-    /**
-     * @throws \Exception
-     * TODO CHECK WITH TECH IF THIS IS CLOSURE TYPE OF IMPLEMENTATION IN JAVA
-     */
-    public function iterator(): ArrayCollection {
-        $deletedIterator = $this->_deletedEntities->getIterator();
-        $deletedIteratorFunc = function () use ($deletedIterator){
-        };
-    }
 
-    public function prepareEntitiesDeletes():Closable{
-        $this->_prepareEntitiesDeletes = true;
+    public function iterator(): Iterator{
+        // TODO
     }
 }

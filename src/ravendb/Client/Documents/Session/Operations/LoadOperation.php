@@ -3,6 +3,7 @@
 namespace RavenDB\Client\Documents\Session\Operations;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use RavenDB\Client\DataBind\Node\ObjectNode;
 use RavenDB\Client\Documents\Commands\GetDocumentsCommand;
 use RavenDB\Client\Documents\Commands\GetDocumentsResult;
 use RavenDB\Client\Documents\Operations\TimeSeries\TimeSeriesRange;
@@ -69,19 +70,29 @@ class LoadOperation
 
         foreach($result->getResults() as $document){
             if(empty($document)) continue;
+            // DOCUMENT IS SENT
             $newDocument = DocumentInfo::getNewDocumentInfo($document);
-            dd($newDocument);
+            $this->_session->documentsById->add($newDocument);
         }
 
-        foreach($this->_ids as $id){
+        /*foreach($this->_ids as $id){
             $value = $this->_session->documentsById->getValue($id);
             if(null !== $value){
                 $this->_session->registerMissing($id);
             }
-        }
+        }*/
     }
 
     public function getDocument(object|string $class, $id){
-        dd(__METHOD__);
+        if($this->_session->isDeleted($id)){
+            return $class; // TODO CHECK WITH TECH THE APPROACH FOR DEFAULT CLASS TYPE VALUE. IF NEEDED IN PHP
+        }
+        $doc = $this->_session->documentsById->getValue($id);
+       /* TODO GETS TRIGGERED AS THE DOC IS IN THE SESSION. TRACKENTITY TO PUT IN PLACE
+       if($doc !== null){
+            return $this->_session->trackEntity($class,$doc);
+        }
+       */
+        return $class;
     }
 }

@@ -1,13 +1,6 @@
 <?php
 namespace RavenDB\Client\Documents\Session;
-
 use Ds\Map;
-use Ds\Pair;
-use Ds\Vector;
-use Psalm\Context;
-use RavenDB\Client\Extensions\JsonExtensions;
-use SebastianBergmann\CodeCoverage\Node\Iterator;
-
 class DocumentsByEntityHolder
 {
     /**

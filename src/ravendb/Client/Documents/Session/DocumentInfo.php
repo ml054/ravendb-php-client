@@ -22,10 +22,10 @@ class DocumentInfo
     private string $id;
     private string $changeVector;
     private bool $ignoreChanges;
-    private ObjectNode $metadata;
+    private object $metadata;
     private ?object $document;
     private IMetadataDictionary $metadataInstance;
-    private object $entity;
+    private ?object $entity=null;
     private bool $newDocument;
     private string $collection;
     private string $concurrencyCheckMode;
@@ -96,12 +96,12 @@ class DocumentInfo
         $this->newDocument = $newDocument;
     }
 
-    public function getMetadata(): ObjectNode
+    public function getMetadata(): object
     {
         return $this->metadata;
     }
 
-    public function setMetadata(ObjectNode $metadata): void
+    public function setMetadata(object $metadata): void
     {
         $this->metadata = $metadata;
     }
@@ -131,7 +131,7 @@ class DocumentInfo
         return $this->entity;
     }
 
-    public function setEntity(object $entity): void
+    public function setEntity(?object $entity): void
     {
         $this->entity = $entity;
     }
@@ -167,21 +167,27 @@ class DocumentInfo
         };
     }
 
-    public static function getNewDocumentInfo(ObjectNode|array $document):DocumentInfo {
-        $metadata = $document->get(Constants::METADATA_KEY);
-        if(null === $metadata || !is_object($metadata)) throw new \Exception("Document must have a metadata");
+    /**
+     * @throws \Exception
+     */
+    public static function getNewDocumentInfo($document):DocumentInfo {
+        // TODO : THIS VERSION IS JUST THE DESIGN OF COMPLETING THE TASK. SUBJECT TO CHANGES. setDocument is expecting an object
+        $documentObject = new ObjectNode($document);
 
-        $id = $document->get(Constants::METADATA_KEY,Constants::METADATA_ID);
+        $metadata = $documentObject->get(Constants::METADATA_KEY);
+     //   dd($metadata->{@}."id");
+        if(null === $metadata || empty($metadata)) throw new \Exception("Document must have a metadata");
+
+        $id = $metadata[Constants::METADATA_ID];
         if(null === $id || !StringUtils::isString($id)) throw new \Exception("Document must have a id");
 
-        $changeVector = $document->get(Constants::METADATA_KEY,Constants::METADATA_CHANGE_VECTOR); //
+        $changeVector = $metadata[Constants::METADATA_CHANGE_VECTOR];
         if(null === $changeVector || !StringUtils::isString($changeVector)) throw new \Exception("Document " . $id." must have a Change Vector");
 
-        /** JAVA VERSION WILL CRASH IN PHP AS THE CLASS IS INTANTIATED ITSELF. WILL CAUSE RECURSION ERROR. LEAVING FOR THE DEV PURPOSE */
         $newDocumentInfo = new DocumentInfo();
         $newDocumentInfo->setId($id);
-        $newDocumentInfo->setDocument($document);
-        $newDocumentInfo->setMetadata($metadata);
+        $newDocumentInfo->setDocument($documentObject);
+        $newDocumentInfo->setMetadata((object)$metadata);
         $newDocumentInfo->setEntity(null);
         $newDocumentInfo->setChangeVector($changeVector);
         return $newDocumentInfo;

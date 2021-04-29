@@ -78,10 +78,11 @@ abstract class InMemoryDocumentSessionOperations implements Closable
      * @psalm-return Map<string, DocumentInfo>
      */
     public Map $includedDocumentsById;
-
+    public DeletedEntitiesHolder $deletedEntities;
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
         $this->id = $id;
+        $this->deletedEntities = new DeletedEntitiesHolder();
         // HARD CODED TO BE REMOVED
         $this->databaseName = $options->getDatabase();
         $this->numberOfRequests = 0;
@@ -188,7 +189,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     /***************** LifeCycle/UOW/Workflow ********************/
     public function prepareForSaveChanges(): SaveChangesData {
         $result = new SaveChangesData($this);
-     //   $this->prepareForEntitiesDeletion($result,null);
+        $this->prepareForEntitiesDeletion($result,null);
         $this->prepareForEntitiesPuts($result);
         //$this->prepareForCreatingRevisionsFromIds($result);
         //$this->prepareCompareExchangeEntities($result);
@@ -201,10 +202,10 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
     public function prepareForEntitiesPuts(SaveChangesData $result):void {
         try{
-            $serializer = JsonExtensions::storeSerializer();
             $shouldIgnoreEntityChanges = $this->getConvetions()->getShouldIgnoreEntityChanges();
 
             $entities = $this->documentsByEntity->entities();
+
             /*** @var DocumentsByEntityEnumeratorResult $entity */
             foreach($entities as $index=>$entity){
 
@@ -261,7 +262,9 @@ abstract class InMemoryDocumentSessionOperations implements Closable
      */
     public function prepareForEntitiesDeletion(SaveChangesData $result, Map $changes):void {
         try {
-            foreach($deletedEntities as $deletedEntity){ }
+            foreach($this->deletedEntities as $deletedEntity){
+                $documentInfo = $this->documentsByEntity->get($this->deletedEntities->);
+            }
         } finally {
             $this->close();
         }
@@ -278,7 +281,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
      * @param noTracking no tracking
      * @return entity
      */
-    public function trackEntity(object $entityType,object $document, ?string $id,  object $metadata, bool $noTracking){
+    public function trackEntity(string $entityType,object $document, ?string $id=null,  ?object $metadata=null, ?bool $noTracking=null){
+
         $noTracking = $this->noTracking || $noTracking;
         if(StringUtils::isEmpty($id)){
             dd("TODO deserializeFromTransformer",__METHOD__);

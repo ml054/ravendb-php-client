@@ -39,7 +39,6 @@ class DocumentsChanges
         $this->fieldOldValue = $fieldOldValue;
     }
 
-
     /**
      * @return object
      */
@@ -104,7 +103,6 @@ class DocumentsChanges
      */
     public function setChange(string $change): void
     {
-        // TODO CHANGE THE match version of php java ENUM
         if(!in_array($change,self::ChangeType)) throw new \Exception('Invalid Change Type');
         $this->change = self::ChangeType[$change];
     }

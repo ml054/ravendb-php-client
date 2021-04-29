@@ -7,7 +7,7 @@ class DeletedEntitiesEnumeratorResult
     public object $entity;
     private bool $executeOnBeforeDelete;
 
-    public function __construct(object $entity,bool $executeOnBeforeDelete)
+    private function __construct(object $entity,bool $executeOnBeforeDelete)
     {
         $this->entity = $entity;
         $this->executeOnBeforeDelete = $executeOnBeforeDelete;
