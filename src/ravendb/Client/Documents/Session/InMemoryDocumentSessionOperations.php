@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Ds\Map;
 use Ramsey\Uuid\Uuid;
 use RavenDB\Client\Constants;
+use RavenDB\Client\Documents\Commands\Batches\BatchCommandResult;
 use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
 use RavenDB\Client\Documents\Commands\Batches\IndexesWaitOptsBuilder;
 use RavenDB\Client\Documents\Commands\Batches\PutCommandDataWithJson;
@@ -176,11 +177,15 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     /***************** LifeCycle/UOW/Workflow ********************/
     public function prepareForSaveChanges(): SaveChangesData {
         $result = new SaveChangesData($this);
-        $this->prepareForEntitiesDeletion($result,null);
+     //   $this->prepareForEntitiesDeletion($result,null);
         $this->prepareForEntitiesPuts($result);
         //$this->prepareForCreatingRevisionsFromIds($result);
         //$this->prepareCompareExchangeEntities($result);
         return $result;
+    }
+
+    protected function updateSessionAfterSaveChanges(BatchCommandResult $result){
+        $returnedTransactionIndex = $result->getTransactionIndex();
     }
 
     public function prepareForEntitiesPuts(SaveChangesData $result):void {
@@ -299,7 +304,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     protected function rememberEntityForDocumentIdGeneration(object $entity): void {
         throw new \Exception(Constants::EXCEPTION_STRING_ID_GENERATOR);
     }
-
+    // TODO COMPLETE IMPLEMENTATION OF THE ALL PARAMS (JAVA'S LIKE)
     public function storeEntityInUnitOfWork($entity, string $id = null, ?string $changeVector=null){
         $documentInfo = new DocumentInfo();
         $documentInfo->setId($id);

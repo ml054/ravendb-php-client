@@ -2,6 +2,7 @@
 
 namespace RavenDB\Client\Documents\Session\Operations;
 
+use Ds\Map;
 use RavenDB\Client\Documents\Commands\Batches\BatchCommandResult;
 use RavenDB\Client\Documents\Commands\Batches\SingleNodeBatchCommand;
 use RavenDB\Client\Documents\Session\InMemoryDocumentSessionOperations;
@@ -12,7 +13,7 @@ class BatchOperation
     private array $_entities;
     private int $_sessionCommandsCount;
     private int $_allCommandsCount;
-
+    private Map $_modifications;
     public function __construct(InMemoryDocumentSessionOperations $_session)
     {
         $this->_session = $_session;
@@ -27,7 +28,7 @@ class BatchOperation
     }
 
     public function setResult(BatchCommandResult $result){
-
+        // TODO COMPLETE THE RESPONSE FORMATING
     }
 
     private function handleCompareExchangePut():void {

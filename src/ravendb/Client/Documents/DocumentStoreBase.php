@@ -33,8 +33,6 @@ abstract class DocumentStoreBase implements IDocumentStore
         return self::effectiveDatabase($database);
     }
 
-
-
     public static function effectiveDatabase(string $database, ?IDocumentStore $store = null): string
     {
         if (null === $database) {
@@ -155,20 +153,23 @@ abstract class DocumentStoreBase implements IDocumentStore
     }
 
     /**
-     * @return array
+     * @param string $database
+     * @return Map|null
      */
-    public function getLastRaftIndexPerDatabase(): array
+    public function getLastTransactionIndex(string $database): ?Map
     {
-        return $this->_lastRaftIndexPerDatabase;
+        $index = $this->_lastRaftIndexPerDatabase->get($database);
+        if(null === $index || 0 === $index) return null;
+        return $index;
     }
 
     /**
      * @param array $lastRaftIndexPerDatabase
      */
-    public function setLastRaftIndexPerDatabase(array $lastRaftIndexPerDatabase): void
+    public function setLastTransactionIndex(string $database, string $index): void
     {
 
-        $this->_lastRaftIndexPerDatabase = $lastRaftIndexPerDatabase;
+        //TODO $this->_lastRaftIndexPerDatabase = $lastRaftIndexPerDatabase;
     }
 
 }

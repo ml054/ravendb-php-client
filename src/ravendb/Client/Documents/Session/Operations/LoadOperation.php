@@ -82,5 +82,6 @@ class LoadOperation
     }
 
     public function getDocument(object|string $class, $id){
+        dd("herer",$class,$id);
     }
 }

@@ -81,6 +81,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
                 throw new IllegalStateException("Cannot execute saveChanges when entity tracking is disabled in session.");
             }
             $this->_requestExecutor->execute($command,null);
+            //$this->updateSessionAfterSaveChanges($command->getResult());
             $saveChangeOperation->setResult($command->getResult());
         } finally {
             $this->close();
