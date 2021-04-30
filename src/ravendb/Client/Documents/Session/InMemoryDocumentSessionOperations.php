@@ -81,21 +81,37 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public Map $includedDocumentsById;
     public DeletedEntitiesHolder $deletedEntities;
 
+    /**
+     * UNIT OF WORK WATCHERS
+    */
+    private Map $uowQueueIsUpdate;
+    private Map $uowQueueIsDelete;
+    private Map $uowQueueIsClean;
+    private Map $uowQueueIsCreate;
+    private Map $uowQueueIsOriginal;
+
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
         $this->id = $id;
-        // HARD CODED TO BE REMOVED
         $this->databaseName = $options->getDatabase();
         $this->numberOfRequests = 0;
         $this->maxNumberOfRequestsPerSession=5;
+
         if(StringUtils::isBlank($this->databaseName)){
             static::throwNoDatabase();
         }
+
+        // OBJECT LIFECYCLE MONITORING QUEUES
+        $this->uowQueueIsUpdate = new Map();
+        $this->uowQueueIsDelete = new Map();
+        $this->uowQueueIsClean = new Map();
+        $this->uowQueueIsCreate = new Map();
+        $this->uowQueueIsOriginal = new Map();
+
         $saveChangesOptions = new IndexesWaitOptsBuilder($this);
-        // MAPPING THE CONTAINERS WITHIN CONSTRUCTOR FOR A REASON : IN PHP WE CANNOT AT THIS MOMENT INSTANTIATE AND OBJECT AT THE PROPERTY LEVEL
         $this->_knownMissingIds = new ArrayCollection();
         $this->includedDocumentsById = new Map();
-        $this->documentsById = new DocumentsById(); // MAPPING IN THE CONSTRUCTOR TO HAVE ACCESS TO THE CONTAINER THROUGH SESSIONS
+        $this->documentsById = new DocumentsById();
         $this->documentsByEntity = new DocumentsByEntityHolder();
         $this->deletedEntities = new DeletedEntitiesHolder();
 
@@ -112,7 +128,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
     public function registerIncludes(object $includes){
         if($this->noTracking || null === $includes) return;
-        // TODO
     }
 
     public function getCurrentSessionNode():ServerNode {

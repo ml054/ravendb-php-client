@@ -20,12 +20,13 @@ class CrudTest extends RemoteTestBase
                 try {
                     $session = $store->openSession($options);
                     $user = new User();
-                    $user->setName("First Member");
+                    $user->setName("John");
                     $session->store($user,"members/1");
 
                     $user2 = new User();
-                    $user2->setName("First Member 2");
+                    $user2->setName("Do");
                     $session->store($user2,"members/2");
+
                     $session->saveChanges();
 
                 } finally {
@@ -35,10 +36,10 @@ class CrudTest extends RemoteTestBase
                 try {
 
                     $session = $store->openSession($options);
-                    $user = $session->load(User::class,"8cdc509e-1659-4731-81ef-58c44ac96744");
+                    $user = $session->load(User::class,"009dce03-73ac-4afb-97dd-1df0e0fc3086");
                     $user->setName(null);
                     $session->saveChanges();
-                    AssertUtils::assertThat($user)::isInstanceOf(Member::class); // <--- expected to fail
+                    AssertUtils::assertThat($user)::isInstanceOf(User::class); // <--- expected to fail
 
                 } finally {
                     $store->close();
@@ -48,6 +49,4 @@ class CrudTest extends RemoteTestBase
                 $store->close();
             }
     }
-
-
 }

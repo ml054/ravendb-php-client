@@ -5,6 +5,7 @@
 namespace RavenDB\Client\Documents\Session;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Ds\Map;
 use RavenDB\Client\Constants;
 use RavenDB\Client\Documents\Batches\ICommandData;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
@@ -30,11 +31,13 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     private ArrayCollection $externalState;
     private int $getMaxNumberOfRequestsPerSession;
     private bool $useOptimisticConcurrency;
+    private Map $container;
     public function __construct(DocumentStore $documentStore, string $id, SessionOptions $options)
     {
         $this->documentStore = $documentStore;
         $this->id = $id;
         $this->options = $options;
+        $this->container = new Map();
         parent::__construct($documentStore,$id,$options);
     }
 
@@ -212,16 +215,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         }
     }
 
-    public function hasChanged(object $entity): bool
-    {
-        $documentInfo = $this->documentsByEntity->get($entity);
-        if(null === $documentInfo) return false;
-        /* TODO
-         * ObjectNode document = entityToJson.convertEntityToJson(entity, documentInfo);
-        return entityChanged(document, documentInfo, null);
-         * */
-    }
-
     public function isLoaded(string $id): bool
     {
 
@@ -267,5 +260,15 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         }else{
             return $operation->setResult($command->getResult());
         }
+    }
+
+    /**
+     * Determines whether the specified entity has changed.
+     * @param entity Entity to check
+     * @return true if entity has changed
+     */
+    public function hasChanged(object $entity):bool {
+        $documentInfo = $this->documentsByEntity->get($entity);
+
     }
 }

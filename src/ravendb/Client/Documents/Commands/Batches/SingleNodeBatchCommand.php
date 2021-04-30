@@ -58,7 +58,6 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
     public function createRequest(ServerNode $node): array|string|object
     {
         $commands = $this->_commands->getValues();
-
         $documents = [];
         foreach($commands as $index=>$command){
             // THE COMMAND IS AN ARRAYCOLLECTION GIVING ACCESS TO OBJECT LIKE TARGET
@@ -71,7 +70,6 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
 
         $httpClient = new HttpRequestBase();
         $url = $node->getUrl()."/databases/".$node->getDatabase()."/bulk_docs";
-
         $curlopt = [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER =>Constants::CURLOPT_RETURNTRANSFER,
