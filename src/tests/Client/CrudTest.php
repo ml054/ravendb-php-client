@@ -5,6 +5,7 @@ namespace RavenDB\Tests\Client;
 use RavenDB\Client\Documents\Session\SessionOptions;
 use RavenDB\Client\Infrastructure\Entities\User;
 use RavenDB\Client\Util\AssertUtils;
+use RavenDB\Tests\Client\CrudEntities\Member;
 
 class CrudTest extends RemoteTestBase
 {
@@ -37,7 +38,7 @@ class CrudTest extends RemoteTestBase
                     $user = $session->load(User::class,"8cdc509e-1659-4731-81ef-58c44ac96744");
                     $user->setName(null);
                     $session->saveChanges();
-                    AssertUtils::assertThat($user)::isInstanceOf(User::class);
+                    AssertUtils::assertThat($user)::isInstanceOf(Member::class); // <--- expected to fail
 
                 } finally {
                     $store->close();
