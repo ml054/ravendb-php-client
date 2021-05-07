@@ -116,6 +116,7 @@ class DocumentStore extends DocumentStoreBase
         $this->assertInitialized();
         $this->ensureNotClosed();
         $sessionID = Uuid::uuid4()->toString();
+
         return new DocumentSession($this,$sessionID,$sessionOptions);
     }
     function executeIndex(IAbstractIndexCreationTask $task, string $database): void
@@ -158,5 +159,10 @@ class DocumentStore extends DocumentStoreBase
     public function removeAfterCloseListener(VoidArgs $event)
     {
         // TODO: Implement removeAfterCloseListener() method.
+    }
+
+    public function close(): void
+    {
+        // TODO: Implement close() method.
     }
 }

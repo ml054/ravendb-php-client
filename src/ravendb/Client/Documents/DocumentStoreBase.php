@@ -55,17 +55,11 @@ abstract class DocumentStoreBase implements IDocumentStore
     {
         return $this->database = $database;
     }
-    public function close() { }
+    public abstract function close():void ;
 
     public function getIdentifier(): string { }
 
     public function setIdentifier(string $identifier): void { }
-
-    public function initialize(): IDocumentStore{ }
-
-    public function openSession(SessionOptions $sessionOptions): IDocumentSession
-    {
-    }
 
     function executeIndex(IAbstractIndexCreationTask $task, string $database): void
     {
@@ -105,11 +99,20 @@ abstract class DocumentStoreBase implements IDocumentStore
     {
         return $this->database;
     }
-    public function getRequestExecutor(?string $databaseName = null): RequestExecutor{}
-    public function timeSeries(): TimeSeriesOperations{}
-    public function maintenance(): MaintenanceOperationExecutor {}
-    public function operations(): OperationExecutor{ }
-    public function smuggler(): DatabaseSmuggler{ }
+    public abstract function getRequestExecutor(?string $databaseName = null): RequestExecutor;
+    private TimeSeriesOperations $_timeSeriesOperations;
+
+    public function timeSeries(): TimeSeriesOperations{
+        if(null === $this->_timeSeriesOperations){
+            $this->_timeSeriesOperations = new TimeSeriesOperations($this);
+        }
+    }
+    public abstract function  maintenance(): MaintenanceOperationExecutor;
+    public abstract function operations(): OperationExecutor;
+    public abstract function smuggler(): DatabaseSmuggler;
+    public abstract function initialize(): IDocumentStore;
+    public abstract function openSession(SessionOptions $sessionOptions): IDocumentSession;
+
     public function setRequestTimeout(int $timeout, ?string $database): Closable{}
 
     protected function ensureNotClosed():void {

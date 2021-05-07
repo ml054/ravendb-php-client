@@ -2,12 +2,14 @@
 
 namespace RavenDB\Client\Documents\Batches\Operations;
 // DOCUMENT TYPE TEMPLATE return "Document" keyword for serializing purpuse
+use RavenDB\Client\Documents\Session\DocumentsByEntityEnumeratorResult;
+
 class Document
 {
     private object $Document;
     private string $Type;
     private string $id;
-    public function __construct(string $Type,string $id){
+    public function __construct(string $Type,DocumentsByEntityEnumeratorResult $id){
         $this->Type = $Type;
     }
 

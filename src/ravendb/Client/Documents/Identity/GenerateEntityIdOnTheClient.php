@@ -15,5 +15,4 @@ class GenerateEntityIdOnTheClient
         $this->_generateId = $generateId;
     }
 
-
 }

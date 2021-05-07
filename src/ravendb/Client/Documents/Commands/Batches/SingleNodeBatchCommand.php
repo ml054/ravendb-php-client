@@ -33,6 +33,7 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
 
         $this->_commands = $commands;
         $this->_options = $options;
+
         // TODO IMPLEMENT CONVENTIONS DURING THE SAVING PROCESS. TO CHECK WITH TECH. RESOURCE AVAILABLE BUT ALL SET TO NULL
         $this->_conventions = $conventions;
         $this->_mode = self::TRANSACTION_MODE_SINGLE_NODE;
@@ -44,7 +45,6 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
             throw new \InvalidArgumentException("commands cannot be null");
         }
         $commandsCollection = $this->_commands->getValues();
-
         // JUST FOR THE PURPOSE OF CONFIRMING THE INSTANCE OF THE COMMANDS FOR NOW
         foreach($commandsCollection as $command){
             if(!$command instanceof PutCommandDataWithJson) throw new \Exception("Wrong command submitted.");
@@ -62,12 +62,13 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
         foreach($commands as $index=>$command){
             // THE COMMAND IS AN ARRAYCOLLECTION GIVING ACCESS TO OBJECT LIKE TARGET
             $type = $command->getType();
-            dd($command);
-            $documents[] = (new Document($type,$command->getDocument())->setDocument($command->getDocument()->getValue());
+         //   dd($command);
+            $documents[] = (new Document($type,$command->getDocument()))->setDocument($command->getDocument()->getValue());
         }
         $command = (new Command())->setCommands($documents);
-        $request = $this->internalSerializer->serialize($command,'json');
+        dd($documents);
 
+        $request = $this->internalSerializer->serialize($command,'json');
         $httpClient = new HttpRequestBase();
         $url = $node->getUrl()."/databases/".$node->getDatabase()."/bulk_docs";
         $curlopt = [

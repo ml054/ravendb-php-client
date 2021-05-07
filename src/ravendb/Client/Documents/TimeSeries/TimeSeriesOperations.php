@@ -11,14 +11,12 @@ use RavenDB\Client\Documents\Operations\MaintenanceOperationExecutor;
 class TimeSeriesOperations
 {
     private IDocumentStore $_store;
-    private string $_database;
+    private ?string $_database;
     private MaintenanceOperationExecutor $_executor;
 
-    public function __construct(DocumentStore $store, string $database)
+    public function __construct(DocumentStore $store, ?string $database=null)
     {
         $this->_store = $store;
         $this->_database = $database;
     }
-
-
 }

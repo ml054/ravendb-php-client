@@ -70,6 +70,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
      */
     public function store(object|string $entity, string $id, ?string $changeVector = null, ?string $forceConcurrencyCheck = null)
     {
+
         return $this->storeInternal($entity,$id,$changeVector);
     }
 

@@ -56,7 +56,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public DocumentsByEntityHolder $documentsByEntity;
     public DocumentsById $documentsById;
     public ArrayCollection $deferredCommands;
-    public ArrayCollection $deferredCommandsMap;
+    public Map $deferredCommandsMap;
     protected ArrayCollection $pendingLazyOperations;
     protected ArrayCollection $onEvaluateLazy;
     // TODO : IMPLEMENT THE MATCH FUNCTION
@@ -107,10 +107,11 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->uowQueueIsClean = new Map();
         $this->uowQueueIsNew = new Map();
         $this->uowQueueIsOriginal = new Map();
+        $this->deferredCommandsMap = new Map();
+        $this->includedDocumentsById = new Map();
 
         $saveChangesOptions = new IndexesWaitOptsBuilder($this);
         $this->_knownMissingIds = new ArrayCollection();
-        $this->includedDocumentsById = new Map();
         $this->documentsById = new DocumentsById();
         $this->documentsByEntity = new DocumentsByEntityHolder();
         $this->deletedEntities = new DeletedEntitiesHolder();
@@ -205,7 +206,9 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
     /***************** LifeCycle/UOW/Workflow ********************/
     public function prepareForSaveChanges(): SaveChangesData {
+
         $result = new SaveChangesData($this);
+
       //  $this->prepareForEntitiesDeletion($result,null);
         $this->prepareForEntitiesPuts($result);
         //$this->prepareForCreatingRevisionsFromIds($result);
@@ -236,11 +239,10 @@ abstract class InMemoryDocumentSessionOperations implements Closable
                 if($this->isDeleted($entity->getValue()->getId())) continue;
                 // $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
                 $document = $entity;
+
                 $result->getEntities()->add($entity->getKey());
-                // HARD CODING CHANGEVECTOR. TO BE REMOVE
                 $result->getSessionCommands()->add(new PutCommandDataWithJson($entity->getValue()->getId(),'PA-Test',$document,"NONE"));
             }
-
         } finally {
             $this->close();
         }
@@ -399,6 +401,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     }
     public function storeEntityInUnitOfWork($entity, string $id = null, ?string $changeVector=null){
         if(null !== $id) $this->_knownMissingIds->remove($id);
+
+
         $documentInfo = new DocumentInfo();
         $documentInfo->setId($id);
         $documentInfo->setEntity($entity);
@@ -408,19 +412,23 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         if($id !== null){
             $this->documentsById->add($documentInfo);
         }
+       // dd($this->documentsById,__METHOD__, $documentInfo);
     }
 
     public function storeInternal(object|array $entity, string $id = null, ?string $changeVector=null,string $forceConcurrencyCheck="DISABLED"):void {
+
         $this->noTracking = true;
         if(false === $this->noTracking) throw new IllegalStateException(Constants::EXCEPTION_STRING_NO_TRACKING);
         if(null === $entity) throw new \InvalidArgumentException(Constants::EXCEPTION_STRING_EMTPY_ENTITY);
+
         $metadata = "";
         $value = $this->documentsByEntity->get($entity);
-        if(null !== $value){
-            $value->setChangeVector(ObjectUtils::firstNonNull([$changeVector,$value->getChangeVector()]));
+        /*if(null !== $value){
+            $value->setChangeVector(ObjectUtils::firstNonNull([$changeVector]));
             $value->setConcurrencyCheckMode($forceConcurrencyCheck);
             return;
-        }
+        }*/
+
 
         if(null === $id){
             if($this->generateDocumentKeysOnStore){
@@ -429,15 +437,17 @@ abstract class InMemoryDocumentSessionOperations implements Closable
                 $this->rememberEntityForDocumentIdGeneration($entity);
             }
         }else{
-
+            // JAVA SOURCE :  generateEntityIdOnTheClient.trySetIdentity(entity, id);
         }
-         $this->storeEntityInUnitOfWork($entity,$id,$changeVector,$metadata,$forceConcurrencyCheck);
+
+      //  if($this->deferredCommandsMap->hasKey()) TODO
+       // if($this->deletedEntities->contains($entity)) throw new \Exception("Can't store object, it was already deleted in this session. Document id: " . $id);
+        $this->storeEntityInUnitOfWork($entity,$id,$changeVector,$metadata,$forceConcurrencyCheck);
     }
 
     public function forceConcurrenceCheck(string $option){
         if(!array_key_exists($option,self::ConcurrencyCheckMode)) throw new \Exception(Constants::EXCEPTION_STRING_INVALID_OPTION);
         return self::ConcurrencyCheckMode[$option];
     }
-
 
 }

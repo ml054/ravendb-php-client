@@ -31,8 +31,9 @@ class DocumentsByEntityHolder
         $this->_inner->clear();
     }
 
-    public function get(object $entity): DocumentInfo {
-        $documentInfo = $this->_inner->get($entity);
+    public function get(object $entity): object
+    {
+        $documentInfo = $entity;
         if(null !== $documentInfo){
             return $documentInfo;
         }
