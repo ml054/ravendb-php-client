@@ -59,21 +59,21 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
     {
       //  dd($this->_commands->getValues()[0]->getId());
         $commands = $this->_commands->getValues();
-        $documents = [];
+        $command_operations = [];
         foreach($commands as $index=>$command){
             $type = $command->getType();
-            $documents[] = (new Document($type,$command->getDocument()->getValue()->getId()))->setDocument($command->getDocument()->getValue());
             /**
              * @var Document $document
-            */
-            $document = $documents[$index]->getDocument();
-           // $document->getId();
+             */
+            $document = $command->getDocument();
+            $entity = $document->getValue()->getEntity();
+            $docInfoId = $document->getValue()->getId();
+            $command_operations[] = ["Id"=>$docInfoId,"Type"=>$type,"Document"=>$entity];
         }
-        $command = (new Command())->setCommands($documents);
-        dd($command);
-
+        $command = (new Command())->setCommands($command_operations);
         $request = $this->internalSerializer->serialize($command,'json');
         $httpClient = new HttpRequestBase();
+
         $url = $node->getUrl()."/databases/".$node->getDatabase()."/bulk_docs";
         $curlopt = [
             CURLOPT_URL => $url,
