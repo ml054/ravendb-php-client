@@ -3,7 +3,7 @@ namespace RavenDB\Client\Util;
 
 class ObjectUtils
 {
-    public static function firstNonNull(array|object $getDatabases): string
+    public static function firstNonNull(array $getDatabases): string
     {
       $database = null;
 

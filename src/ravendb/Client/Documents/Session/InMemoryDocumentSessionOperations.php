@@ -397,8 +397,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     protected function rememberEntityForDocumentIdGeneration(object $entity): void {
         throw new \Exception(Constants::EXCEPTION_STRING_ID_GENERATOR);
     }
-    // TODO COMPLETE IMPLEMENTATION OF THE ALL PARAMS (JAVA'S LIKE)
     public function storeEntityInUnitOfWork($entity, string $id = null, ?string $changeVector=null){
+        if(null !== $id) $this->_knownMissingIds->remove($id);
         $documentInfo = new DocumentInfo();
         $documentInfo->setId($id);
         $documentInfo->setEntity($entity);
@@ -410,17 +410,34 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         }
     }
 
-    public function storeInternal(object|array $entity, string $id = null, ?string $changeVector=null,string $forceConcurrencyCheck="DISABLED") {
+    public function storeInternal(object|array $entity, string $id = null, ?string $changeVector=null,string $forceConcurrencyCheck="DISABLED"):void {
         $this->noTracking = true;
         if(false === $this->noTracking) throw new IllegalStateException(Constants::EXCEPTION_STRING_NO_TRACKING);
         if(null === $entity) throw new \InvalidArgumentException(Constants::EXCEPTION_STRING_EMTPY_ENTITY);
-        $metadata = ""; // TODO METADATA
-        $forceConcurrencyCheck= false;
-        return $this->storeEntityInUnitOfWork($entity,$id,$changeVector,$metadata,$forceConcurrencyCheck);
+        $metadata = "";
+        $value = $this->documentsByEntity->get($entity);
+        if(null !== $value){
+            $value->setChangeVector(ObjectUtils::firstNonNull([$changeVector,$value->getChangeVector()]));
+            $value->setConcurrencyCheckMode($forceConcurrencyCheck);
+            return;
+        }
+
+        if(null === $id){
+            if($this->generateDocumentKeysOnStore){
+                throw new \Exception("TODO MIGRATE THE GENERATOR"); // TODO CHECK WITH AREK
+            }else{
+                $this->rememberEntityForDocumentIdGeneration($entity);
+            }
+        }else{
+
+        }
+         $this->storeEntityInUnitOfWork($entity,$id,$changeVector,$metadata,$forceConcurrencyCheck);
     }
 
     public function forceConcurrenceCheck(string $option){
         if(!array_key_exists($option,self::ConcurrencyCheckMode)) throw new \Exception(Constants::EXCEPTION_STRING_INVALID_OPTION);
         return self::ConcurrencyCheckMode[$option];
     }
+
+
 }

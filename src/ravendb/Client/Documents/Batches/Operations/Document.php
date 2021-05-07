@@ -6,7 +6,8 @@ class Document
 {
     private object $Document;
     private string $Type;
-    public function __construct(string $Type){
+    private string $id;
+    public function __construct(string $Type,string $id){
         $this->Type = $Type;
     }
 
@@ -22,4 +23,19 @@ class Document
         $this->Document = $Document;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function setId(string $id): void
+    {
+        $this->id = $id;
+    }
+
+
 }

@@ -14,4 +14,6 @@ class GenerateEntityIdOnTheClient
         $this->_conventions = $conventions;
         $this->_generateId = $generateId;
     }
+
+
 }
