@@ -4,28 +4,11 @@ namespace RavenDB\Client\Infrastructure\Entities;
 
 class User
 {
-    private ?string $id=null;
     private ?string $name=null;
     private ?string $lastName=null;
     private ?string $addressId=null;
     private ?int $count=null;
     private ?int $age=null;
-
-    /**
-     * @return string
-     */
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param string|null $id
-     */
-    public function setId(?string $id): void
-    {
-        $this->id = $id;
-    }
 
     /**
      * @return string|null

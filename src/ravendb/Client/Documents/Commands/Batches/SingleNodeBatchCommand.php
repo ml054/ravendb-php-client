@@ -57,16 +57,20 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
      */
     public function createRequest(ServerNode $node): array|string|object
     {
+      //  dd($this->_commands->getValues()[0]->getId());
         $commands = $this->_commands->getValues();
         $documents = [];
         foreach($commands as $index=>$command){
-            // THE COMMAND IS AN ARRAYCOLLECTION GIVING ACCESS TO OBJECT LIKE TARGET
             $type = $command->getType();
-         //   dd($command);
-            $documents[] = (new Document($type,$command->getDocument()))->setDocument($command->getDocument()->getValue());
+            $documents[] = (new Document($type,$command->getDocument()->getValue()->getId()))->setDocument($command->getDocument()->getValue());
+            /**
+             * @var Document $document
+            */
+            $document = $documents[$index]->getDocument();
+           // $document->getId();
         }
         $command = (new Command())->setCommands($documents);
-        dd($documents);
+        dd($command);
 
         $request = $this->internalSerializer->serialize($command,'json');
         $httpClient = new HttpRequestBase();
