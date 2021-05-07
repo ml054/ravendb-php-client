@@ -73,4 +73,9 @@ class Constants
 
     public const EXCEPTION_STRING_EMTPY_ENTITY = "Entity cannot be null";
     public const EXCEPTION_STRING_INVALID_OPTION = "Invalid option";
+
+    public const COMPAREEXCHANGEVALUESTATE_NONE = "NONE";
+    public const COMPAREEXCHANGEVALUESTATE_CREATED = "CREATED";
+    public const COMPAREEXCHANGEVALUESTATE_DELETED = "DELETED";
+    public const COMPAREEXCHANGEVALUESTATE_MISSING = "MISSING";
 }

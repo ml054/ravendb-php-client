@@ -3,15 +3,16 @@
 namespace RavenDB\Client\Json;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Ds\Map;
 use RavenDB\Client\DataBind\Node\ObjectNode;
 use RavenDB\Client\Documents\Session\IMetadataDictionary;
 
 class MetadataAsDictionary  implements IMetadataDictionary
 {
-    private IMetadataDictionary|ArrayCollection $_parent;
+    private IMetadataDictionary|Map $_parent;
     private string $_parentKey;
-    private ArrayCollection $_metadata;
-    private ObjectNode|ArrayCollection $_source; // TODO CHECK WITH TECH HOW TO IMPLEMENT SOURCE PROPERTY
+    private Map $_metadata;
+    private ObjectNode|Map $_source;
     private bool $dirty = false;
 
     public function __construct(ObjectNode|ArrayCollection $metadata, IMetadataDictionary|ArrayCollection $parent, string $parentKey)
@@ -30,7 +31,7 @@ class MetadataAsDictionary  implements IMetadataDictionary
 
     private function initialize(ObjectNode $metadata){
         $this->dirty = true;
-        $_metadata = new ArrayCollection();
+        $_metadata = new Map();
     }
 
     public function size():int {
@@ -55,24 +56,65 @@ class MetadataAsDictionary  implements IMetadataDictionary
         }
     }
 
-    public function getObjects(array $key): IMetadataDictionary
+    public function getObjects(string $key): IMetadataDictionary
     {
-        // TODO: Implement getObjects() method.
+        $obj = $this->get($key);
+        if(null !== $this->_metadata){
+            return $this->_metadata->get($key);
+        }
+    }
+
+    public function convertValue(string $key, object $value){
+        if(null === $value){
+            return null;
+        }
+
+        if(is_bool($value)){
+            return (bool) $value;
+        }
+
+        if(is_int($value)){
+            return (int) $value;
+        }
+
+        if(is_string($value)){
+            return (string) $value;
+        }
+
+        if(is_object($value)){
+            $dictionary = new MetadataAsDictionary($value,$this,$key);
+            $dictionary->initialize((object) $value);
+            return $dictionary;
+        }
+
+        if(is_array($value)){
+            $array = $value;
+            $arraySize = count($array);
+            $result = (object) new Map($arraySize);
+            for((int) $i; $i < $arraySize ; $i ++) {
+                $result[$i] = $this->convertValue($key,$array->get(i));
+            }
+        }
     }
 
     public function getString(string $key)
     {
-        // TODO: Implement getString() method.
+        $obj = $this->get($key);
+        if(null === $obj){
+            return null ; // TODO CHECK EQUIVALENT IN PHP SOURCE : return 0L;
+        }
     }
 
     public function getLong(string $key)
     {
-        // TODO: Implement getLong() method.
+
     }
 
     public function getBoolean(bool $key): bool
     {
-        // TODO: Implement getBoolean() method.
+        $obj = $this->get($key);
+        if(null === $obj) return false;
+        return (bool) $obj;
     }
 
     public function getDouble(string $key): float
@@ -80,8 +122,12 @@ class MetadataAsDictionary  implements IMetadataDictionary
         // TODO: Implement getDouble() method.
     }
 
-    public function getObject(string $key): IMetadataDictionary
+    public function getObject(string $key): ?IMetadataDictionary
     {
-        // TODO: Implement getObject() method.
+        $obj = $this->get($key);
+        if(null === $obj){
+            return null ;
+        }
+         return $obj;
     }
 }

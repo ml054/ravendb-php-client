@@ -14,13 +14,13 @@ trait ObjectMapper
     /**
      * @throws \Exception
      */
-    public function serialize(?object $object=null): void {
+    public function serialize(?object $object=null): string {
         if(!is_object($object)) throw new \Exception("Data source must be an object");
         $serializer = JsonExtensions::storeSerializer();
-        $serializer->serialize($object,'json');
+       return $serializer->serialize($object,'json');
     }
 
     public function convertEntityToJson(object $entity,DocumentInfo $documentInfo){
-        return $this->serialize();
+        return $this->serialize($entity);
     }
 }

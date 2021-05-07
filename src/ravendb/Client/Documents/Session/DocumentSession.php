@@ -123,10 +123,8 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     {
         $documentInfo = $this->documentsByEntity->get($entity);
         if(null === $documentInfo) return false;
-        /*
-        ObjectNode document = entityToJson.convertEntityToJson(entity, documentInfo);
-        return entityChanged(document, documentInfo, null);
-         * */
+
+      //  $document =
     }
 
     public function getMaxNumberOfRequestsPerSession(): int
@@ -267,8 +265,8 @@ class DocumentSession extends InMemoryDocumentSessionOperations
      * @param entity Entity to check
      * @return true if entity has changed
      */
-    public function hasChanged(object $entity):bool {
+    public function hasChanged(object $entity): bool {
         $documentInfo = $this->documentsByEntity->get($entity);
-
+        if(null === $documentInfo) return false;
     }
 }

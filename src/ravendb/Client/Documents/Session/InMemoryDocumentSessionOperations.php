@@ -105,7 +105,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->uowQueueIsUpdate = new Map();
         $this->uowQueueIsDelete = new Map();
         $this->uowQueueIsClean = new Map();
-        $this->uowQueueIsCreate = new Map();
+        $this->uowQueueIsNew = new Map();
         $this->uowQueueIsOriginal = new Map();
 
         $saveChangesOptions = new IndexesWaitOptsBuilder($this);

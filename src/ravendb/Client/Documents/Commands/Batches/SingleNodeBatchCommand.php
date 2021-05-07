@@ -62,9 +62,10 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
         foreach($commands as $index=>$command){
             // THE COMMAND IS AN ARRAYCOLLECTION GIVING ACCESS TO OBJECT LIKE TARGET
             $type = $command->getType();
+            dd($command);
             $documents[] = (new Document($type))->setDocument($command->getDocument()->getValue());
         }
-
+        dd($command);
         $command = (new Command())->setCommands($documents);
         $request = $this->internalSerializer->serialize($command,'json');
 

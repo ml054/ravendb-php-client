@@ -25,9 +25,10 @@ interface IAdvancedDocumentSessionOperations
 
     /**
      * Gets a value indicating whether any of the entities tracked by the session has changes.
-     * @return true if any entity associated with session has changes
+     * @param object $entity
+     * @return bool|null if any entity associated with session has changes
      */
-    public function hasChanges(object $entity):bool;
+    public function hasChanges(object $entity):?bool;
 
     /**
      * Gets the max number of requests per session.
