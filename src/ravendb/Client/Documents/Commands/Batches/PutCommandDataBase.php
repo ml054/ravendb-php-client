@@ -12,6 +12,7 @@ class PutCommandDataBase implements ICommandData
     private string $changeVector;
     private string $type = "PUT";
     public string $forceRevisionCreationStrategy="NONE";
+
     public function __construct(string $id, string $changeVector, object $document,string $strategy)
     {
         if ($document === null) {

@@ -3,12 +3,14 @@
 namespace RavenDB\Client\Documents\Session\Operations;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use http\Exception;
 use RavenDB\Client\DataBind\Node\ObjectNode;
 use RavenDB\Client\Documents\Commands\GetDocumentsCommand;
 use RavenDB\Client\Documents\Commands\GetDocumentsResult;
 use RavenDB\Client\Documents\Operations\TimeSeries\TimeSeriesRange;
 use RavenDB\Client\Documents\Session\DocumentInfo;
 use RavenDB\Client\Documents\Session\InMemoryDocumentSessionOperations;
+use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\StringUtils;
 use function Webmozart\Assert\Tests\StaticAnalysis\null;
@@ -86,29 +88,22 @@ class LoadOperation
         }*/
     }
 
-    // TODO CHECK WITH TECH THE APPROACH FOR DEFAULT CLASS TYPE VALUE. IF NEEDED IN PHP
     public function getDocument(object|string $class, $id){
-       if($this->_session->isDeleted($id)){
-            return $class;
-       }
-       $doc = $this->_session->documentsById->getValue($id);
-        // SUBJECT TO IMPROVEMENT
-       if($doc !== null){
-           $results = (object) $doc->getDocument()->getNodeDocument();
 
-           if(property_exists($results,'Results') && is_array($results->Results)){
-               foreach($results->Results as $index=>$data) {
-                   $object = (object)$data;
-                   $entity = $object->entity;
-               }
-           }else{
-               $entity = $results->entity;
-           }
-           $convertEntity = $this->mapper()::storeSerializer()->encode($entity,'json');
-           $class = $this->mapper()::readValue($convertEntity,$class);
-           return $class;
+        $docById = $this->_session->documentsById->getValue($id);
+        $entity = $docById->setEntity($docById->getDocument()->getNodeDocument());
+        if(null === $docById->getEntity()){
+            throw new \Exception("Entity object cannot be null");
         }
-        // THE RESPONSE IN JAVA VERSION THE FULL QUALIFIED NAMESPACE. WE NEED TO INSTANTIATE IT IN PHP IN ORDER TO ACCESS THE METHODS
-        return $class;
+        if($this->_session->isDeleted($id)){
+            return $class;
+        }
+        $document = $docById->getDocument();
+        if($this->_session->isDeleted($id)){
+            return $class;
+        }
+        $serialize = JsonExtensions::storeSerializer()->serialize($docById->getEntity(),'json');
+        $classSerialized = $this->mapper()::readValue($serialize,$class);
+        return $classSerialized;
     }
 }

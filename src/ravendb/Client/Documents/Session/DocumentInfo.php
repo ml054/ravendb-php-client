@@ -25,7 +25,7 @@ class DocumentInfo
     private object $metadata;
     private ?object $document;
     private IMetadataDictionary $metadataInstance;
-    private ?object $entity=null;
+    private object|array|null $entity=null;
     private bool $newDocument;
     private string $collection;
     private string $concurrencyCheckMode;
@@ -126,12 +126,12 @@ class DocumentInfo
         $this->metadataInstance = $metadataInstance;
     }
 
-    public function getEntity(): object
+    public function getEntity(): object|array
     {
         return $this->entity;
     }
 
-    public function setEntity(?object $entity): void
+    public function setEntity(object|array|null $entity): void
     {
         $this->entity = $entity;
     }

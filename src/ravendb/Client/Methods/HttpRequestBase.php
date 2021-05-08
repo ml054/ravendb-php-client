@@ -34,7 +34,6 @@ class HttpRequestBase
             $response = curl_exec($curlObject);
             if (!curl_errno($curlObject)) {
                 $http_code = curl_getinfo($curlObject, CURLINFO_HTTP_CODE);
-              //  dd($http_code);
                 $expectedStatusCode = $this->http_codes[$http_code];
                 match ($http_code){
                     $expectedStatusCode=> $this->response = $response,

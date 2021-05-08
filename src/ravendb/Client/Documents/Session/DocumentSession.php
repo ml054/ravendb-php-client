@@ -58,9 +58,9 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         $loadOperation->byId($id);
         $command = $loadOperation->createRequest();
         if(null !== $command){
-
             $this->sessionInfo = new SessionInfo($this,$this->options,$this->documentStore);
             $this->_requestExecutor->execute($command,$this->sessionInfo,$this->documentStore);
+//            dd($command->getResult());
             $loadOperation->setResult($command->getResult());
         }
         return $loadOperation->getDocument($clazz,$id);

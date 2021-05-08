@@ -256,7 +256,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
      * @return true is document is deleted
      */
     public function isDeleted(string $id) {
-        //  return $this->_knownMissingIds->containsKey(id); TODO REIMPLEMENT COMMENTED FOR THE PURPOSE OF THE TEST
+        //  return $this->_knownMissingIds->containsKey(id);
     }
 
     private static function updateMetadataModifications(DocumentInfo $documentInfo):bool{
