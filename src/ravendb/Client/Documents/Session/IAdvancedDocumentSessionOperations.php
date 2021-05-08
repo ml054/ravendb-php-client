@@ -4,6 +4,7 @@ namespace RavenDB\Client\Documents\Session;
 
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Ds\Map;
 use RavenDB\Client\Documents\Batches\ICommandData;
 use RavenDB\Client\Documents\IDocumentStore;
 use RavenDB\Client\Http\RequestExecutor;

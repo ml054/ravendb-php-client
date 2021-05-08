@@ -12,7 +12,7 @@ class SessionOptions
     private bool $noCaching;
     private ?RequestExecutor $requestExecutor=null;
     private TransactionMode $transactionMode;
-
+    private $unitOfWork;
     public function getDatabase(): string
     {
         return $this->database;

@@ -6,9 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 class AssertUtils
 {
-    static private array|string|object $elements;
+    static private mixed $elements;
 
-    public static function assertThat(array|string|object $element): self
+    public static function assertThat(mixed $element): ?self
     {
         self::$elements = $element;
         return new self;

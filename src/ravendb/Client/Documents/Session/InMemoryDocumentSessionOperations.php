@@ -75,6 +75,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     private int $maxNumberOfRequestsPerSession;
     protected bool $generateDocumentKeysOnStore;
     private bool $_isDisposal;
+
     /**
      * @psalm-return Map<string, DocumentInfo>
      */
@@ -88,7 +89,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     private Map $uowQueueIsDelete;
     private Map $uowQueueIsClean;
     private Map $uowQueueIsCreate;
-    private Map $uowQueueIsOriginal;
+    public ArrayCollection $uowQueueIsOriginal;
 
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
@@ -106,7 +107,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->uowQueueIsDelete = new Map();
         $this->uowQueueIsClean = new Map();
         $this->uowQueueIsNew = new Map();
-        $this->uowQueueIsOriginal = new Map();
+        $this->uowQueueIsOriginal = new ArrayCollection();
         $this->deferredCommandsMap = new Map();
         $this->includedDocumentsById = new Map();
 
@@ -121,6 +122,10 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->_requestExecutor = $documentStore->getRequestExecutor($this->databaseName);
         $this->noTracking = $options->isNoTracking();
         $this->useOptimisticConcurrency = $this->_requestExecutor->getConventions()->isUseOptimisticConcurrency();
+    }
+
+    public function getUowQueueIsOriginal(){
+        return $this->uowQueueIsOriginal;
     }
 
     public function getId(){
@@ -208,8 +213,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function prepareForSaveChanges(): SaveChangesData {
 
         $result = new SaveChangesData($this);
-
-      //  $this->prepareForEntitiesDeletion($result,null);
+        $this->prepareForEntitiesDeletion($result,null);
         $this->prepareForEntitiesPuts($result);
         //$this->prepareForCreatingRevisionsFromIds($result);
         //$this->prepareCompareExchangeEntities($result);
@@ -237,9 +241,9 @@ abstract class InMemoryDocumentSessionOperations implements Closable
                 }
 
                 if($this->isDeleted($entity->getValue()->getId())) continue;
-                // $dirtyMetadata = self::updateMetadataModifications($entity->getValue());
+                 //$dirtyMetadata = self::updateMetadataModifications($entity->getValue());
+                 //dd($dirtyMetadata);
                 $document = $entity;
-
                 $result->getEntities()->add($entity->getKey());
                 $result->getSessionCommands()->add(new PutCommandDataWithJson($entity->getValue()->getId(),'PA-Test',$document,"NONE"));
             }
@@ -264,16 +268,37 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         if(null !== $documentInfo->getMetadataInstance()){
             $dirty = true;
         }
-        foreach ($documentInfo->getMetadataInstance() as $pop) { // TODO : CHECK FOR THE KEYSET
+        foreach ($documentInfo->getMetadataInstance() as $pop) {
             $dirty = false;
-            /**
-             * @var MetadataAsDictionary $propValue
-             */
+            /*** @var MetadataAsDictionary $propValue */
             $propValue = $documentInfo->getMetadataInstance()->getLong($pop);
             if(null === $propValue || $propValue instanceof MetadataAsDictionary && ($propValue->isDirty())){
                 $dirty = true;
             }
         }
+    }
+
+    private function getDocumentInfo($instance){
+        $documentInfo = $this->documentsByEntity->get($instance);
+        if(null !== $documentInfo) return $documentInfo;
+        return null; // TODO COMPLETE WITH GENERATOR
+    }
+
+    public function getMetadataFor ($instance){
+        if(null === $instance) throw new \InvalidArgumentException("Instance cannot be null");
+        /**
+         * @var DocumentInfo $documentInfo
+        */
+        $documentInfo = $this->getDocumentInfo($instance);
+        if(null !== $documentInfo->getMetadataInstance()){
+            return $documentInfo->getMetadataInstance();
+        }
+
+        $metadataAsJson = $documentInfo->getMetadata();
+        $metadata = new MetadataAsDictionary($metadataAsJson);
+        $documentInfo->setMetadataInstance($metadata);
+
+        return $metadata;
     }
 
     /**
@@ -401,28 +426,28 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     }
     public function storeEntityInUnitOfWork($entity, string $id = null, ?string $changeVector=null){
         if(null !== $id) $this->_knownMissingIds->remove($id);
-
-
+        $oldDoc = $this->getDocumentInfo($entity);
+        $oldDoc;
         $documentInfo = new DocumentInfo();
         $documentInfo->setId($id);
         $documentInfo->setEntity($entity);
         $documentInfo->setNewDocument(true);
         $documentInfo->setDocument(null);
+        $document = $this->documentsByEntity->get($entity);
         $this->documentsByEntity->put($entity,$documentInfo);
         if($id !== null){
             $this->documentsById->add($documentInfo);
         }
-       // dd($this->documentsById,__METHOD__, $documentInfo);
     }
 
     public function storeInternal(object|array $entity, string $id = null, ?string $changeVector=null,string $forceConcurrencyCheck="DISABLED"):void {
-
-        $this->noTracking = true;
-        if(false === $this->noTracking) throw new IllegalStateException(Constants::EXCEPTION_STRING_NO_TRACKING);
+        $this->noTracking = false;
+        if(true === $this->noTracking) throw new IllegalStateException(Constants::EXCEPTION_STRING_NO_TRACKING);
         if(null === $entity) throw new \InvalidArgumentException(Constants::EXCEPTION_STRING_EMTPY_ENTITY);
 
         $metadata = "";
         $value = $this->documentsByEntity->get($entity);
+
         /*if(null !== $value){
             $value->setChangeVector(ObjectUtils::firstNonNull([$changeVector]));
             $value->setConcurrencyCheckMode($forceConcurrencyCheck);
@@ -439,8 +464,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         }else{
             // JAVA SOURCE :  generateEntityIdOnTheClient.trySetIdentity(entity, id);
         }
-
-      //  if($this->deferredCommandsMap->hasKey()) TODO
        // if($this->deletedEntities->contains($entity)) throw new \Exception("Can't store object, it was already deleted in this session. Document id: " . $id);
         $this->storeEntityInUnitOfWork($entity,$id,$changeVector,$metadata,$forceConcurrencyCheck);
     }
@@ -449,5 +472,13 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         if(!array_key_exists($option,self::ConcurrencyCheckMode)) throw new \Exception(Constants::EXCEPTION_STRING_INVALID_OPTION);
         return self::ConcurrencyCheckMode[$option];
     }
-
+    /**
+     * Determines whether the specified entity has changed.
+     * @param entity Entity to check
+     * @return true if entity has changed
+     */
+    public function hasChanged(object $entity): bool {
+        $documentInfo = $this->documentsByEntity->get($entity);
+        return null === $documentInfo? false : true;
+    }
 }

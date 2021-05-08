@@ -20,7 +20,7 @@ use RavenDB\Client\Exceptions\RavenException;
 use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\StringUtils;
-
+use \Swaggest\JsonDiff;
 class DocumentSession extends InMemoryDocumentSessionOperations
     implements IDocumentSessionImpl,IAdvancedSessionOperations,IDocumentQueryGenerator
 {
@@ -31,6 +31,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     private ArrayCollection $externalState;
     private int $getMaxNumberOfRequestsPerSession;
     private bool $useOptimisticConcurrency;
+    private ArrayCollection $changes;
     private Map $container;
     public function __construct(DocumentStore $documentStore, string $id, SessionOptions $options)
     {
@@ -60,8 +61,12 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         if(null !== $command){
             $this->sessionInfo = new SessionInfo($this,$this->options,$this->documentStore);
             $this->_requestExecutor->execute($command,$this->sessionInfo,$this->documentStore);
-//            dd($command->getResult());
-            $loadOperation->setResult($command->getResult());
+            $jsonOriginal = $command->getResult()->getResults();
+            $jsonOriginal = JsonExtensions::storeSerializer()->serialize($command->getResult()->getResults(),'json');
+            $jsonCompareNew = JsonExtensions::storeSerializer()->serialize($this->documentsById->getValue($id)->getEntity(),'json');
+            $diff = new JsonDiff\JsonDiff($jsonOriginal,$jsonCompareNew);
+
+            dd($diff->getPatch());
         }
         return $loadOperation->getDocument($clazz,$id);
     }
@@ -70,7 +75,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
      */
     public function store(object|string $entity, string $id, ?string $changeVector = null, ?string $forceConcurrencyCheck = null)
     {
-
         return $this->storeInternal($entity,$id,$changeVector);
     }
 
@@ -78,13 +82,13 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         $saveChangeOperation = new BatchOperation($this);
         try{
             $command = $saveChangeOperation->createRequest();
-            $this->noTracking = true;
+            $this->noTracking = false;
             if(null === $command) return;
-            if($this->noTracking === false) {
+            if($this->noTracking === true) {
                 throw new IllegalStateException("Cannot execute saveChanges when entity tracking is disabled in session.");
             }
             $this->_requestExecutor->execute($command,null);
-            //$this->updateSessionAfterSaveChanges($command->getResult());
+          //  $this->updateSessionAfterSaveChanges($command->getResult());
             $saveChangeOperation->setResult($command->getResult());
         } finally {
             $this->close();
@@ -122,10 +126,10 @@ class DocumentSession extends InMemoryDocumentSessionOperations
 
     public function hasChanges(object $entity): bool
     {
-        $documentInfo = $this->documentsByEntity->get($entity);
-        if(null === $documentInfo) return false;
-
-      //  $document =
+        foreach($this->documentsByEntity as $entity){
+            $document = JsonExtensions::storeSerializer()->serialize([$entity->getKey()=>$entity->getValue()]);
+            //dd($document);
+        }
     }
 
     public function getMaxNumberOfRequestsPerSession(): int
@@ -267,7 +271,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
      * @return true if entity has changed
      */
     public function hasChanged(object $entity): bool {
-        $documentInfo = $this->documentsByEntity->get($entity);
-        if(null === $documentInfo) return false;
+        return parent::hasChanged($entity);
     }
 }

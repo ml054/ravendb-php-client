@@ -13,7 +13,7 @@ class DocumentsById
         $this->_inner = new ArrayCollection();
     }
 
-    public function getValue(string $id):DocumentInfo {
+    public function getValue(?string $id):?DocumentInfo {
         return $this->_inner->get($id);
     }
 
@@ -23,6 +23,7 @@ class DocumentsById
     }
 
     public function remove (string $id):bool {
+      //  dd("hereree");
         return $this->_inner->remove($id) !== null;
     }
 

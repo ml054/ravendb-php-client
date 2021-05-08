@@ -24,7 +24,7 @@ class DocumentInfo
     private bool $ignoreChanges;
     private object $metadata;
     private ?object $document;
-    private IMetadataDictionary $metadataInstance;
+    private ?IMetadataDictionary $metadataInstance;
     private object|array|null $entity=null;
     private bool $newDocument;
     private string $collection;
@@ -116,7 +116,7 @@ class DocumentInfo
         $this->document = $document;
     }
 
-    public function getMetadataInstance(): IMetadataDictionary
+    public function getMetadataInstance(): ?IMetadataDictionary
     {
         return $this->metadataInstance;
     }

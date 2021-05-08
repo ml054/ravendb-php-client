@@ -72,37 +72,18 @@ class LoadOperation
             $this->_session->registerMissing([$this->id]);
             return;
         }
-
         foreach($result->getResults() as $document){
             if(empty($document)) continue;
             // DOCUMENT IS SENT
             $newDocument = DocumentInfo::getNewDocumentInfo($document);
             $this->_session->documentsById->add($newDocument);
         }
-
-        /*foreach($this->_ids as $id){
-            $value = $this->_session->documentsById->getValue($id);
-            if(null !== $value){
-                $this->_session->registerMissing($id);
-            }
-        }*/
     }
 
     public function getDocument(object|string $class, $id){
-
         $docById = $this->_session->documentsById->getValue($id);
-        $entity = $docById->setEntity($docById->getDocument()->getNodeDocument());
-        if(null === $docById->getEntity()){
-            throw new \Exception("Entity object cannot be null");
-        }
-        if($this->_session->isDeleted($id)){
-            return $class;
-        }
-        $document = $docById->getDocument();
-        if($this->_session->isDeleted($id)){
-            return $class;
-        }
-        $serialize = JsonExtensions::storeSerializer()->serialize($docById->getEntity(),'json');
+        $entity = $docById->getEntity();
+        $serialize = JsonExtensions::storeSerializer()->serialize($entity,'json');
         $classSerialized = $this->mapper()::readValue($serialize,$class);
         return $classSerialized;
     }

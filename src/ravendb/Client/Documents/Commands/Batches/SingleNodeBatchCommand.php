@@ -57,7 +57,6 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
      */
     public function createRequest(ServerNode $node): array|string|object
     {
-      //  dd($this->_commands->getValues()[0]->getId());
         $commands = $this->_commands->getValues();
         $command_operations = [];
         foreach($commands as $index=>$command){
@@ -85,6 +84,7 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
                Constants::HEADERS_CONTENT_TYPE_APPLICATION_JSON
             ]
         ];
+   //     dd($curlopt);
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 
