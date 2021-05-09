@@ -111,7 +111,7 @@ class RemoteTestBase extends RavenTestDriver implements Closable
         $this->customizeDbRecord($databaseRecord);
         $createDatabaseOperation = new CreateDatabaseOperation($databaseRecord, 0);
         $documentStore->maintenance()->server()->send($createDatabaseOperation);
-        $store = new DocumentStore('http://devtool.infra:9095a/',$name);
+        $store = new DocumentStore('http://devtool.infra:9095/',$name);
         $store->setUrls(["http://devtool.infra:9095/"]);
         $store->setDatabase($name);
         $this->customizeStore($store);

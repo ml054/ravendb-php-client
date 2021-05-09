@@ -26,7 +26,6 @@ class RavenDB_11649Test extends RemoteTestBase
                 $session->saveChanges();
                 $doc->getInnerClass()->setA("NewInnerValue");
                 $changes = $session->advanced()->whatChanged();
-
             } finally {
                 $store->close();
             }

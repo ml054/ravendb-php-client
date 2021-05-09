@@ -129,7 +129,6 @@ class CrudTestDatabase extends RemoteTestBase
         $writeStartObject->set("Type","DELETE");
         $serializer = JsonExtensions::storeSerializer();
         $request = $serializer->serialize($writeStartObject,'json');
-        dd($request);
     }
 
     public function testCanGetDocumentOperation(){
