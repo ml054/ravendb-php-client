@@ -64,8 +64,8 @@ class DocumentSession extends InMemoryDocumentSessionOperations
             $this->_requestExecutor->execute($command,$this->sessionInfo,$this->documentStore);
             $jsonOriginal = $command->getResult()->getResults();
             $jsonOriginal = JsonExtensions::storeSerializer()->serialize($command->getResult()->getResults(),'json');
-//            $jsonCompareNew = JsonExtensions::storeSerializer()->serialize($this->documentsById->getValue($id)->getEntity(),'json');
-          //  $diff = new JsonDiff\JsonDiff($jsonOriginal,$jsonCompareNew);
+            $jsonCompareNew = JsonExtensions::storeSerializer()->serialize($this->documentsById->getValue($id)->getEntity(),'json');
+            $diff = new JsonDiff\JsonDiff($jsonOriginal,$jsonCompareNew);
 
         }
         return $loadOperation->getDocument($clazz,$id);

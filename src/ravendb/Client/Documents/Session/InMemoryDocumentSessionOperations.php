@@ -427,7 +427,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function storeEntityInUnitOfWork($entity, string $id = null, ?string $changeVector=null){
         if(null !== $id) $this->_knownMissingIds->remove($id);
         $oldDoc = $this->getDocumentInfo($entity);
-        $oldDoc;
         $documentInfo = new DocumentInfo();
         $documentInfo->setId($id);
         $documentInfo->setEntity($entity);
