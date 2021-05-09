@@ -81,10 +81,11 @@ class LoadOperation
     }
 
     public function getDocument(object|string $class, $id){
-        $docById = $this->_session->documentsById->getValue($id);
+
+        /*$docById = $this->_session->documentsById->getValue($id);
         $entity = $docById->getEntity();
         $serialize = JsonExtensions::storeSerializer()->serialize($entity,'json');
         $classSerialized = $this->mapper()::readValue($serialize,$class);
-        return $classSerialized;
+        return $classSerialized;*/
     }
 }
