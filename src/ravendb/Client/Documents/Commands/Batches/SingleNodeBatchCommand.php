@@ -30,7 +30,6 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
     public function __construct(DocumentConventions $conventions, ArrayCollection $commands, ?BatchOptions $options)
     {
         parent::__construct(BatchCommandResult::class);
-
         $this->_commands = $commands;
         $this->_options = $options;
 
@@ -44,6 +43,7 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
         if(null === $commands){
             throw new \InvalidArgumentException("commands cannot be null");
         }
+
         $commandsCollection = $this->_commands->getValues();
         // JUST FOR THE PURPOSE OF CONFIRMING THE INSTANCE OF THE COMMANDS FOR NOW
         foreach($commandsCollection as $command){
@@ -84,7 +84,7 @@ class SingleNodeBatchCommand extends RavenCommand implements Closable
                Constants::HEADERS_CONTENT_TYPE_APPLICATION_JSON
             ]
         ];
-   //     dd($curlopt);
+
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 

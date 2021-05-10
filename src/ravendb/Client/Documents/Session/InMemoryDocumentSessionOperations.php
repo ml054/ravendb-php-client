@@ -56,6 +56,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public DocumentsByEntityHolder $documentsByEntity;
     public DocumentsById $documentsById;
     public DocumentsByIdUnitOfWork $documentsByIdUnitOfWork;
+    public DocumentsByEntityUnitOfWork $documentsByEntityUnitOfWork;
     public ArrayCollection $deferredCommands;
     public Map $deferredCommandsMap;
     protected ArrayCollection $pendingLazyOperations;
@@ -102,13 +103,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         if(StringUtils::isBlank($this->databaseName)){
             static::throwNoDatabase();
         }
-
-        // OBJECT LIFECYCLE MONITORING QUEUES
-        $this->uowQueueIsUpdate = new Map();
-        $this->uowQueueIsDelete = new Map();
-        $this->uowQueueIsClean = new Map();
-        $this->uowQueueIsNew = new Map();
-        $this->uowQueueIsOriginal = new ArrayCollection();
         $this->deferredCommandsMap = new Map();
         $this->includedDocumentsById = new Map();
 
@@ -118,6 +112,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->documentsByEntity = new DocumentsByEntityHolder();
         $this->deletedEntities = new DeletedEntitiesHolder();
         $this->documentsByIdUnitOfWork = new DocumentsByIdUnitOfWork();
+        $this->documentsByEntityUnitOfWork = new DocumentsByEntityUnitOfWork();
 
         $this->_saveChangesOptions = $saveChangesOptions->getOptions();
         $this->_documentStore = $documentStore;
@@ -243,8 +238,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
                 }
 
                 if($this->isDeleted($entity->getValue()->getId())) continue;
-                 //$dirtyMetadata = self::updateMetadataModifications($entity->getValue());
-                 //dd($dirtyMetadata);
                 $document = $entity;
                 $result->getEntities()->add($entity->getKey());
                 $result->getSessionCommands()->add(new PutCommandDataWithJson($entity->getValue()->getId(),'PA-Test',$document,"NONE"));
@@ -436,6 +429,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $documentInfo->setDocument(null);
         $document = $this->documentsByEntity->get($entity);
         $this->documentsByEntity->put($entity,$documentInfo);
+        // TODO IMPLEMENT documentsByEntityUnitOfWork LEVEL JSON DIFF DIRECTLY
+        $this->documentsByEntityUnitOfWork->tracker($entity,null);
         if($id !== null){
             $this->documentsById->add($documentInfo);
             $this->documentsByIdUnitOfWork->tracker($id,null);
@@ -480,7 +475,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
      * @return true if entity has changed
      */
     public function hasChanged(object $entity): bool {
-        $documentInfo = $this->documentsByEntity->get($entity);
+        $documentInfo = $this->documentsByEntityUnitOfWork->get($entity);
         return null === $documentInfo? false : true;
     }
 }

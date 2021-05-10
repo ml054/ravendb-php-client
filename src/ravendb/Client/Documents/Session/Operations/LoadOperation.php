@@ -63,20 +63,24 @@ class LoadOperation
      * @throws \Exception
      */
     public function setResult(GetDocumentsResult $result):void{
+
         $this->_resultsSet = true;
         if($this->_session->noTracking){
             $this->_results = $result;
             return;
         }
+
         if($result === null){
             $this->_session->registerMissing([$this->id]);
             return;
         }
+
         foreach($result->getResults() as $document){
             if(empty($document)) continue;
             $newDocument = DocumentInfo::getNewDocumentInfo($document);
             $this->_session->documentsById->add($newDocument);
         }
+        dd("hereere");
     }
 
     public function getDocument(object|string $class, $id){

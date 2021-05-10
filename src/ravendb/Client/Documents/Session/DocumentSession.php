@@ -58,16 +58,20 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     {
         $loadOperation = new LoadOperation($this);
         $loadOperation->byId($id);
+
         $command = $loadOperation->createRequest();
+
         if(null !== $command){
             $this->sessionInfo = new SessionInfo($this,$this->options,$this->documentStore);
-            $this->_requestExecutor->execute($command,$this->sessionInfo,$this->documentStore);
+            $this->_requestExecutor->execute($command,$this->sessionInfo);
+            $loadOperation->setResult($command->getResult());
+          /*//  dd($command->getResult()->getResults()            );
             $jsonOriginal = $command->getResult()->getResults();
             // TODO RELOCATE THE TRACKER TO KEEP THE LOAD METHOD NEUTRAL. FOR NOW JUST FOR TESTING
             $jsonOriginal = JsonExtensions::storeSerializer()->serialize($command->getResult()->getResults(),'json');
             $jsonNew = JsonExtensions::storeSerializer()->serialize($this->documentsById->getValue($id)->getEntity(),'json');
             $diff = new JsonDiff\JsonDiff($jsonOriginal,$jsonNew);
-            $this->documentsByIdUnitOfWork->tracker($id,$diff);
+            $this->documentsByIdUnitOfWork->tracker($id,$diff);*/
         }
         return $loadOperation->getDocument($clazz,$id);
     }
@@ -88,8 +92,8 @@ class DocumentSession extends InMemoryDocumentSessionOperations
             if($this->noTracking === true) {
                 throw new IllegalStateException("Cannot execute saveChanges when entity tracking is disabled in session.");
             }
-           // $this->_requestExecutor->execute($command,null);
-           // $saveChangeOperation->setResult($command->getResult());
+            $this->_requestExecutor->execute($command,null);
+            $saveChangeOperation->setResult($command->getResult());
         } finally {
             $this->close();
         }
