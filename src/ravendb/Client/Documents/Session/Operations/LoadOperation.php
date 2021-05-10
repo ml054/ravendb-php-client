@@ -20,7 +20,7 @@ class LoadOperation
 {
     use ObjectMapper;
     private InMemoryDocumentSessionOperations $_session;
-    private ?array $_ids=null;
+    private ?ArrayCollection $_ids=null;
     private string $id;
     private array $_includes;
     private ArrayCollection $_countersToInclude;
@@ -57,7 +57,7 @@ class LoadOperation
     {
         if( StringUtils::isEmpty($id)){ return $this; }
         if(null === $this->_ids){
-            $this->_ids = [$id];
+            $this->_ids = new ArrayCollection([$id]);
         }
         return $this;
     }

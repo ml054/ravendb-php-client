@@ -18,7 +18,7 @@ class GetDocumentsCommand extends RavenCommand
     private  TimeSeriesRange $_timeSeriesIncludes;
     private string $id;
     private ArrayCollection $_ids;
-    private ArrayCollection $_includes;
+    private ?ArrayCollection $_includes=null;
     private ArrayCollection $_counters;
     private bool $_includeAllCounters;
     private ArrayCollection $_compareExchangeValueIncludes;
@@ -30,11 +30,19 @@ class GetDocumentsCommand extends RavenCommand
     private string $_exclude;
     private string $_startAfter;
 
-    public function __construct(string $id,ArrayCollection|null $includes, ?bool $metadataOnly)
+    public function __construct(ArrayCollection $ids,ArrayCollection $includes, bool $metadataOnly, string $startWith, string $startAfter,string $matches,string $exclude, int $start, int $pageSize )
     {
-
         parent::__construct(GetDocumentsResult::class);
-        $this->id = $id;
+
+        $this->_ids = $ids;
+        $this->_includes = $includes;
+        $this->_metadataOnly = $metadataOnly;
+        $this->_startWith = $startWith;
+        $this->_startAfter = $startAfter;
+        $this->_matches = $matches;
+        $this->_exclude = $exclude;
+        $this->_start = $start;
+        $this->_pageSize = $pageSize;
     }
 
     public function isReadRequest(): bool
@@ -47,8 +55,12 @@ class GetDocumentsCommand extends RavenCommand
      */
     public function createRequest(ServerNode $node): \CurlHandle
     {
+        $url = $node->getUrl()."/databases/".$node->getDatabase()."/docs?";
+        $queryArgs = new ArrayCollection();
 
-        $url = $node->getUrl()."/databases/".$node->getDatabase()."/docs?id=".urlencode($this->id);
+
+
+       /* $url = $node->getUrl()."/databases/".$node->getDatabase()."/docs?id=".urlencode($this->id);
         $httpClient = new HttpRequestBase();
         $curlopt = [
             CURLOPT_URL => $url,
@@ -61,7 +73,7 @@ class GetDocumentsCommand extends RavenCommand
             ]
         ];
 
-        return $httpClient->createCurlRequest($url,$curlopt);
+        return $httpClient->createCurlRequest($url,$curlopt);*/
     }
 
     public function setResponse(array|string $response, bool $fromCache)
