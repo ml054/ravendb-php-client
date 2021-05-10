@@ -357,11 +357,11 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         if(StringUtils::isEmpty($id)){
             dd("TODO deserializeFromTransformer",__METHOD__);
         }
-
         $docInfo = $this->documentsById->getValue($id);
         if(null !== $docInfo){
             if(null === $docInfo->getEntity()){
-                dd("entityToJson",__METHOD__);
+                dd($entityType);
+               //$docInfo->setEntity(JsonExtensions::storeSerializer()->serialize([]));
             }
             if(!$noTracking){
                 $this->includedDocumentsById->remove($id);

@@ -3,8 +3,10 @@
 namespace RavenDB\Client\Documents\Session\Operations;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Ds\Map;
 use http\Exception;
 use RavenDB\Client\DataBind\Node\ObjectNode;
+use RavenDB\Client\Defaults;
 use RavenDB\Client\Documents\Commands\GetDocumentsCommand;
 use RavenDB\Client\Documents\Commands\GetDocumentsResult;
 use RavenDB\Client\Documents\Operations\TimeSeries\TimeSeriesRange;
@@ -58,7 +60,54 @@ class LoadOperation
         $this->_ids = $id;
         return $this;
     }
+    // FINAL
+    public function byIds(array $ids):self {
+        $distinct = new ArrayCollection();
+        foreach($ids as $id){
+            $distinct->add($id);
+        }
+        $this->_ids = $distinct->toArray();
+        return $this;
+    }
+    public function  withIncludes(array $includes):self {
+        $this->_includes = $includes;
+        return $this;
+    }
 
+    public function getDocument($clazz,?string $id=null)
+    {
+        if(null === $id){
+            if($this->_session->noTracking){
+                if(!$this->_resultsSet && count($this->_ids) > 0) throw new \Exception("Cannot execute getDocument before operation execution.");
+                if(null === $this->_results || null === $this->_results->getResults() || 0 === $this->_results->getResults()->count()) return null;
+                $document = $this->_results->getResults()->get(0);
+                if(null === $document) return null;
+                $documentInfo = DocumentInfo::getNewDocumentInfo($document);
+                return $this->_session->trackEntity($clazz,$documentInfo);
+            }
+        }else{
+            if($this->_session->isDeleted($id))return Defaults::defaultValue($clazz);
+            $doc = $this->_session->documentsById->getValue($id);
+            if(null !== $doc) return $this->_session->trackEntity($clazz,$doc);
+            return Defaults::defaultValue($clazz);
+        }
+    }
+
+    public function getDocuments($clazz): Map {
+        $finalResults = new Map();
+        if($this->_session->noTracking){
+            if(!$this->_resultsSet && count($this->_ids) > 0) throw new \Exception("Cannot execute getDocument before operation execution.");
+            foreach($this->_ids as $id){
+                if( null === $id ) continue;
+                $finalResults->put($id,null);
+            }
+            if(null === $this->_results || null === $this->_results->getResults() || 0 === $this->_results->getResults()->count()) return $finalResults;
+
+            foreach($this->_results->getResults() as $document){
+                if(null === $document)
+            }
+        }
+    }
     /**
      * @throws \Exception
      */
@@ -74,7 +123,7 @@ class LoadOperation
             $this->_session->registerMissing([$this->id]);
             return;
         }
-
+        $this->_session->registerIncludes($result->getIncludes());
         foreach($result->getResults() as $document){
             if(empty($document)) continue;
             $newDocument = DocumentInfo::getNewDocumentInfo($document);
@@ -83,11 +132,4 @@ class LoadOperation
         dd("hereere");
     }
 
-    public function getDocument(object|string $class, $id){
-        $docById = $this->_session->documentsById->getValue($id);
-        $entity = $docById->getEntity();
-        $serialize = JsonExtensions::storeSerializer()->serialize($entity,'json');
-        $classSerialized = $this->mapper()::readValue($serialize,$class);
-        return $classSerialized;
-    }
 }

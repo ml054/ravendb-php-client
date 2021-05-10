@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class GetDocumentsResult
 {
     private mixed $includes;
-    private mixed $results;
+    private ArrayCollection $results;
     private mixed $counterIncludes;
     private mixed $timeSeriesIncludes;
     private mixed $compareExchangeValueIncludes;
@@ -18,7 +18,7 @@ class GetDocumentsResult
         return $this->includes;
     }
 
-    public function getResults()
+    public function getResults():ArrayCollection
     {
         return $this->results;
     }
