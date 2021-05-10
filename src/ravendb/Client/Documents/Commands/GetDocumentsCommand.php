@@ -91,6 +91,5 @@ class GetDocumentsCommand extends RavenCommand
     public function setResponse(array|string $response, bool $fromCache)
     {
         $this->result = $this->mapper()::readValue($response,GetDocumentsResult::class);
-        dd($this->result,$response);
     }
 }
