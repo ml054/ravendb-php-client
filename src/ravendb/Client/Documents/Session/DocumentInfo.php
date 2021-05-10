@@ -184,7 +184,7 @@ class DocumentInfo
 
         $newDocumentInfo = new DocumentInfo();
         $newDocumentInfo->setId($id);
-        $newDocumentInfo->setDocument($documentObject);
+        $newDocumentInfo->setDocument((object)$document);
         $newDocumentInfo->setMetadata((object)$metadata);
         $newDocumentInfo->setEntity(null);
         $newDocumentInfo->setChangeVector($changeVector);

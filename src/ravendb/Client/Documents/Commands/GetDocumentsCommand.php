@@ -17,8 +17,8 @@ class GetDocumentsCommand extends RavenCommand
      * @psalm-var List<TimeSeriesRange>
      */
     private  TimeSeriesRange $_timeSeriesIncludes;
-   // private ?string $_id=null;
-    private ArrayCollection|string $_ids;
+    private ?string $_id=null;
+    private ArrayCollection $_ids;
     private ?ArrayCollection $_includes=null;
     private ArrayCollection $_counters;
     private bool $_includeAllCounters;
@@ -31,7 +31,7 @@ class GetDocumentsCommand extends RavenCommand
     private ?string $_exclude=null;
     private ?string $_startAfter=null;
 
-    public function __construct( ArrayCollection|string $ids,?ArrayCollection $includes, ?bool $metadataOnly, ?string $startWith, ?string $startAfter, ?string $matches, ?string $exclude, ?int $start, ?int $pageSize )
+    public function __construct( ArrayCollection $ids,?ArrayCollection $includes, ?bool $metadataOnly, ?string $startWith, ?string $startAfter, ?string $matches, ?string $exclude, ?int $start, ?int $pageSize )
     {
         parent::__construct(GetDocumentsResult::class);
         $this->_ids = $ids;
@@ -68,11 +68,13 @@ class GetDocumentsCommand extends RavenCommand
             if(null !== $this->_exclude){ $pathBuilder->set("exclude",urlencode($this->_exclude));}
             if(null !== $this->_startAfter){ $pathBuilder->set("startAfter",$this->_startAfter); }
         }
-        if(null !== $this->_ids || is_string($this->_ids)){
+
+        if(null !== $this->_ids || 1 === $this->_ids->count()){
             $pathBuilder->set("id",$this->_ids->get(0));
         } elseif(null !== $this->_ids && is_array($this->_ids)){
             throw new \InvalidArgumentException("prepareRequestWithMultipleIds not yet implemented");
         }
+
         $path = $url.UrlUtils::pathBuilder($pathBuilder->toArray());
         $httpClient = new HttpRequestBase();
         $curlopt = [
@@ -81,7 +83,7 @@ class GetDocumentsCommand extends RavenCommand
             CURLOPT_SSL_VERIFYHOST=>Constants::CURLOPT_SSL_VERIFYHOST,
             CURLOPT_SSL_VERIFYPEER=>Constants::CURLOPT_SSL_VERIFYPEER,
             CURLOPT_CUSTOMREQUEST=>Constants::CURLOPT_CUSTOMREQUEST_GET,
-            CURLOPT_HTTPHEADER=>[ // The CURLOPT_HTTPHEADER option must have an array value
+            CURLOPT_HTTPHEADER=>[
                 Constants::HEADERS_CONTENT_TYPE_APPLICATION_JSON
             ]
         ];

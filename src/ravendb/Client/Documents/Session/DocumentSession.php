@@ -48,7 +48,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         // TODO: Implement documentQuery() method.
     }
 
-
     public function close(){ }
 
     /**

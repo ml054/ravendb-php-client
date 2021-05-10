@@ -52,7 +52,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     /**
      * @psalm-var Set<String>
     */
-    protected Map $_knownMissingIds;
+    protected ArrayCollection $_knownMissingIds;
     public DocumentsByEntityHolder $documentsByEntity;
     public DocumentsById $documentsById;
     public ArrayCollection $deferredCommands;
@@ -82,15 +82,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public Map $includedDocumentsById;
     public DeletedEntitiesHolder $deletedEntities;
 
-    /**
-     * UNIT OF WORK WATCHERS
-    */
-    private Map $uowQueueIsUpdate;
-    private Map $uowQueueIsDelete;
-    private Map $uowQueueIsClean;
-    private Map $uowQueueIsCreate;
-    public ArrayCollection $uowQueueIsOriginal;
-
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
     {
         $this->id = $id;
@@ -106,7 +97,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->includedDocumentsById = new Map();
 
         $saveChangesOptions = new IndexesWaitOptsBuilder($this);
-        $this->_knownMissingIds = new Map();
+        $this->_knownMissingIds = new ArrayCollection();
         $this->documentsById = new DocumentsById();
         $this->documentsByEntity = new DocumentsByEntityHolder();
         $this->deletedEntities = new DeletedEntitiesHolder();
@@ -207,7 +198,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function prepareForSaveChanges(): SaveChangesData {
 
         $result = new SaveChangesData($this);
-       // $this->prepareForEntitiesDeletion($result,null);
+     //  $this->prepareForEntitiesDeletion($result,null);
         $this->prepareForEntitiesPuts($result);
         //$this->prepareForCreatingRevisionsFromIds($result);
         //$this->prepareCompareExchangeEntities($result);
@@ -348,17 +339,19 @@ abstract class InMemoryDocumentSessionOperations implements Closable
      * @param noTracking no tracking
      * @return entity
      */
-    public function trackEntity(string $entityType,object $document, ?string $id=null,  ?object $metadata=null, ?bool $noTracking=null){
-
+    public function trackEntity(string $entityType, object $document, ?string $id=null, ?object $metadata=null, ?bool $noTracking=null)
+    {
         $noTracking = $this->noTracking || $noTracking;
-        if(StringUtils::isEmpty($id)){
-            dd("TODO deserializeFromTransformer",__METHOD__);
+        if(empty($id)){
+            throw new \Exception("TODO ".__METHOD__);
         }
         $docInfo = $this->documentsById->getValue($id);
+
         if(null !== $docInfo){
+            // the local instance may have been changed, we adhere to the current Unit of Work
+            // instance, and return that, ignoring anything new.
             if(null === $docInfo->getEntity()){
-                dd($entityType);
-               //$docInfo->setEntity(JsonExtensions::storeSerializer()->serialize([]));
+                dd($entityType,$id,$document);
             }
             if(!$noTracking){
                 $this->includedDocumentsById->remove($id);
@@ -417,14 +410,20 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         throw new \Exception(Constants::EXCEPTION_STRING_ID_GENERATOR);
     }
     public function storeEntityInUnitOfWork($entity, string $id = null, ?string $changeVector=null){
-        if(null !== $id) $this->_knownMissingIds->remove($id);
+
+        if(null !== $id){
+            $this->_knownMissingIds->add($id);
+        }
+
         $documentInfo = new DocumentInfo();
         $documentInfo->setId($id);
         $documentInfo->setEntity($entity);
         $documentInfo->setNewDocument(true);
         $documentInfo->setDocument(null);
         $document = $this->documentsByEntity->get($entity);
+
         $this->documentsByEntity->put($entity,$documentInfo);
+
         if($id !== null){
             $this->documentsById->add($documentInfo);
         }

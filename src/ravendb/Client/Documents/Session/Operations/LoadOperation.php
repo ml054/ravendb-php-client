@@ -1,7 +1,6 @@
 <?php /** @noinspection ALL */
 
 namespace RavenDB\Client\Documents\Session\Operations;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Ds\Map;
 use http\Exception;
@@ -15,13 +14,11 @@ use RavenDB\Client\Documents\Session\InMemoryDocumentSessionOperations;
 use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\StringUtils;
-use function Webmozart\Assert\Tests\StaticAnalysis\null;
-
 class LoadOperation
 {
     use ObjectMapper;
     private InMemoryDocumentSessionOperations $_session;
-    private string|null|ArrayCollection $_ids=null;
+    private ?ArrayCollection $_ids=null;
     private string $id;
     private array $_includes;
     private ArrayCollection $_countersToInclude;
@@ -76,22 +73,16 @@ class LoadOperation
 
     public function getDocument($clazz,?string $id=null)
     {
-        if(null === $id){
-            if($this->_session->noTracking){
-                if(!$this->_resultsSet && count($this->_ids) > 0) throw new \Exception("Cannot execute getDocument before operation execution.");
-                if(null === $this->_results || null === $this->_results->getResults() || 0 === $this->_results->getResults()->count()) return null;
-                $document = $this->_results->getResults()->get(0);
-                if(null === $document) return null;
-                $documentInfo = DocumentInfo::getNewDocumentInfo($document);
-                return $this->_session->trackEntity($clazz,$documentInfo);
-            }
-        }else{
-            if($this->_session->isDeleted($id))return Defaults::defaultValue($clazz);
-            $doc = $this->_session->documentsById->getValue($id);
-            if(null !== $doc) return $this->_session->trackEntity($clazz,$doc);
-            return Defaults::defaultValue($clazz);
-        }
 
+        if($this->_session->isDeleted($id)) return Defaults::defaultValue($clazz);
+
+        $doc = $this->_session->documentsById->getValue($id);
+        if(null !== $doc) return $this->_session->trackEntity($clazz,$doc,$id); // adding the id as available to bypass trackEntity exception
+
+        $doc = $this->_session->includedDocumentsById->get($id);
+        if(null !== $doc) return $this->_session->trackEntity($clazz,$doc,$id); // adding the id as available to bypass trackEntity exception
+
+        return Defaults::defaultValue($clazz);
     }
 
     public function getDocuments($clazz): Map
@@ -123,7 +114,6 @@ class LoadOperation
      * @throws \Exception
      */
     public function setResult(GetDocumentsResult $result):void{
-
         $this->_resultsSet = true;
         if($this->_session->noTracking){
             $this->_results = $result;
@@ -135,9 +125,9 @@ class LoadOperation
         if(!empty($result->getIncludes())) $this->_session->registerIncludes($result->getIncludes());
 
         foreach($result->getResults() as $document){
-           if(null === $document || is_null($document)) continue;
-           $newDocumentInfo = DocumentInfo::getNewDocumentInfo($document);
-           $this->_session->documentsById->add($newDocumentInfo);
+            if(null === $document || is_null($document)) continue;
+            $newDocumentInfo = DocumentInfo::getNewDocumentInfo($document);
+            $this->_session->documentsById->add($newDocumentInfo);
         }
 
         if(is_array($this->_ids)){
@@ -146,7 +136,5 @@ class LoadOperation
                 if(null === $value ) $this->_session->registerMissing($id);
             }
         }
-
-        // TODO _session.registerMissingIncludes(result.getResults(), result.getIncludes(), _includes);
     }
 }
