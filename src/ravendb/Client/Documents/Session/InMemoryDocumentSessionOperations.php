@@ -52,7 +52,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     /**
      * @psalm-var Set<String>
     */
-    protected ArrayCollection $_knownMissingIds;
+    protected Map $_knownMissingIds;
     public DocumentsByEntityHolder $documentsByEntity;
     public DocumentsById $documentsById;
     public DocumentsByIdUnitOfWork $documentsByIdUnitOfWork;
@@ -413,7 +413,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         if ($this->noTracking) {
             return;
         }
-        $this->_knownMissingIds->add($ids);
+        $this->_knownMissingIds->putAll($ids);
     }
 
     protected function rememberEntityForDocumentIdGeneration(object $entity): void {
@@ -477,5 +477,19 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function hasChanged(object $entity): bool {
         $documentInfo = $this->documentsByEntityUnitOfWork->get($entity);
         return null === $documentInfo? false : true;
+    }
+    /// CACHING METHOD FOR NOW OUT OF PHP MIGRATION SCOPE
+    public function registerCounters(object $resultCounters, array $ids, array $countersToInclude, bool $gotAll):void {
+        if($this->noTracking) return;
+        if(null === $resultCounters || 0 === count($resultCounters)){
+            if(true === $gotAll){
+                foreach($ids as $id){
+                    $this->setGotAllCountersForDocument($id);
+                }
+                return;
+            }
+        }else{
+            $this->registerCountersInternal($resultCounters);
+        }
     }
 }

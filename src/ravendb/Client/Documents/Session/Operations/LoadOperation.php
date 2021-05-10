@@ -15,7 +15,6 @@ use RavenDB\Client\Documents\Session\InMemoryDocumentSessionOperations;
 use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\StringUtils;
-use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 class LoadOperation
 {
@@ -60,7 +59,7 @@ class LoadOperation
         $this->_ids = $id;
         return $this;
     }
-    // FINAL
+
     public function byIds(array $ids):self {
         $distinct = new ArrayCollection();
         foreach($ids as $id){
@@ -93,7 +92,8 @@ class LoadOperation
         }
     }
 
-    public function getDocuments($clazz): Map {
+    public function getDocuments($clazz): Map
+    {
         $finalResults = new Map();
         if($this->_session->noTracking){
             if(!$this->_resultsSet && count($this->_ids) > 0) throw new \Exception("Cannot execute getDocument before operation execution.");
@@ -104,32 +104,42 @@ class LoadOperation
             if(null === $this->_results || null === $this->_results->getResults() || 0 === $this->_results->getResults()->count()) return $finalResults;
 
             foreach($this->_results->getResults() as $document){
-                if(null === $document)
+                if(null === $document || empty($document)) continue;
+                $newDocumentInfo = DocumentInfo::getNewDocumentInfo($document);
+                $finalResults->put($newDocumentInfo->getId(),$this->_session->trackEntity($clazz,$newDocumentInfo));
             }
+            return $finalResults;
         }
+        foreach($this->_ids as $id){
+            if(null === $id) continue;
+            $finalResults->put($id,$this->getDocument($clazz,$id));
+        }
+        return $finalResults;
     }
+
     /**
      * @throws \Exception
      */
     public function setResult(GetDocumentsResult $result):void{
-
         $this->_resultsSet = true;
         if($this->_session->noTracking){
             $this->_results = $result;
-            return;
         }
-
-        if($result === null){
-            $this->_session->registerMissing([$this->id]);
+        if(null === $result) {
+            $this->_session->registerMissing($this->_ids);
             return;
         }
         $this->_session->registerIncludes($result->getIncludes());
         foreach($result->getResults() as $document){
-            if(empty($document)) continue;
-            $newDocument = DocumentInfo::getNewDocumentInfo($document);
-            $this->_session->documentsById->add($newDocument);
+           if(null === $document || is_null($document)) continue;
+           $newDocumentInfo = DocumentInfo::getNewDocumentInfo($document);
+           $this->_session->documentsById->add($newDocumentInfo);
         }
-        dd("hereere");
-    }
 
+        foreach($this->_ids as $id){
+            $value = $this->_session->documentsById->getValue($id);
+            if(null === $value ) $this->_session->registerMissing($id);
+        }
+        // TODO _session.registerMissingIncludes(result.getResults(), result.getIncludes(), _includes);
+    }
 }
