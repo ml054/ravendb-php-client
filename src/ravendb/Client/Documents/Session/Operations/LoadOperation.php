@@ -129,7 +129,9 @@ class LoadOperation
             $this->_session->registerMissing($this->_ids);
             return;
         }
+
         $this->_session->registerIncludes($result->getIncludes());
+
         foreach($result->getResults() as $document){
            if(null === $document || is_null($document)) continue;
            $newDocumentInfo = DocumentInfo::getNewDocumentInfo($document);

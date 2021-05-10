@@ -429,11 +429,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $documentInfo->setDocument(null);
         $document = $this->documentsByEntity->get($entity);
         $this->documentsByEntity->put($entity,$documentInfo);
-        // TODO IMPLEMENT documentsByEntityUnitOfWork LEVEL JSON DIFF DIRECTLY
-        $this->documentsByEntityUnitOfWork->tracker($entity,null);
         if($id !== null){
             $this->documentsById->add($documentInfo);
-            $this->documentsByIdUnitOfWork->tracker($id,null);
         }
     }
 
