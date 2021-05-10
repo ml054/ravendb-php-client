@@ -15,12 +15,13 @@ use RavenDB\Client\Documents\Session\InMemoryDocumentSessionOperations;
 use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\StringUtils;
+use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 class LoadOperation
 {
     use ObjectMapper;
     private InMemoryDocumentSessionOperations $_session;
-    private ?ArrayCollection $_ids=null;
+    private string|null|ArrayCollection $_ids=null;
     private string $id;
     private array $_includes;
     private ArrayCollection $_countersToInclude;
@@ -45,12 +46,9 @@ class LoadOperation
      * @throws \Exception
      */
     public function createRequest(): ?GetDocumentsCommand {
-        /*if($this->_session->checkIfIdAlreadyIncluded($this->_ids,$this->_includes !== null ? new ArrayCollection($this->_includes): null)){
-            return null;
-        }*/
 
         $this->_session->incrementRequestCount();
-        return new GetDocumentsCommand($this->_ids,null,null);
+        return new GetDocumentsCommand($this->_ids,null,null,null,null,null,null,null,null);
     }
 
     public function byId (string $id): LoadOperation

@@ -9,6 +9,7 @@ use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Http\RavenCommand;
 use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Methods\HttpRequestBase;
+use RavenDB\Client\Util\UrlUtils;
 
 class GetDocumentsCommand extends RavenCommand
 {
@@ -16,24 +17,23 @@ class GetDocumentsCommand extends RavenCommand
      * @psalm-var List<TimeSeriesRange>
      */
     private  TimeSeriesRange $_timeSeriesIncludes;
-    private string $id;
-    private ArrayCollection $_ids;
+   // private ?string $_id=null;
+    private ArrayCollection|string $_ids;
     private ?ArrayCollection $_includes=null;
     private ArrayCollection $_counters;
     private bool $_includeAllCounters;
     private ArrayCollection $_compareExchangeValueIncludes;
-    private bool $_metadataOnly;
-    private string $_startWith;
-    private string $_matches;
-    private int $_start;
-    private int $_pageSize;
-    private string $_exclude;
-    private string $_startAfter;
+    private ?bool $_metadataOnly=null;
+    private ?string $_startWith=null;
+    private ?string $_matches=null;
+    private ?int $_start=null;
+    private ?int $_pageSize=null;
+    private ?string $_exclude=null;
+    private ?string $_startAfter=null;
 
-    public function __construct(ArrayCollection $ids,ArrayCollection $includes, bool $metadataOnly, string $startWith, string $startAfter,string $matches,string $exclude, int $start, int $pageSize )
+    public function __construct( ArrayCollection|string $ids,?ArrayCollection $includes, ?bool $metadataOnly, ?string $startWith, ?string $startAfter, ?string $matches, ?string $exclude, ?int $start, ?int $pageSize )
     {
         parent::__construct(GetDocumentsResult::class);
-
         $this->_ids = $ids;
         $this->_includes = $includes;
         $this->_metadataOnly = $metadataOnly;
@@ -56,11 +56,24 @@ class GetDocumentsCommand extends RavenCommand
     public function createRequest(ServerNode $node): \CurlHandle
     {
         $url = $node->getUrl()."/databases/".$node->getDatabase()."/docs?";
-        $queryArgs = new ArrayCollection();
+        $pathBuilder = new ArrayCollection();
 
+        if(null !== $this->_start){ $pathBuilder->set("start",$this->_start); }
+        if(null !== $this->_pageSize){ $pathBuilder->set("pageSize",$this->_pageSize); }
+        if(null !== $this->_metadataOnly){ $pathBuilder->set("metadataOnly",$this->_metadataOnly); }
 
-
-       /* $url = $node->getUrl()."/databases/".$node->getDatabase()."/docs?id=".urlencode($this->id);
+        if(null !== $this->_startWith){
+            $pathBuilder->set("startsWith",$this->_startWith);
+            if(null !== $this->_matches){ $pathBuilder->set("matches",urlencode($this->_matches));}
+            if(null !== $this->_exclude){ $pathBuilder->set("exclude",urlencode($this->_exclude));}
+            if(null !== $this->_startAfter){ $pathBuilder->set("startAfter",$this->_startAfter); }
+        }
+        if(null !== $this->_ids || is_string($this->_ids)){
+            $pathBuilder->set("id",$this->_ids->get(0));
+        } elseif(null !== $this->_ids && is_array($this->_ids)){
+            throw new \InvalidArgumentException("prepareRequestWithMultipleIds not yet implemented");
+        }
+        $path = $url.UrlUtils::pathBuilder($pathBuilder->toArray());
         $httpClient = new HttpRequestBase();
         $curlopt = [
             CURLOPT_URL => $url,
@@ -73,7 +86,7 @@ class GetDocumentsCommand extends RavenCommand
             ]
         ];
 
-        return $httpClient->createCurlRequest($url,$curlopt);*/
+        return $httpClient->createCurlRequest($url,$curlopt);
     }
 
     public function setResponse(array|string $response, bool $fromCache)
