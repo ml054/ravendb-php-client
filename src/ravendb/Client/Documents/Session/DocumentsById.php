@@ -23,7 +23,6 @@ class DocumentsById
     }
 
     public function remove (string $id):bool {
-      //  dd("hereree");
         return $this->_inner->remove($id) !== null;
     }
 

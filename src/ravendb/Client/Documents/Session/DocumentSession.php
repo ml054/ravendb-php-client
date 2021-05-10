@@ -21,6 +21,7 @@ use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Util\ObjectMapper;
 use RavenDB\Client\Util\StringUtils;
 use \Swaggest\JsonDiff;
+use \TreeWalker;
 class DocumentSession extends InMemoryDocumentSessionOperations
     implements IDocumentSessionImpl,IAdvancedSessionOperations,IDocumentQueryGenerator
 {
@@ -55,7 +56,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
      */
     public function load(string $clazz, string $id, ?ArrayCollection $includes=null)
     {
-
         $loadOperation = new LoadOperation($this);
         $loadOperation->byId($id);
         $command = $loadOperation->createRequest();
@@ -63,10 +63,11 @@ class DocumentSession extends InMemoryDocumentSessionOperations
             $this->sessionInfo = new SessionInfo($this,$this->options,$this->documentStore);
             $this->_requestExecutor->execute($command,$this->sessionInfo,$this->documentStore);
             $jsonOriginal = $command->getResult()->getResults();
+            // TODO RELOCATE THE TRACKER TO KEEP THE LOAD METHOD NEUTRAL. FOR NOW JUST FOR TESTING
             $jsonOriginal = JsonExtensions::storeSerializer()->serialize($command->getResult()->getResults(),'json');
-            $jsonCompareNew = JsonExtensions::storeSerializer()->serialize($this->documentsById->getValue($id)->getEntity(),'json');
-            $diff = new JsonDiff\JsonDiff($jsonOriginal,$jsonCompareNew);
-
+            $jsonNew = JsonExtensions::storeSerializer()->serialize($this->documentsById->getValue($id)->getEntity(),'json');
+            $diff = new JsonDiff\JsonDiff($jsonOriginal,$jsonNew);
+            $this->documentsByIdUnitOfWork->tracker($id,$diff);
         }
         return $loadOperation->getDocument($clazz,$id);
     }
@@ -87,9 +88,8 @@ class DocumentSession extends InMemoryDocumentSessionOperations
             if($this->noTracking === true) {
                 throw new IllegalStateException("Cannot execute saveChanges when entity tracking is disabled in session.");
             }
-            $this->_requestExecutor->execute($command,null);
-          //  $this->updateSessionAfterSaveChanges($command->getResult());
-            $saveChangeOperation->setResult($command->getResult());
+           // $this->_requestExecutor->execute($command,null);
+           // $saveChangeOperation->setResult($command->getResult());
         } finally {
             $this->close();
         }

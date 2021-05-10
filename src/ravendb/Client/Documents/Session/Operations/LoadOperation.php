@@ -74,7 +74,6 @@ class LoadOperation
         }
         foreach($result->getResults() as $document){
             if(empty($document)) continue;
-            // DOCUMENT IS SENT
             $newDocument = DocumentInfo::getNewDocumentInfo($document);
             $this->_session->documentsById->add($newDocument);
         }

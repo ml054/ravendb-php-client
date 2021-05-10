@@ -55,6 +55,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     protected ArrayCollection $_knownMissingIds;
     public DocumentsByEntityHolder $documentsByEntity;
     public DocumentsById $documentsById;
+    public DocumentsByIdUnitOfWork $documentsByIdUnitOfWork;
     public ArrayCollection $deferredCommands;
     public Map $deferredCommandsMap;
     protected ArrayCollection $pendingLazyOperations;
@@ -116,6 +117,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->documentsById = new DocumentsById();
         $this->documentsByEntity = new DocumentsByEntityHolder();
         $this->deletedEntities = new DeletedEntitiesHolder();
+        $this->documentsByIdUnitOfWork = new DocumentsByIdUnitOfWork();
 
         $this->_saveChangesOptions = $saveChangesOptions->getOptions();
         $this->_documentStore = $documentStore;
@@ -436,6 +438,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->documentsByEntity->put($entity,$documentInfo);
         if($id !== null){
             $this->documentsById->add($documentInfo);
+            $this->documentsByIdUnitOfWork->tracker($id,null);
         }
     }
 
