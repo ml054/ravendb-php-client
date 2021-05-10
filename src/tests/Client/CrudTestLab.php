@@ -11,7 +11,6 @@ use RavenDB\Tests\Client\CrudEntities\Family;
 use RavenDB\Tests\Client\CrudEntities\FamilyMembers;
 use RavenDB\Tests\Client\CrudEntities\Member;
 use RavenDB\Tests\Client\CrudEntities\Poc;
-use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 class CrudTestLab extends RemoteTestBase
 {

@@ -126,7 +126,7 @@ class DocumentInfo
         $this->metadataInstance = $metadataInstance;
     }
 
-    public function getEntity(): object|array
+    public function getEntity(): object|array|null
     {
         return $this->entity;
     }

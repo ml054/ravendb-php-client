@@ -342,25 +342,35 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function trackEntity(string $entityType, object $document, ?string $id=null, ?object $metadata=null, ?bool $noTracking=null)
     {
         $noTracking = $this->noTracking || $noTracking;
+
         if(empty($id)){
             throw new \Exception("TODO ".__METHOD__);
         }
         $docInfo = $this->documentsById->getValue($id);
-
         if(null !== $docInfo){
             // ORIGINAL COMMENT FROM JAVA SOURCE
             // the local instance may have been changed, we adhere to the current Unit of Work
             // instance, and return that, ignoring anything new.
-            if(null === $docInfo->getEntity()){
-                dd(__METHOD__,$entityType,$id,$document);
+
+         //   dd($document->getDocument());
+            if(null === $docInfo->getEntity() && null !== $document->getDocument()){
+                /*$normalize = JsonExtensions::storeSerializer()->serialize($document->getDocument(),'json');
+                $deserialize = JsonExtensions::storeSerializer()->deserialize($normalize,$entityType,'json');
+                $docInfo->setEntity($deserialize);*/
+                $decode = JsonExtensions::storeSerializer()->decode($document->getDocument(),'json');
+                dd($decode);
             }
+
             if(!$noTracking){
                 $this->includedDocumentsById->remove($id);
                 $this->documentsByEntity->put($docInfo->getEntity(),$docInfo);
             }
+
             return $docInfo->getEntity();
         }
+
         $docInfo = $this->includedDocumentsById->get($id);
+
         if(null !== $docInfo){
             if(null === $docInfo->getEntity()){
                 dd(__METHOD__,$entityType,$id,$document);
@@ -372,6 +382,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             }
             return $docInfo->getEntity();
         }
+
     }
     /** *************************************************** **/
     private static function throwNoDatabase(){
@@ -464,7 +475,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         }else{
             // JAVA SOURCE :  generateEntityIdOnTheClient.trySetIdentity(entity, id);
         }
-       // if($this->deletedEntities->contains($entity)) throw new \Exception("Can't store object, it was already deleted in this session. Document id: " . $id);
+        // if($this->deletedEntities->contains($entity)) throw new \Exception("Can't store object, it was already deleted in this session. Document id: " . $id);
         $this->storeEntityInUnitOfWork($entity,$id,$changeVector,$metadata,$forceConcurrencyCheck);
     }
 
