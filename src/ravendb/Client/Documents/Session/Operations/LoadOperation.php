@@ -20,7 +20,7 @@ class LoadOperation
 {
     use ObjectMapper;
     private InMemoryDocumentSessionOperations $_session;
-    private string $_ids;
+    private ?array $_ids=null;
     private string $id;
     private array $_includes;
     private ArrayCollection $_countersToInclude;
@@ -48,15 +48,17 @@ class LoadOperation
         /*if($this->_session->checkIfIdAlreadyIncluded($this->_ids,$this->_includes !== null ? new ArrayCollection($this->_includes): null)){
             return null;
         }*/
+
         $this->_session->incrementRequestCount();
         return new GetDocumentsCommand($this->_ids,null,null);
     }
 
-    public function byId (string $id): LoadOperation {
-        if(StringUtils::isEmpty($id)){
-            return $this;
+    public function byId (string $id): LoadOperation
+    {
+        if( StringUtils::isEmpty($id)){ return $this; }
+        if(null === $this->_ids){
+            $this->_ids = [$id];
         }
-        $this->_ids = $id;
         return $this;
     }
 
@@ -68,6 +70,7 @@ class LoadOperation
         $this->_ids = $distinct->toArray();
         return $this;
     }
+
     public function  withIncludes(array $includes):self {
         $this->_includes = $includes;
         return $this;
@@ -121,6 +124,7 @@ class LoadOperation
      * @throws \Exception
      */
     public function setResult(GetDocumentsResult $result):void{
+
         $this->_resultsSet = true;
         if($this->_session->noTracking){
             $this->_results = $result;
@@ -129,8 +133,7 @@ class LoadOperation
             $this->_session->registerMissing($this->_ids);
             return;
         }
-
-        $this->_session->registerIncludes($result->getIncludes());
+        if(!empty($result->getIncludes())) $this->_session->registerIncludes($result->getIncludes());
 
         foreach($result->getResults() as $document){
            if(null === $document || is_null($document)) continue;

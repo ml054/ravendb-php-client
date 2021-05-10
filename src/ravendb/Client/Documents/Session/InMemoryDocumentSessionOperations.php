@@ -55,8 +55,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     protected Map $_knownMissingIds;
     public DocumentsByEntityHolder $documentsByEntity;
     public DocumentsById $documentsById;
-    public DocumentsByIdUnitOfWork $documentsByIdUnitOfWork;
-    public DocumentsByEntityUnitOfWork $documentsByEntityUnitOfWork;
     public ArrayCollection $deferredCommands;
     public Map $deferredCommandsMap;
     protected ArrayCollection $pendingLazyOperations;
@@ -103,16 +101,15 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         if(StringUtils::isBlank($this->databaseName)){
             static::throwNoDatabase();
         }
+
         $this->deferredCommandsMap = new Map();
         $this->includedDocumentsById = new Map();
 
         $saveChangesOptions = new IndexesWaitOptsBuilder($this);
-        $this->_knownMissingIds = new ArrayCollection();
+        $this->_knownMissingIds = new Map();
         $this->documentsById = new DocumentsById();
         $this->documentsByEntity = new DocumentsByEntityHolder();
         $this->deletedEntities = new DeletedEntitiesHolder();
-        $this->documentsByIdUnitOfWork = new DocumentsByIdUnitOfWork();
-        $this->documentsByEntityUnitOfWork = new DocumentsByEntityUnitOfWork();
 
         $this->_saveChangesOptions = $saveChangesOptions->getOptions();
         $this->_documentStore = $documentStore;
