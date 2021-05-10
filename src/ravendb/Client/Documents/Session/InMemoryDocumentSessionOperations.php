@@ -79,7 +79,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     /**
      * @psalm-return Map<string, DocumentInfo>
      */
-    public Map $includedDocumentsById;
+    public ArrayCollection $includedDocumentsById;
     public DeletedEntitiesHolder $deletedEntities;
 
     protected function __construct(DocumentStoreBase $documentStore, string $id, SessionOptions $options)
@@ -94,7 +94,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         }
 
         $this->deferredCommandsMap = new Map();
-        $this->includedDocumentsById = new Map();
+        $this->includedDocumentsById = new ArrayCollection();
 
         $saveChangesOptions = new IndexesWaitOptsBuilder($this);
         $this->_knownMissingIds = new ArrayCollection();
@@ -348,10 +348,11 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $docInfo = $this->documentsById->getValue($id);
 
         if(null !== $docInfo){
+            // ORIGINAL COMMENT FROM JAVA SOURCE
             // the local instance may have been changed, we adhere to the current Unit of Work
             // instance, and return that, ignoring anything new.
             if(null === $docInfo->getEntity()){
-                dd($entityType,$id,$document);
+                dd(__METHOD__,$entityType,$id,$document);
             }
             if(!$noTracking){
                 $this->includedDocumentsById->remove($id);
@@ -359,8 +360,18 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             }
             return $docInfo->getEntity();
         }
-
-
+        $docInfo = $this->includedDocumentsById->get($id);
+        if(null !== $docInfo){
+            if(null === $docInfo->getEntity()){
+                dd(__METHOD__,$entityType,$id,$document);
+            }
+            if(!$this->noTracking){
+                $this->includedDocumentsById->remove($id);
+                $this->documentsById->add($docInfo);
+                $this->documentsByEntity->put($docInfo->getEntity(),$docInfo);
+            }
+            return $docInfo->getEntity();
+        }
     }
     /** *************************************************** **/
     private static function throwNoDatabase(){
