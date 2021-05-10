@@ -76,7 +76,7 @@ class GetDocumentsCommand extends RavenCommand
         $path = $url.UrlUtils::pathBuilder($pathBuilder->toArray());
         $httpClient = new HttpRequestBase();
         $curlopt = [
-            CURLOPT_URL => $url,
+            CURLOPT_URL => $path,
             CURLOPT_RETURNTRANSFER =>Constants::CURLOPT_RETURNTRANSFER,
             CURLOPT_SSL_VERIFYHOST=>Constants::CURLOPT_SSL_VERIFYHOST,
             CURLOPT_SSL_VERIFYPEER=>Constants::CURLOPT_SSL_VERIFYPEER,
@@ -85,12 +85,12 @@ class GetDocumentsCommand extends RavenCommand
                 Constants::HEADERS_CONTENT_TYPE_APPLICATION_JSON
             ]
         ];
-
         return $httpClient->createCurlRequest($url,$curlopt);
     }
 
     public function setResponse(array|string $response, bool $fromCache)
     {
         $this->result = $this->mapper()::readValue($response,GetDocumentsResult::class);
+        dd($this->result,$response);
     }
 }

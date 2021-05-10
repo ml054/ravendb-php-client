@@ -91,6 +91,7 @@ class LoadOperation
             if(null !== $doc) return $this->_session->trackEntity($clazz,$doc);
             return Defaults::defaultValue($clazz);
         }
+
     }
 
     public function getDocuments($clazz): Map
@@ -139,10 +140,13 @@ class LoadOperation
            $this->_session->documentsById->add($newDocumentInfo);
         }
 
-        foreach($this->_ids as $id){
-            $value = $this->_session->documentsById->getValue($id);
-            if(null === $value ) $this->_session->registerMissing($id);
+        if(is_array($this->_ids)){
+            foreach($this->_ids as $id){
+                $value = $this->_session->documentsById->getValue($id);
+                if(null === $value ) $this->_session->registerMissing($id);
+            }
         }
+
         // TODO _session.registerMissingIncludes(result.getResults(), result.getIncludes(), _includes);
     }
 }

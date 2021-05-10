@@ -58,7 +58,6 @@ class DocumentSession extends InMemoryDocumentSessionOperations
     {
         $loadOperation = new LoadOperation($this);
         $loadOperation->byId($id);
-
         $command = $loadOperation->createRequest();
 
         if(null !== $command){
