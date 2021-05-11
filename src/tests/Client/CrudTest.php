@@ -29,7 +29,7 @@ class CrudTest extends RemoteTestBase
                 $session->store($poc,"pocs/1");
                 $session->saveChanges();
             } finally {
-                $store->close();
+                $session->close();
             }
 
             // TO FIX IN TRACKENTITY : SUBMITTING NULL OBJECT
@@ -40,7 +40,7 @@ class CrudTest extends RemoteTestBase
                  $poc->setObj($user);
                  $session->saveChanges();
             } finally {
-                $store->close();
+                $session->close();
             }
             try {
                 $session = $store->openSession($options);
@@ -50,7 +50,7 @@ class CrudTest extends RemoteTestBase
                  $poc = $session->load(Poc::class,"pocs/1");
                  AssertUtils::assertThat($poc->getObj())::isNull();
             } finally {
-                $store->close();
+                $session->close();
             }
         } finally {
             $store->close();
@@ -92,9 +92,11 @@ class CrudTest extends RemoteTestBase
                 $newFamily = $session->load(FamilyMembers::class,"family/2");
                 AssertUtils::assertThat($newFamily)::isObject();
                 AssertUtils::assertThat($newFamily)::isInstanceOf(FamilyMembers::class);
+
             } finally {
-                $store->close();
+                $session->close();
             }
+
         } finally {
             $store->close();
         }

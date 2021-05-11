@@ -74,7 +74,9 @@ class GetDocumentsCommand extends RavenCommand
         } elseif(null !== $this->_ids && is_array($this->_ids)){
             throw new \InvalidArgumentException("prepareRequestWithMultipleIds not yet implemented");
         }
+
         $path = $url.UrlUtils::pathBuilder($pathBuilder->toArray());
+
         $httpClient = new HttpRequestBase();
         $curlopt = [
             CURLOPT_URL => $path,

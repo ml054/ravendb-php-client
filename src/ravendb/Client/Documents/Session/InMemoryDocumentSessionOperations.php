@@ -109,8 +109,9 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->useOptimisticConcurrency = $this->_requestExecutor->getConventions()->isUseOptimisticConcurrency();
     }
 
-    public function getUowQueueIsOriginal(){
-        return $this->uowQueueIsOriginal;
+
+    public function getNumberOfEntitiesInUnitOfWork(){
+        return $this->documentsByEntity->size();
     }
 
     public function getId(){
@@ -287,17 +288,13 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     /**
      * @psalm-param Map<string, list<DocumentsChanges>> $changes
      */
-    public function prepareForEntitiesDeletion(SaveChangesData $result, Map $changes):void {
+    public function prepareForEntitiesDeletion(SaveChangesData $result, ?Map $changes=null):void {
         try {
             foreach($this->deletedEntities as  $deletedEntity){
                 $documentInfo = $this->documentsByEntity->get($this->deletedEntities->getEntity());
-
                 if(null === $documentInfo) continue;
 
                 if(null !== $changes){
-                    /**
-                     * @psalm-var List<DocumentsChanges>
-                    */
                     $docChanges = new ArrayCollection();
                     $change = new DocumentsChanges();
                     $change->setFieldNewValue("");
@@ -306,13 +303,12 @@ abstract class InMemoryDocumentSessionOperations implements Closable
                     $docChanges->add($change);
                     $changes->put($documentInfo->getId(),$docChanges);
                 }else{
-                    $command = null; // null by design
+                    $command = null;
                     if(null !== $command){
                         throw new \Exception("throwInvalidDeletedDocumentWithDeferredCommand");
                     }
                     $changeVector = null;
                     $documentInfo = $this->documentsById->getValue($documentInfo->getId());
-
                     if (null !== $documentInfo){
                         $changeVector = $documentInfo->getChangeVector();
                         if(null !== $documentInfo->getEntity()){
@@ -330,8 +326,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function prepareForCreatingRevisionsFromIds(SaveChangesData $result):void { }
     public function prepareCompareExchangeEntities(SaveChangesData $result):void { }
     /**
-     * Tracks the entity.
-     *
+     * Tracks the entity inside the unit of work
      * @param entityType Entity class
      * @param id         Id of document
      * @param document   raw entity
@@ -349,11 +344,11 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $docInfo = $this->documentsById->getValue($id);
         if(null !== $docInfo){
 
-            // ORIGINAL COMMENT FROM JAVA SOURCE
             // the local instance may have been changed, we adhere to the current Unit of Work
             // instance, and return that, ignoring anything new.
 
             if(null === $docInfo->getEntity() && null !== $document->getDocument()){
+                // TODO : OBJECT IS MAPPED BUT CHILD OBJECT IS MAP AS AN ARRAY LEADING TO ATTRIBUTE TYPE ERROR. TRANSFORMER TO CONSIDER
                 $normalize = JsonExtensions::storeSerializer()->serialize($document->getDocument(),'json');
                 $deserialize = JsonExtensions::storeSerializer()->deserialize($normalize,$entityType,'json');
                 $test = $document->getDocument();
@@ -487,8 +482,11 @@ abstract class InMemoryDocumentSessionOperations implements Closable
      * @return true if entity has changed
      */
     public function hasChanged(object $entity): bool {
-        $documentInfo = $this->documentsByEntityUnitOfWork->get($entity);
-        return null === $documentInfo? false : true;
+        $documentInfo = $this->documentsByEntity->get($entity);
+        if(null === $documentInfo) return false;
+        // Serialize
+
+
     }
     /// CACHING METHOD FOR NOW OUT OF PHP MIGRATION SCOPE
     public function registerCounters(object $resultCounters, array $ids, array $countersToInclude, bool $gotAll):void {

@@ -5,14 +5,16 @@ use Doctrine\Common\Collections\ArrayCollection;
 use RavenDB\Client\Documents\Session\DocumentInfo;
 use RavenDB\Client\Documents\Session\DocumentsChanges;
 use RavenDB\Client\Constants;
+
 class JsonOperation
 {
     /**
      * @throws \Exception
      */
     public static function entityChanged(object $newObject, DocumentInfo $documentInfo, ArrayCollection $changes){
-        $changes = null !== $changes ? new ArrayCollection() : null;
+        $docChanges = null !== $changes ? new ArrayCollection() : null;
         if($documentInfo->isNewDocument() && null !== $documentInfo->getDocument()){
+
         }
 
         if(null === $changes){
@@ -39,7 +41,6 @@ class JsonOperation
 
        $newJsonProps = new ArrayCollection();
        $oldJsonProps = new ArrayCollection();
-
 
     }
 }
