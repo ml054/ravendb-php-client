@@ -22,7 +22,8 @@
     "vimeo/psalm": "4.x-dev",
     "php-ds/php-ds": "dev-master",
     "doctrine/collections": "1.6.x-dev",
-    "swaggest/json-diff": "dev-master"
+    "swaggest/json-diff": "dev-master",
+    "lukascivil/treewalker": "dev-master"
   },
   "autoload": {
     "psr-4": {

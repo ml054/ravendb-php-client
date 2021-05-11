@@ -30,6 +30,7 @@ return array(
     'Symfony\\Component\\HttpClient\\' => array($vendorDir . '/symfony/http-client'),
     'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
     'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
+    'Swaggest\\JsonDiff\\' => array($vendorDir . '/swaggest/json-diff/src'),
     'RavenDB\\Tests\\' => array($baseDir . '/src/tests'),
     'RavenDB\\' => array($baseDir . '/src/ravendb'),
     'Ramsey\\Uuid\\' => array($vendorDir . '/ramsey/uuid/src'),
@@ -45,6 +46,7 @@ return array(
     'Nahid\\QArray\\' => array($vendorDir . '/nahid/qarray/src'),
     'Nahid\\JsonQ\\' => array($vendorDir . '/nahid/jsonq/src'),
     'LanguageServerProtocol\\' => array($vendorDir . '/felixfbecker/language-server-protocol/src'),
+    'Ds\\' => array($vendorDir . '/php-ds/php-ds/src'),
     'Doctrine\\Persistence\\' => array($vendorDir . '/doctrine/persistence/lib/Doctrine/Persistence'),
     'Doctrine\\ORM\\' => array($vendorDir . '/doctrine/orm/lib/Doctrine/ORM'),
     'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),
@@ -63,4 +65,5 @@ return array(
     'Amp\\ByteStream\\' => array($vendorDir . '/amphp/byte-stream/lib'),
     'Amp\\' => array($vendorDir . '/amphp/amp/lib'),
     'AdvancedJsonRpc\\' => array($vendorDir . '/felixfbecker/advanced-json-rpc/lib'),
+    '' => array($vendorDir . '/lukascivil/treewalker/src'),
 );

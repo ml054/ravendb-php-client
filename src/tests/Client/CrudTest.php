@@ -32,28 +32,23 @@ class CrudTest extends RemoteTestBase
                 $store->close();
             }
 
+            // TO FIX IN TRACKENTITY : SUBMITTING NULL OBJECT
             try {
                 $session = $store->openSession($options);
-                 /**
-                   * @var Poc $poc
-                  */
                  $poc = $session->load(Poc::class,"pocs/1");
-               //  AssertUtils::assertThat($poc)::isObject();
-               //  dd("herere");
                  $user = new User();
                  $poc->setObj($user);
                  $session->saveChanges();
             } finally {
                 $store->close();
             }
-
             try {
                 $session = $store->openSession($options);
                  /**
                    * @var Poc $poc
                   */
                  $poc = $session->load(Poc::class,"pocs/1");
-                 AssertUtils::assertThat($poc)::isNull();
+                 AssertUtils::assertThat($poc->getObj())::isNull();
             } finally {
                 $store->close();
             }
@@ -72,32 +67,31 @@ class CrudTest extends RemoteTestBase
             try {
                 $session = $store->openSession($options);
                 $member1 = new Member();
-                $member1->setName("Hibernating-RavenDB");
+                $member1->setName("Hibernating");
                 $member1->setAge(4);
 
                 $member2 = new Member();
-                $member2->setName("RavenDB-Hibernating");
+                $member2->setName("RavenDB");
                 $member2->setAge(4);
 
                 $family = new FamilyMembers();
                 $family->setMembers([$member1,$member2]);
-                $session->store($family,'family/1');
+                $session->store($family,'family/2');
                 $session->saveChanges();
 
                 $member1 = new Member();
-                $member1->setName("RavenDB-testes");
+                $member1->setName("Hibernating");
                 $member1->setAge(4);
 
                 $member2 = new Member();
-                $member2->setName("Hibernating Rhinos");
+                $member2->setName("Rhinos");
                 $member2->setAge(4);
                 /**
                  * @var FamilyMembers $newFamily
                  */
-                $newFamily = $session->load(FamilyMembers::class,"family/1");
+                $newFamily = $session->load(FamilyMembers::class,"family/2");
                 AssertUtils::assertThat($newFamily)::isObject();
                 AssertUtils::assertThat($newFamily)::isInstanceOf(FamilyMembers::class);
-
             } finally {
                 $store->close();
             }

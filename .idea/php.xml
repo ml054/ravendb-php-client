@@ -99,6 +99,7 @@
       <path value="$PROJECT_DIR$/vendor/vimeo/psalm" />
       <path value="$PROJECT_DIR$/vendor/webmozart/path-util" />
       <path value="$PROJECT_DIR$/vendor/swaggest/json-diff" />
+      <path value="$PROJECT_DIR$/vendor/lukascivil/treewalker" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

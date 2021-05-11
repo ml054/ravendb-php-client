@@ -198,8 +198,8 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function prepareForSaveChanges(): SaveChangesData {
 
         $result = new SaveChangesData($this);
-     //  $this->prepareForEntitiesDeletion($result,null);
-        $this->prepareForEntitiesPuts($result);
+       $this->prepareForEntitiesDeletion($result,null);
+       $this->prepareForEntitiesPuts($result);
         //$this->prepareForCreatingRevisionsFromIds($result);
         //$this->prepareCompareExchangeEntities($result);
         return $result;
@@ -348,17 +348,15 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         }
         $docInfo = $this->documentsById->getValue($id);
         if(null !== $docInfo){
+
             // ORIGINAL COMMENT FROM JAVA SOURCE
             // the local instance may have been changed, we adhere to the current Unit of Work
             // instance, and return that, ignoring anything new.
 
-         //   dd($document->getDocument());
             if(null === $docInfo->getEntity() && null !== $document->getDocument()){
-                /*$normalize = JsonExtensions::storeSerializer()->serialize($document->getDocument(),'json');
+                $normalize = JsonExtensions::storeSerializer()->serialize($document->getDocument(),'json');
                 $deserialize = JsonExtensions::storeSerializer()->deserialize($normalize,$entityType,'json');
-                $docInfo->setEntity($deserialize);*/
-                $decode = JsonExtensions::storeSerializer()->decode($document->getDocument(),'json');
-                dd($decode);
+                $test = $document->getDocument();
             }
 
             if(!$noTracking){

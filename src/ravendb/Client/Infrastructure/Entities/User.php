@@ -10,82 +10,51 @@ class User
     private ?int $count=null;
     private ?int $age=null;
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string|null $name
-     * @return User|null
-     */
     public function setName(?string $name=null): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
     public function getLastName(): ?string
     {
         return $this->lastName;
     }
 
-    /**
-     * @param string $lastName
-     */
     public function setLastName(?string $lastName): void
     {
         $this->lastName = $lastName;
     }
 
-    /**
-     * @return string
-     */
     public function getAddressId(): ?string
     {
         return $this->addressId;
     }
 
-    /**
-     * @param string $addressId
-     */
     public function setAddressId(?string $addressId): void
     {
         $this->addressId = $addressId;
     }
 
-    /**
-     * @return int
-     */
     public function getCount(): ?int
     {
         return $this->count;
     }
 
-    /**
-     * @param int $count
-     */
     public function setCount(?int $count): void
     {
         $this->count = $count;
     }
 
-    /**
-     * @return int
-     */
     public function getAge(): ?int
     {
         return $this->age;
     }
 
-    /**
-     * @param int $age
-     */
     public function setAge(?int $age): void
     {
         $this->age = $age;

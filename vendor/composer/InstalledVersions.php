@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '5aa353d990c0d9542bc24d864ac20c85966ddb2b',
+    'reference' => '89e29e18c5527036a5180aee8fd1a12e38ffd2ed',
     'name' => 'initxlab/ravendb',
   ),
   'versions' => 
@@ -133,12 +133,13 @@ private static $installed = array (
     ),
     'doctrine/collections' => 
     array (
-      'pretty_version' => '1.7.x-dev',
-      'version' => '1.7.9999999.9999999-dev',
+      'pretty_version' => '1.6.x-dev',
+      'version' => '1.6.9999999.9999999-dev',
       'aliases' => 
       array (
+        0 => '9999999-dev',
       ),
-      'reference' => '436a4eb4535f141c6c52a3099016cb22ceca05b5',
+      'reference' => '94918256daa6ac99c7e5774720c0e76f01936bda',
     ),
     'doctrine/common' => 
     array (
@@ -210,7 +211,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'ddfee26f80930b672c45bc6d95f21ca4880438ae',
+      'reference' => 'e1388fa9861f047ee51ec1842755ceffebbe52ed',
     ),
     'doctrine/persistence' => 
     array (
@@ -248,7 +249,17 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '5aa353d990c0d9542bc24d864ac20c85966ddb2b',
+      'reference' => '89e29e18c5527036a5180aee8fd1a12e38ffd2ed',
+    ),
+    'lukascivil/treewalker' => 
+    array (
+      'pretty_version' => 'dev-master',
+      'version' => 'dev-master',
+      'aliases' => 
+      array (
+        0 => '9999999-dev',
+      ),
+      'reference' => 'edc0b9c613732f4796c1b2574811b6ed658d6f9f',
     ),
     'myclabs/deep-copy' => 
     array (
@@ -337,6 +348,16 @@ private static $installed = array (
       ),
       'reference' => 'bae7c545bef187884426f042434e561ab1ddb182',
     ),
+    'php-ds/php-ds' => 
+    array (
+      'pretty_version' => 'dev-master',
+      'version' => 'dev-master',
+      'aliases' => 
+      array (
+        0 => '9999999-dev',
+      ),
+      'reference' => '5652e5870b20713ebe02182050df98aee5856d5b',
+    ),
     'php-http/async-client-implementation' => 
     array (
       'provided' => 
@@ -369,7 +390,7 @@ private static $installed = array (
       array (
         0 => '5.x-dev',
       ),
-      'reference' => 'f8d350d8514ff60b5993dd0121c62299480c989c',
+      'reference' => '8719cc12e2a57ec3432a76989bb4ef773ac75b63',
     ),
     'phpdocumentor/type-resolver' => 
     array (
@@ -407,7 +428,7 @@ private static $installed = array (
       array (
         0 => '3.0.x-dev',
       ),
-      'reference' => '8e1b28fa4315f9ab66b5a4ca4c93bd983361eefa',
+      'reference' => '85dd79ebb4c7394d29f134abd4db3c600ce2ef16',
     ),
     'phpunit/php-invoker' => 
     array (
@@ -417,7 +438,7 @@ private static $installed = array (
       array (
         0 => '3.1.x-dev',
       ),
-      'reference' => 'a46c3aae802b80c3442bd85006697666cd587441',
+      'reference' => '9f0c14d68458a25b29b42db99fb5c23a33479741',
     ),
     'phpunit/php-text-template' => 
     array (
@@ -427,7 +448,7 @@ private static $installed = array (
       array (
         0 => '2.0.x-dev',
       ),
-      'reference' => '9e01d4179f9caf8028d0ae48cd84a6427a581793',
+      'reference' => '523c1399af53f5457350c4df99b2ea8a3c1b302c',
     ),
     'phpunit/php-timer' => 
     array (
@@ -437,7 +458,7 @@ private static $installed = array (
       array (
         0 => '5.0.x-dev',
       ),
-      'reference' => '60a62b284ad6770a1fdc7e07bff609be5233edfb',
+      'reference' => '1e086856e0db1a8edd6e78b47e11145e40d74e39',
     ),
     'phpunit/phpunit' => 
     array (
@@ -446,14 +467,14 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'd41e3f632163be390e38fbeac4b1c3b810e6ef2a',
+      'reference' => '0421783c33f5a0bd297e02db2bd5f5d9f99699f5',
     ),
     'psalm/psalm' => 
     array (
       'provided' => 
       array (
-        0 => 'dev-master',
-        1 => '4.x-dev',
+        0 => '4.x-dev',
+        1 => 'dev-master',
       ),
     ),
     'psr/cache' => 
@@ -533,7 +554,7 @@ private static $installed = array (
       array (
         0 => '4.x-dev',
       ),
-      'reference' => 'e5b3699bbe04e18794a3b6e6e1e0443a9742e4ad',
+      'reference' => '90a87a75432831ec4882ddea9cf49ee9127130ef',
     ),
     'rhumsaa/uuid' => 
     array (
@@ -551,7 +572,7 @@ private static $installed = array (
       array (
         0 => '1.0.x-dev',
       ),
-      'reference' => '32fe3bd93f89a92c20992150d9b4a0353e33cb86',
+      'reference' => '8d7dbbf44288f39cd779eba000877a0a0ed323a9',
     ),
     'sebastian/code-unit' => 
     array (
@@ -570,7 +591,7 @@ private static $installed = array (
       array (
         0 => '2.0.x-dev',
       ),
-      'reference' => '0c90ae4074246c4576e341a4eb8a880965b0bfa0',
+      'reference' => '3044cb6b22a3cc3ab3d85d5b98bebb7e0a256074',
     ),
     'sebastian/comparator' => 
     array (
@@ -580,7 +601,7 @@ private static $installed = array (
       array (
         0 => '4.0.x-dev',
       ),
-      'reference' => '7507dc3ba34a0a01a771d4004db63cf2f69ad5ae',
+      'reference' => '5c05cfeac47b1dd4220a26f2a53526f26df8a664',
     ),
     'sebastian/complexity' => 
     array (
@@ -599,7 +620,7 @@ private static $installed = array (
       array (
         0 => '4.0.x-dev',
       ),
-      'reference' => '7e1b9f252c029cfd8a1aef17489db44565181128',
+      'reference' => 'fc54c741786379db0038137f46ca8d5f22499e60',
     ),
     'sebastian/environment' => 
     array (
@@ -609,7 +630,7 @@ private static $installed = array (
       array (
         0 => '5.1.x-dev',
       ),
-      'reference' => 'e403442971a53d2aba4bfb8d51f3c1e67cd0cc8f',
+      'reference' => '9427082157dcf06236628c998b2abdb44225a6e2',
     ),
     'sebastian/exporter' => 
     array (
@@ -619,7 +640,7 @@ private static $installed = array (
       array (
         0 => '4.0.x-dev',
       ),
-      'reference' => '24e3cf476cabd6d4b6f5a95ed2c06c2793b85429',
+      'reference' => 'c7b513206ca2da5be8c969184dc54624cce72c4c',
     ),
     'sebastian/global-state' => 
     array (
@@ -629,7 +650,7 @@ private static $installed = array (
       array (
         0 => '5.0.x-dev',
       ),
-      'reference' => '0f039e95ee9bd338306223844b449de04eb14cb4',
+      'reference' => '31023f78eef92ab1cc6c5625cfc03c0cecd461c6',
     ),
     'sebastian/lines-of-code' => 
     array (
@@ -648,7 +669,7 @@ private static $installed = array (
       array (
         0 => '4.0.x-dev',
       ),
-      'reference' => 'f2ae14774922039da37ba02727d006a00a5697d4',
+      'reference' => 'e6850adbed0155ed6582e2e6a0a0c32f7f06ee0c',
     ),
     'sebastian/object-reflector' => 
     array (
@@ -658,7 +679,7 @@ private static $installed = array (
       array (
         0 => '2.0.x-dev',
       ),
-      'reference' => 'aa101bb19453d2b29a6ab66c2489cd07a84af4cd',
+      'reference' => 'd61f2e1b28f1027e9903a8aa99b0fda9e79e55b2',
     ),
     'sebastian/recursion-context' => 
     array (
@@ -668,7 +689,7 @@ private static $installed = array (
       array (
         0 => '4.0.x-dev',
       ),
-      'reference' => '40cee94304292d3639df961c1b5d6eee0491eec3',
+      'reference' => '76964a313f58c93a2d072c644abf5beffa0adecc',
     ),
     'sebastian/resource-operations' => 
     array (
@@ -688,7 +709,7 @@ private static $installed = array (
       array (
         0 => '2.3.x-dev',
       ),
-      'reference' => '5101d5742b2ed2736e72111bcec63638648e0a5d',
+      'reference' => '875245f69e5e749626e7fb3ded71f8dc92cc4d0b',
     ),
     'sebastian/version' => 
     array (
@@ -698,6 +719,16 @@ private static $installed = array (
       array (
       ),
       'reference' => 'c6c1022351a901512170118436c764e473f6de8c',
+    ),
+    'swaggest/json-diff' => 
+    array (
+      'pretty_version' => 'dev-master',
+      'version' => 'dev-master',
+      'aliases' => 
+      array (
+        0 => '9999999-dev',
+      ),
+      'reference' => 'f373420bc21017a5a221cb70365e82d5fa64cc6a',
     ),
     'symfony/console' => 
     array (
@@ -811,7 +842,7 @@ private static $installed = array (
       array (
         0 => '1.23.x-dev',
       ),
-      'reference' => '298b87cbbe99cb2c9f88fb1d1de78833b64b483e',
+      'reference' => '9ad2f3c9de0273812c616fdf96070a129c3defcb',
     ),
     'symfony/polyfill-php73' => 
     array (
@@ -940,7 +971,7 @@ private static $installed = array (
       array (
         0 => '4.x-dev',
       ),
-      'reference' => 'ecd5e3b7ae7196aaea10befd02a8d18bbf631533',
+      'reference' => '123a9bc703286b4f8effca9f08bb11256088000e',
     ),
     'webmozart/assert' => 
     array (
