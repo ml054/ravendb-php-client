@@ -71,7 +71,7 @@ class CrudTest extends RemoteTestBase
                 $member1->setAge(4);
 
                 $member2 = new Member();
-                $member2->setName("RavenDB");
+                $member2->setName("RavenDB-new Entry");
                 $member2->setAge(4);
 
                 $family = new FamilyMembers();
@@ -90,6 +90,7 @@ class CrudTest extends RemoteTestBase
                  * @var FamilyMembers $newFamily
                  */
                 $newFamily = $session->load(FamilyMembers::class,"family/2");
+
                 AssertUtils::assertThat($newFamily)::isObject();
                 AssertUtils::assertThat($newFamily)::isInstanceOf(FamilyMembers::class);
 

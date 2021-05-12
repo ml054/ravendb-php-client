@@ -11,16 +11,8 @@ class JsonOperation
     /**
      * @throws \Exception
      */
-    public static function entityChanged(object $newObject, DocumentInfo $documentInfo, ArrayCollection $changes){
-        $docChanges = null !== $changes ? new ArrayCollection() : null;
-        if($documentInfo->isNewDocument() && null !== $documentInfo->getDocument()){
-
-        }
-
-        if(null === $changes){
-            return true;
-        }
-        self::newChange(null,null,null,null,$changes,Constants::CHANGE_TYPE_DOCUMENT_ADDED);
+    public static function entityChanged(?object $newObject=null, ?DocumentInfo $documentInfo=null, ?ArrayCollection $changes=null){
+       dd("Herere");
     }
 
     /**

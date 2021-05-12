@@ -28,6 +28,7 @@ use RavenDB\Client\Extensions\JsonExtensions;
 use RavenDB\Client\Http\RequestExecutor;
 use RavenDB\Client\Http\ServerNode;
 use RavenDB\Client\Infrastructure\Entities\User;
+use RavenDB\Client\Json\JsonOperation;
 use RavenDB\Client\Json\MetadataAsDictionary;
 use RavenDB\Client\Primitives\Closable;
 use RavenDB\Client\Util\ObjectMapper;
@@ -75,7 +76,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     private int $maxNumberOfRequestsPerSession;
     protected bool $generateDocumentKeysOnStore;
     private bool $_isDisposal;
-
+    protected Map $originalContent;
     /**
      * @psalm-return Map<string, DocumentInfo>
      */
@@ -95,6 +96,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
 
         $this->deferredCommandsMap = new Map();
         $this->includedDocumentsById = new ArrayCollection();
+        $this->originalContent = new Map();
 
         $saveChangesOptions = new IndexesWaitOptsBuilder($this);
         $this->_knownMissingIds = new ArrayCollection();
@@ -141,6 +143,9 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $this->useOptimisticConcurrency = $useOptimisticConcurrency;
     }
 
+    protected function entityChanged(?object $newObject=null, ?DocumentInfo $documentInfo=null, ?ArrayCollection $changes=null){
+        JsonOperation::entityChanged($newObject,$documentInfo,$changes);
+    }
     /**
      * @return int
      */
@@ -485,8 +490,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
         $documentInfo = $this->documentsByEntity->get($entity);
         if(null === $documentInfo) return false;
         // Serialize
-
-
     }
     /// CACHING METHOD FOR NOW OUT OF PHP MIGRATION SCOPE
     public function registerCounters(object $resultCounters, array $ids, array $countersToInclude, bool $gotAll):void {

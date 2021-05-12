@@ -55,6 +55,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
      */
     public function load(string $clazz, string $id, ?ArrayCollection $includes=null)
     {
+
         $loadOperation = new LoadOperation($this);
         $loadOperation->byId($id);
         $command = $loadOperation->createRequest();
@@ -63,6 +64,7 @@ class DocumentSession extends InMemoryDocumentSessionOperations
             $this->sessionInfo = new SessionInfo($this,$this->options,$this->documentStore);
             $this->_requestExecutor->execute($command,$this->sessionInfo);
             $loadOperation->setResult($command->getResult());
+            $this->originalContent->put($id,$command->getResult());
         }
         return $loadOperation->getDocument($clazz,$id);
     }
@@ -74,8 +76,9 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         return $this->storeInternal($entity,$id,$changeVector);
     }
 
-    public function saveChanges(){
+    public function saveChanges():void{
         $saveChangeOperation = new BatchOperation($this);
+        $this->hasChanges();
         try{
             $command = $saveChangeOperation->createRequest();
             $this->noTracking = false;
@@ -83,8 +86,8 @@ class DocumentSession extends InMemoryDocumentSessionOperations
             if($this->noTracking === true) {
                 throw new IllegalStateException("Cannot execute saveChanges when entity tracking is disabled in session.");
             }
-            $this->_requestExecutor->execute($command,null);
-            $saveChangeOperation->setResult($command->getResult());
+      //      $this->_requestExecutor->execute($command,null);
+     //       $saveChangeOperation->setResult($command->getResult());
         } finally {
             $this->close();
         }
@@ -119,12 +122,17 @@ class DocumentSession extends InMemoryDocumentSessionOperations
         return $this->externalState;
     }
 
-    public function hasChanges(object $entity): bool
+    public function hasChanges(): ?bool
     {
-        foreach($this->documentsByEntity as $entity){
+
+        foreach($this->documentsByEntity->entities() as $entityMap){
+            $entity = $entityMap->getKey();
+            $jsonNew = JsonExtensions::storeSerializer()->serialize($entity);
+            dd($entity);
             $document = JsonExtensions::storeSerializer()->serialize([$entity->getKey()=>$entity->getValue()]);
-            //dd($document);
+            dd($document);
         }
+        return false;
     }
 
     public function getMaxNumberOfRequestsPerSession(): int
@@ -230,7 +238,8 @@ class DocumentSession extends InMemoryDocumentSessionOperations
 
     public function whatChanged(): DocumentsChanges
     {
-        $changes = new ArrayCollection();
+        $changes = new Map();
+
     }
 
     public function waitForReplicationAfterSaveChanges(): void
