@@ -352,17 +352,15 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             // instance, and return that, ignoring anything new.
 
             if(null === $docInfo->getEntity() && null !== $document->getDocument()){
-                // TODO : OBJECT IS MAPPED BUT CHILD OBJECT IS MAP AS AN ARRAY LEADING TO ATTRIBUTE TYPE ERROR. TRANSFORMER TO CONSIDER
                 $normalize = JsonExtensions::storeSerializer()->serialize($document->getDocument(),'json');
                 $deserialize = JsonExtensions::storeSerializer()->deserialize($normalize,$entityType,'json');
-                $test = $document->getDocument();
+                return $deserialize;
             }
 
             if(!$noTracking){
                 $this->includedDocumentsById->remove($id);
                 $this->documentsByEntity->put($docInfo->getEntity(),$docInfo);
             }
-            dd($docInfo);
 
             return $docInfo->getEntity();
         }
