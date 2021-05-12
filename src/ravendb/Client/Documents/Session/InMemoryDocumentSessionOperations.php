@@ -342,7 +342,6 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     public function trackEntity(string $entityType, object $document, ?string $id=null, ?object $metadata=null, ?bool $noTracking=null)
     {
         $noTracking = $this->noTracking || $noTracking;
-
         if(empty($id)){
             throw new \Exception("TODO ".__METHOD__);
         }
@@ -363,6 +362,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
                 $this->includedDocumentsById->remove($id);
                 $this->documentsByEntity->put($docInfo->getEntity(),$docInfo);
             }
+            dd($docInfo);
 
             return $docInfo->getEntity();
         }
