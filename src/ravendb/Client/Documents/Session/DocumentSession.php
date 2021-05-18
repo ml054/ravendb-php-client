@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Ds\Map;
 use RavenDB\Client\Constants;
 use RavenDB\Client\Documents\Batches\ICommandData;
+use RavenDB\Client\Documents\Commands\GetDocumentsCommand;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStore;
 use RavenDB\Client\Documents\Linq\IDocumentQuery;
@@ -278,5 +279,14 @@ class DocumentSession extends InMemoryDocumentSessionOperations
      */
     public function hasChanged(object $entity): bool {
         return parent::hasChanged($entity);
+    }
+
+    public function refresh(object $entity) : void {
+        $documentInfo = $this->documentsByEntity->get($entity);
+        if(null === $documentInfo) throw new \Exception("Cannot refresh a transient instance");
+        $this->incrementRequestCount();
+        $command = new GetDocumentsCommand([$documentInfo->getId()],null,false);
+        $this->_requestExecutor->execute($command,$this->sessionInfo);
+        $this->refreshInternal($entity,$command,$documentInfo);
     }
 }

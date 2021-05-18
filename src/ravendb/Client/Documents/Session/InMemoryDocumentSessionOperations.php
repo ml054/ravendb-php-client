@@ -342,9 +342,25 @@ abstract class InMemoryDocumentSessionOperations implements Closable
     }
     public function refreshInternal(object $entity, GetDocumentsResult $cmd, DocumentInfo $documentInfo){
         $document = $cmd->getResult()->getResults()[0];
-        if(null === $document) throw new \InvalidArgumentException("Document '" . $documentInfo->getId() . "' no longer exists and was probably deleted")
+        if(null === $document) throw new \InvalidArgumentException("Document '" . $documentInfo->getId() . "' no longer exists and was probably deleted");
 
+        $docInfoToArray = JsonExtensions::storeSerializer()->normalize(($documentInfo),'json');
+        $value = $docInfoToArray[Constants::METADATA_KEY];
+        $documentInfo->setMetadata($value);
+
+        if(null !== $documentInfo){
+            $changeVector = $value[Constants::METADATA_CHANGE_VECTOR];
+            $documentInfo->setChangeVector($changeVector);
+        }
+
+        if(null !== $documentInfo->getEntity() && !$this->noTracking){
+            // TODO
+        }
+
+        dd($docInfoToArray);
     }
+
+
     public function prepareForCreatingRevisionsFromIds(SaveChangesData $result):void { }
     public function prepareCompareExchangeEntities(SaveChangesData $result):void { }
     /**
@@ -369,7 +385,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             // instance, and return that, ignoring anything new.
 
             if(null === $docInfo->getEntity() && null !== $document->getDocument()){
-                dd($docInfo->getMetadata());
+
                 $normalize = JsonExtensions::storeSerializer()->serialize($document->getDocument(),'json');
                 $deserialize = JsonExtensions::storeSerializer()->deserialize($normalize,$entityType,'json');
                 return $deserialize;
