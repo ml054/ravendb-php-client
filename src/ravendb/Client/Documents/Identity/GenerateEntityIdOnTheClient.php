@@ -15,4 +15,6 @@ class GenerateEntityIdOnTheClient
         $this->_generateId = $generateId;
     }
 
+    private function getIdentityProperty($entityType){
+    }
 }

@@ -18,6 +18,7 @@ use RavenDB\Client\Documents\Commands\Batches\BatchOptions;
 use RavenDB\Client\Documents\Commands\Batches\DeleteCommandData;
 use RavenDB\Client\Documents\Commands\Batches\IndexesWaitOptsBuilder;
 use RavenDB\Client\Documents\Commands\Batches\PutCommandDataWithJson;
+use RavenDB\Client\Documents\Commands\GetDocumentsResult;
 use RavenDB\Client\Documents\Conventions\DocumentConventions;
 use RavenDB\Client\Documents\DocumentStoreBase;
 use RavenDB\Client\Documents\IDocumentStore;
@@ -266,11 +267,22 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             }
         }
     }
+    public function ignoreChangesFor(object $entity):void{
 
+    }
+
+
+    protected function assertNoNonUniqueInstance(object $entity, string $id):void{
+        $info = $this->documentsById->getValue($id);
+        if(null === $info || $info->getEntity() === $entity){
+            return;
+        }
+        throw new \Exception("Attempted to associate a different object with id '" . $id ."'.");
+    }
     private function getDocumentInfo($instance){
         $documentInfo = $this->documentsByEntity->get($instance);
         if(null !== $documentInfo) return $documentInfo;
-        return null; // TODO COMPLETE WITH GENERATOR
+        return null;
     }
 
     public function getMetadataFor ($instance){
@@ -328,6 +340,11 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             $this->close();
         }
     }
+    public function refreshInternal(object $entity, GetDocumentsResult $cmd, DocumentInfo $documentInfo){
+        $document = $cmd->getResult()->getResults()[0];
+        if(null === $document) throw new \InvalidArgumentException("Document '" . $documentInfo->getId() . "' no longer exists and was probably deleted")
+
+    }
     public function prepareForCreatingRevisionsFromIds(SaveChangesData $result):void { }
     public function prepareCompareExchangeEntities(SaveChangesData $result):void { }
     /**
@@ -352,6 +369,7 @@ abstract class InMemoryDocumentSessionOperations implements Closable
             // instance, and return that, ignoring anything new.
 
             if(null === $docInfo->getEntity() && null !== $document->getDocument()){
+                dd($docInfo->getMetadata());
                 $normalize = JsonExtensions::storeSerializer()->serialize($document->getDocument(),'json');
                 $deserialize = JsonExtensions::storeSerializer()->deserialize($normalize,$entityType,'json');
                 return $deserialize;
